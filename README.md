@@ -1,4 +1,4 @@
-# Ecom README
+# :heavy_dollar_sign: Ecom README
 
 ## Quick Start
 
