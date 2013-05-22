@@ -22,7 +22,7 @@ import Ecom.Handler.Home
 -- This line actually creates our YesodDispatch instance. It is the second half
 -- of the call to mkYesodData which occurs in Foundation.hs. Please see the
 -- comments there for more details.
-mkYesodDispatch "App" resourcesApp
+mkYesodDispatch "Ecom" resourcesEcom
 
 -- This function allocates resources (such as a database connection pool),
 -- performs initialization and creates a WAI application. This is also the
@@ -47,12 +47,12 @@ makeApplication conf = do
 
 -- | Loads up any necessary settings, creates your foundation datatype, and
 -- performs some initialization.
-makeFoundation :: AppConfig DefaultEnv Extra -> IO App
+makeFoundation :: AppConfig DefaultEnv Extra -> IO Ecom
 makeFoundation conf = do
     manager <- newManager def
     s <- staticSite
     logger <- mkLogger True stdout
-    let foundation = App conf s manager logger
+    let foundation = Ecom conf s manager logger
 
     return foundation
 

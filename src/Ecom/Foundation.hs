@@ -18,7 +18,7 @@ import System.Log.FastLogger (Logger)
 -- keep settings and values requiring initialization before your application
 -- starts running, such as database connections. Every handler will have
 -- access to the data present here.
-data App = App
+data Ecom = Ecom
     { settings :: AppConfig DefaultEnv Extra
     , getStatic :: Static -- ^ Settings for static file serving.
     , httpManager :: Manager
@@ -26,7 +26,7 @@ data App = App
     }
 
 -- Set up i18n messages. See the message folder.
-mkMessage "App" "messages" "de"
+mkMessage "Ecom" "messages" "de"
 
 -- This is where we define all of the routes in our application. For a full
 -- explanation of the syntax, please see:
@@ -47,13 +47,13 @@ mkMessage "App" "messages" "de"
 -- for our application to be in scope. However, the handler functions
 -- usually require access to the AppRoute datatype. Therefore, we
 -- split these actions into two functions and place them in separate files.
-mkYesodData "App" $(parseRoutesFile "config/routes")
+mkYesodData "Ecom" $(parseRoutesFile "config/routes")
 
-type Form x = Html -> MForm (HandlerT App IO) (FormResult x, Widget)
+type Form x = Html -> MForm (HandlerT Ecom IO) (FormResult x, Widget)
 
 -- Please see the documentation for the Yesod typeclass. There are a number
 -- of settings which can be configured by overriding methods here.
-instance Yesod App where
+instance Yesod Ecom where
     approot = ApprootMaster $ appRoot . settings
 
     -- Store session data on the client in encrypted cookies,
@@ -110,7 +110,7 @@ instance Yesod App where
 
 -- This instance is required to use forms. You can modify renderMessage to
 -- achieve customized and internationalized form validation messages.
-instance RenderMessage App FormMessage where
+instance RenderMessage Ecom FormMessage where
     renderMessage _ _ = defaultFormMessage
 
 -- | Get the 'Extra' value, used to hold data from the settings.yml file.
