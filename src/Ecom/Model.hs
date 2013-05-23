@@ -20,6 +20,7 @@ import           Data.Data
 import           Data.Acid
 import           Data.Aeson           ((.=), (.:))
 import qualified Data.Aeson           as Aeson
+import qualified Data.Aeson.Encode.Pretty           as Aeson
 import           Data.String
 import           Data.ByteString.Lazy as BS
 import           Data.Text            (Text)
@@ -76,6 +77,19 @@ instance FromJSON ProductCategory where
 
 instance FromJSON ProductDescription where
     parseJSON v = ProductDescription <$> Aeson.parseJSON v
+
+
+-- im not sure if this the best solution (i guess it is not)
+instance ToJSON Product where
+    toJSON (Product
+            (ProductId id)
+            (ProductTitle title)
+            (ProductCategory cat)
+            (ProductDescription desc)) = object [ "productId"           .= id
+                                                , "productTitle"        .= title
+                                                , "productCategory"     .= cat
+                                                , "productDescription"  .= desc
+                                                ]
 
 
 ----------------------------------------------------------------------------------------------------
@@ -163,10 +177,11 @@ main :: IO ()
 main = do
     print "parse json"
 
-    bs <- BS.readFile "samples/product.json"
     --print bs
-    let mP = Aeson.decode bs :: Maybe Product
+    mP <- BS.readFile "samples/product.json" >>= return . Aeson.decode
     case mP of
         Nothing -> print $ "error"
-        Just p  -> print $ "Product: " ++ show p
+        Just p  -> do
+                    print $ "Product: " ++ show (p :: Product)
+                    BS.writeFile "samples/out.json" (Aeson.encodePretty p)
 --}
