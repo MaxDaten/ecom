@@ -10,21 +10,21 @@ TypeSynonymInstances, DeriveGeneric, DefaultSignatures #-}
 import           Prelude.Unicode
 import           Control.Applicative
 import           Control.Arrow
-import           Control.Monad        (mzero)
-import           Control.Monad.Reader (ask)
-import           Control.Monad.State  (get, put)
+import           Control.Monad              (mzero)
+import           Control.Monad.Reader       (ask)
+import           Control.Monad.State        (get, put)
 ----------------------------------------------------------------------------------------------------
-import           Data.IxSet           (Indexable (..), IxSet, (@=), (@<), (@>), Proxy (..), getOne, ixFun, ixSet)
-import qualified Data.IxSet           as IxSet
+import           Data.IxSet                 (Indexable (..), IxSet, (@=), (@<), (@>), Proxy (..), getOne, ixFun, ixSet)
+import qualified Data.IxSet                 as IxSet
 import           Data.Data
 import           Data.Acid
-import           Data.Aeson           ((.=), (.:))
-import qualified Data.Aeson           as Aeson
-import qualified Data.Aeson.Encode.Pretty           as Aeson
+import           Data.Aeson                 ((.=), (.:))
+import qualified Data.Aeson                 as Aeson
+import qualified Data.Aeson.Encode.Pretty   as Aeson
 import           Data.String
-import           Data.ByteString.Lazy as BS
-import           Data.Text            (Text)
-import           Data.SafeCopy        (SafeCopy, base, deriveSafeCopy)
+import           Data.ByteString.Lazy       as BS
+import           Data.Text                  (Text)
+import           Data.SafeCopy              (SafeCopy, base, deriveSafeCopy)
 import           GHC.Generics
 ----------------------------------------------------------------------------------------------------
 import           Yesod.Core
@@ -62,10 +62,10 @@ instance ToJSON Product where
 
 mkProduct :: ProductId -> Product
 mkProduct id =
-    Product { productId = id
-            , productTitle = ""
-            , productCategory = ""
-            , productDescription = ""
+    Product { productId             = id
+            , productTitle          = ""
+            , productCategory       = ""
+            , productDescription    = ""
             }
 
 ----------------------------------------------------------------------------------------------------
