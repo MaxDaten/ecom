@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP, UnicodeSyntax, TemplateHaskell, QuasiQuotes, DeriveDataTypeable
 , GeneralizedNewtypeDeriving, TypeFamilies, OverloadedStrings, RecordWildCards, FlexibleInstances,
-TypeSynonymInstances #-}
+TypeSynonymInstances, DeriveGeneric, DefaultSignatures #-}
 -- mainly inspired by
 -- https://github.com/HalfWayMan/meadowstalk.com/blob/a386797b7b1e470d841dbc9c2cc83b77de63fcab/src/Meadowstalk/Model.hs
 -- Model.hs
@@ -25,6 +25,7 @@ import           Data.String
 import           Data.ByteString.Lazy as BS
 import           Data.Text            (Text)
 import           Data.SafeCopy        (SafeCopy, base, deriveSafeCopy)
+import           GHC.Generics
 ----------------------------------------------------------------------------------------------------
 import           Yesod.Core
 ----------------------------------------------------------------------------------------------------
@@ -35,14 +36,14 @@ data Product = Product
     , productCategory       :: ProductCategory
     , productDescription    :: ProductDescription
     }
-    deriving (Eq, Ord, Data, Typeable, Show)
+    deriving (Eq, Ord, Data, Typeable, Show, Generic)
 
 newtype ProductId = ProductId { unPostId :: Integer }
-    deriving (Eq, Ord, Data, Enum, Typeable, SafeCopy, Show)
+    deriving ( Eq, Ord, Data, Enum, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
 
-newtype ProductTitle        = ProductTitle       Text   deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show)
-newtype ProductCategory     = ProductCategory    Text   deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show)
-newtype ProductDescription  = ProductDescription Text   deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show)
+newtype ProductTitle        = ProductTitle       Text   deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
+newtype ProductCategory     = ProductCategory    Text   deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
+newtype ProductDescription  = ProductDescription Text   deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 
 -- TH magic
 deriveSafeCopy 0 'base ''Product
@@ -55,42 +56,17 @@ instance Indexable Product where
         , ixFun $ \p -> [ productDescription p ]
         ]
 
--- sadly Data.Aeson.TH or Data.Aeson.Generic seems to be a bit tricky with wrapped types
--- so we hack the parsing manually, feel free to delete these lines
+-- seems to neccessary, for Product FromJSON and ToJSON are not derivable
 instance FromJSON Product where
-    parseJSON (Aeson.Object o) =
-        Product <$> o .: "productId"
-                <*> o .: "productTitle"
-                <*> o .: "productCategory"
-                <*> o .: "productDescription"
-    parseJSON _ = mzero
-
--- here comes the structual redundancy :(
-instance FromJSON ProductId where
-    parseJSON v = ProductId <$> Aeson.parseJSON v
-
-instance FromJSON ProductTitle where
-    parseJSON v = ProductTitle <$> Aeson.parseJSON v
-
-instance FromJSON ProductCategory where
-    parseJSON v = ProductCategory <$> Aeson.parseJSON v
-
-instance FromJSON ProductDescription where
-    parseJSON v = ProductDescription <$> Aeson.parseJSON v
-
-
--- im not sure if this the best solution (i guess it is not)
 instance ToJSON Product where
-    toJSON (Product
-            (ProductId id)
-            (ProductTitle title)
-            (ProductCategory cat)
-            (ProductDescription desc)) = object [ "productId"           .= id
-                                                , "productTitle"        .= title
-                                                , "productCategory"     .= cat
-                                                , "productDescription"  .= desc
-                                                ]
 
+mkProduct :: ProductId -> Product
+mkProduct id =
+    Product { productId = id
+            , productTitle = ""
+            , productCategory = ""
+            , productDescription = ""
+            }
 
 ----------------------------------------------------------------------------------------------------
 
@@ -122,12 +98,7 @@ putState = put
 newProduct :: Update EcomState Product
 newProduct = do
     ecom@EcomState{..} <- get
-    let product = Product
-            { productId          = nextProductId -- want to replace this with UUID, but now KISS
-            , productTitle       = ""
-            , productCategory    = ""
-            , productDescription = ""
-            }
+    let product = mkProduct nextProductId
     put $ ecom { nextProductId  = succ nextProductId
                , catalog        = IxSet.insert product catalog
                }
