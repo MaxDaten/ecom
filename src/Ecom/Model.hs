@@ -18,6 +18,7 @@ import           Data.IxSet                 (Indexable (..), IxSet, (@=), (@<), 
 import qualified Data.IxSet                 as IxSet
 import           Data.Data
 import           Data.Acid
+--import           Data.Acid.Memory
 import           Data.Aeson                 ((.=), (.:))
 import qualified Data.Aeson                 as Aeson
 import qualified Data.Aeson.Encode.Pretty   as Aeson
@@ -53,7 +54,7 @@ instance Indexable Product where
         [ ixFun $ \p -> [ productId          p ]
         , ixFun $ \p -> [ productTitle       p ]
         , ixFun $ \p -> [ productCategory    p ]
-        , ixFun $ \p -> [ productDescription p ]
+        --, ixFun $ \p -> [ productDescription p ]
         ]
 
 -- seems to neccessary, for Product FromJSON and ToJSON are not derivable
@@ -65,7 +66,7 @@ mkProduct id =
     Product { productId             = id
             , productTitle          = ""
             , productCategory       = ""
-            , productDescription    = ""
+            , productDescription    = "xyz"
             }
 
 ----------------------------------------------------------------------------------------------------
@@ -143,7 +144,7 @@ main = do
     closeAcidState state
 --}
 
---{- json test
+{- json test
 main :: IO ()
 main = do
     print "parse json"
