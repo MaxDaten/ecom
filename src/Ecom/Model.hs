@@ -66,7 +66,7 @@ mkProduct id =
     Product { productId             = id
             , productTitle          = ""
             , productCategory       = ""
-            , productDescription    = "xyz"
+            , productDescription    = ""
             }
 
 ----------------------------------------------------------------------------------------------------
