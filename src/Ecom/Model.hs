@@ -72,9 +72,9 @@ mkProduct id =
     Product { productId             = id
             , productTitle          = ""
             , productCategory       = ""
-            , productDescription    = "xyz"
             , productColor          = ""
             , productSize           = 0
+            , productDescription    = ""
             }
 
 ----------------------------------------------------------------------------------------------------
