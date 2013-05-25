@@ -35,6 +35,8 @@ data Product = Product
     { productId             :: ProductId
     , productTitle          :: ProductTitle
     , productCategory       :: ProductCategory
+    , productSize           :: ProductSize
+    , productColor          :: ProductColor
     , productDescription    :: ProductDescription
     }
     deriving (Eq, Ord, Data, Typeable, Show, Generic)
@@ -42,7 +44,9 @@ data Product = Product
 newtype ProductId = ProductId { unPostId :: Integer }
     deriving ( Eq, Ord, Data, Enum, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
 
+newtype ProductSize         = ProductSize        Int    deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 newtype ProductTitle        = ProductTitle       Text   deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
+newtype ProductColor        = ProductColor       Text   deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 newtype ProductCategory     = ProductCategory    Text   deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 newtype ProductDescription  = ProductDescription Text   deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 
@@ -54,6 +58,8 @@ instance Indexable Product where
         [ ixFun $ \p -> [ productId          p ]
         , ixFun $ \p -> [ productTitle       p ]
         , ixFun $ \p -> [ productCategory    p ]
+        , ixFun $ \p -> [ productSize        p ]
+        , ixFun $ \p -> [ productColor       p ]
         --, ixFun $ \p -> [ productDescription p ]
         ]
 
@@ -67,6 +73,8 @@ mkProduct id =
             , productTitle          = ""
             , productCategory       = ""
             , productDescription    = "xyz"
+            , productColor          = ""
+            , productSize           = 0
             }
 
 ----------------------------------------------------------------------------------------------------
