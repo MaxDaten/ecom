@@ -43,7 +43,7 @@ data Product = Product
 newtype ProductId = ProductId { unPostId :: Integer }
     deriving ( Eq, Ord, Data, Enum, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
 
-newtype ProductSize         = ProductSize        Int    deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
+newtype ProductSize         = ProductSize        Int    deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
 newtype ProductTitle        = ProductTitle       Text   deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 newtype ProductColor        = ProductColor       Text   deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 newtype ProductCategory     = ProductCategory    Text   deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
@@ -72,7 +72,7 @@ mkProduct id =
             , productTitle          = ""
             , productCategory       = ""
             , productColor          = ""
-            , productSize           = 0
+            , productSize           = ProductSize 0 -- maybe we will find some kind of autoboxing
             , productDescription    = ""
             }
 
