@@ -4,8 +4,7 @@ TypeSynonymInstances, DeriveGeneric, DefaultSignatures #-}
 -- mainly inspired by
 -- https://github.com/HalfWayMan/meadowstalk.com/blob/a386797b7b1e470d841dbc9c2cc83b77de63fcab/src/Meadowstalk/Model.hs
 -- Model.hs
- module Ecom.Model (
-    ) where
+ module Ecom.Model where
 ----------------------------------------------------------------------------------------------------
 import           Prelude.Unicode
 import           Control.Applicative
