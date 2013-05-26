@@ -16,12 +16,14 @@ Flag library-only
 library
     hs-source-dirs:    src
     exposed-modules: Ecom.Application
-                     Ecom.Foundation
                      Ecom.Import
                      Ecom.Settings
                      Ecom.Settings.StaticFiles
                      Ecom.Settings.Development
+                     Ecom.Model
+    other-modules:   Ecom.Foundation
                      Ecom.Handler.Home
+                     Ecom.Handler.Product
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -50,26 +52,36 @@ library
                  , yesod-auth                    >= 1.2        && < 1.3
                  , yesod-static                  >= 1.2        && < 1.3
                  , yesod-form                    >= 1.3        && < 1.4
+
                  , bytestring                    >= 0.9        && < 0.11
                  , text                          >= 0.11       && < 0.12
-                 , template-haskell
+
                  , hamlet                        >= 1.1        && < 1.2
                  , shakespeare-css               >= 1.0        && < 1.1
                  , shakespeare-js                >= 1.0.2      && < 1.2
                  , shakespeare-text              >= 1.0        && < 1.1
                  , hjsmin                        >= 0.1        && < 0.2
                  , monad-control                 >= 0.3        && < 0.4
+                 , mtl                           == 2.1.*
                  , wai-extra                     >= 1.3        && < 1.4
                  , yaml                          >= 0.8        && < 0.9
                  , http-conduit                  >= 1.9        && < 1.10
                  , directory                     >= 1.1        && < 1.3
                  , warp                          >= 1.3        && < 1.4
                  , data-default
+
+                 , acid-state                    == 0.8.*
                  , aeson                         == 0.6.*
                  , aeson-pretty                  >= 0.7
+                 , safecopy                      == 0.8.*
+                 , ixset                         == 1.0.*
+
                  , conduit                       >= 1.0
                  , monad-logger                  >= 0.3
                  , fast-logger                   >= 0.3
+
+                 , ghc-prim
+                 , template-haskell
 
 ----------------------------------------------------------------------------------------------------
 
@@ -78,10 +90,26 @@ executable         ecom
         Buildable: False
 
     main-is:           Main.hs
-    hs-source-dirs:    src
+    hs-source-dirs:    app
     build-depends:     base
                      , ecom
                      , yesod
+
+    ghc-options:       -threaded -O2
+
+----------------------------------------------------------------------------------------------------
+
+executable         state-manager
+    if flag(library-only)
+        Buildable: False
+
+    main-is:           StateManager.hs
+    hs-source-dirs:    tools
+    build-depends:     base
+                     , directory
+                     , ecom
+                     , yesod
+                     , acid-state           == 0.8.*
 
     ghc-options:       -threaded -O2
 
