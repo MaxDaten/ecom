@@ -1,28 +1,38 @@
 module Ecom.Foundation where
 
-import Prelude
-import Yesod
-import Yesod.Static
-import Yesod.Default.Config
-import Yesod.Default.Util (addStaticContentExternal)
-import Network.HTTP.Conduit (Manager)
-import qualified Ecom.Settings as Settings
-import Ecom.Settings.Development (development)
-import Ecom.Settings.StaticFiles
-import Ecom.Settings (widgetFile, Extra (..))
-import Text.Jasmine (minifym)
-import Text.Hamlet (hamletFile)
-import System.Log.FastLogger (Logger)
+import              Prelude
+import              Control.Applicative
+----------------------------------------------------------------------------------------------------
+import              Yesod
+import              Yesod.Static
+import              Yesod.Default.Config
+import              Yesod.Default.Util          (addStaticContentExternal)
+----------------------------------------------------------------------------------------------------
+import              Network.HTTP.Conduit        (Manager)
+import              Text.Jasmine                (minifym)
+import              Text.Hamlet                 (hamletFile)
+import              System.Log.FastLogger       (Logger)
+----------------------------------------------------------------------------------------------------
+import              Data.Acid
+import              Data.Acid.Advanced
+----------------------------------------------------------------------------------------------------
+import qualified    Ecom.Settings               as Settings
+import              Ecom.Settings.Development   (development)
+import              Ecom.Settings.StaticFiles
+import              Ecom.Settings               (widgetFile, Extra (..))
+import              Ecom.Model
+----------------------------------------------------------------------------------------------------
 
 -- | The site argument for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
 -- starts running, such as database connections. Every handler will have
 -- access to the data present here.
 data Ecom = Ecom
-    { settings :: AppConfig DefaultEnv Extra
-    , getStatic :: Static -- ^ Settings for static file serving.
-    , httpManager :: Manager
-    , appLogger :: Logger
+    { settings      :: AppConfig DefaultEnv Extra
+    , getStatic     :: Static -- ^ Settings for static file serving.
+    , httpManager   :: Manager
+    , getEcomState  :: AcidState EcomState
+    , appLogger     :: Logger
     }
 
 -- Set up i18n messages. See the message folder.
@@ -117,9 +127,14 @@ instance RenderMessage Ecom FormMessage where
 getExtra :: Handler Extra
 getExtra = fmap (appExtra . settings) getYesod
 
--- Note: previous versions of the scaffolding included a deliver function to
--- send emails. Unfortunately, there are too many different options for us to
--- give a reasonable default. Instead, the information is available on the
--- wiki:
---
--- https://github.com/yesodweb/yesod/wiki/Sending-email
+----------------------------------------------------------------------------------------------------
+
+acidQuery :: (QueryEvent event, MethodState event ~ EcomState) => event -> Handler (EventResult event)
+acidQuery q = do
+  state <- getEcomState <$> getYesod
+  query' state q
+
+acidUpdate :: (UpdateEvent event, MethodState event ~ EcomState) => event -> Handler (EventResult event)
+acidUpdate q = do
+  state <- getEcomState <$> getYesod
+  update' state q

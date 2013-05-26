@@ -6,18 +6,23 @@ module Ecom.Application
     ) where
 
 import Ecom.Import
+
 import Yesod.Default.Config
 import Yesod.Default.Main
 import Yesod.Default.Handlers
+
 import Network.Wai.Middleware.RequestLogger
 import Network.HTTP.Conduit (newManager, def)
 import Control.Monad.Logger (runLoggingT)
 import System.IO (stdout)
 import System.Log.FastLogger (mkLogger)
 
+import Data.Acid (openLocalState)
+
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
 import Ecom.Handler.Home
+import Ecom.Handler.Product
 
 -- This line actually creates our YesodDispatch instance. It is the second half
 -- of the call to mkYesodData which occurs in Foundation.hs. Please see the
@@ -50,9 +55,10 @@ makeApplication conf = do
 makeFoundation :: AppConfig DefaultEnv Extra -> IO Ecom
 makeFoundation conf = do
     manager <- newManager def
-    s <- staticSite
-    logger <- mkLogger True stdout
-    let foundation = Ecom conf s manager logger
+    s       <- staticSite
+    logger  <- mkLogger True stdout
+    state   <- openLocalState initialEcomState
+    let foundation = Ecom conf s manager state logger
 
     return foundation
 
