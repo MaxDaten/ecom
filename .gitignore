@@ -8,3 +8,4 @@ config/client_session_key.aes
 yesod-devel/
 state/
 *.sublime-*
+static/combined
