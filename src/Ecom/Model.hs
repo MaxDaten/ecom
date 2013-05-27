@@ -9,8 +9,6 @@ module Ecom.Model where
 --import           Prelude.Unicode
 import           Prelude
 import           Control.Applicative
-import           Control.Arrow
-import           Control.Monad              (mzero)
 import           Control.Monad.Reader       (ask)
 import           Control.Monad.State        (get, put)
 ----------------------------------------------------------------------------------------------------
@@ -18,14 +16,12 @@ import           Data.IxSet                 (Indexable (..), IxSet, (@=), (@<), 
 import qualified Data.IxSet                 as IxSet
 import           Data.Data
 import           Data.Acid
-import           Data.Acid.Memory
 import           Data.Aeson                 ((.=), (.:))
 import qualified Data.Aeson                 as Aeson
 import qualified Data.Aeson.Encode.Pretty   as Aeson
 import           Data.String
 import           Data.ByteString.Lazy       as BS
 import           Data.Text                  (Text)
---import           Text.Blaze                 (ToHtml)
 import           Data.SafeCopy              (SafeCopy, base, deriveSafeCopy)
 import           GHC.Generics
 ----------------------------------------------------------------------------------------------------
@@ -73,8 +69,8 @@ instance FromJSON Product where
 instance ToJSON Product where
 
 mkProduct :: ProductId -> Product
-mkProduct id =
-    Product { productId             = id
+mkProduct pid =
+    Product { productId             = pid
             , productTitle          = ""
             , productCategory       = ""
             , productColor          = ""
@@ -112,11 +108,11 @@ putState = put
 newProduct :: Update EcomState Product
 newProduct = do
     ecom@EcomState{..} <- get
-    let product = mkProduct nextProductId
+    let p = mkProduct nextProductId
     put $ ecom { nextProductId  = succ nextProductId
-               , catalog        = IxSet.insert product catalog
+               , catalog        = IxSet.insert p catalog
                }
-    return product
+    return p
 
 
 updateProduct :: Product -> Update EcomState ()
@@ -127,14 +123,14 @@ updateProduct p = do
 
 allProducts :: Query EcomState [Product]
 allProducts = do
-    ecom@EcomState{..} <- ask
+    EcomState{..} <- ask
     return $ IxSet.toDescList (Proxy :: Proxy ProductId) catalog
 
 
 productById :: ProductId -> Query EcomState (Maybe Product)
-productById porductId = do
-    ecom@EcomState{..} <- ask
-    return $ getOne $ catalog @= productId
+productById pid = do
+    EcomState{..} <- ask
+    return $ getOne $ catalog @= pid
 
 
 makeAcidic ''EcomState [ 'fetchState, 'putState
