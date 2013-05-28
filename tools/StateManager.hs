@@ -21,7 +21,7 @@ initializeStateWithSamplesFrom :: FilePath -> IO ()
 initializeStateWithSamplesFrom sampleFolder = do
 	state <- openLocalState initialEcomState
 	sampleFiles <- getDirectoryContents sampleFolder >>= return . filterSamples
-	print sampleFiles
+	
 	closeAcidState state
 	where 
 		filterSamples :: [FilePath] -> [FilePath]
