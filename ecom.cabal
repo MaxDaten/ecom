@@ -16,13 +16,13 @@ Flag library-only
 library
     hs-source-dirs:    src
     exposed-modules: Ecom.Application
+                     Ecom.Foundation
                      Ecom.Import
                      Ecom.Settings
                      Ecom.Settings.StaticFiles
                      Ecom.Settings.Development
                      Ecom.Model
-    other-modules:   Ecom.Foundation
-                     Ecom.Handler.Home
+    other-modules:   Ecom.Handler.Home
                      Ecom.Handler.Product
 
     if flag(dev) || flag(library-only)
@@ -124,7 +124,9 @@ test-suite test
 
     build-depends: base
                  , ecom
-                 , yesod-test >= 1.2 && < 1.3
+                 , yesod-test               >= 1.2 && < 1.3
+                 , bytestring               >= 0.9        && < 0.11
                  , yesod-core
+                 , aeson                    == 0.6.*
                  , yesod
                  , hspec

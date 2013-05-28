@@ -1,6 +1,8 @@
 {
-    "productId"             : 1,
-    "productTitle"          : "The First Product",
-    "productCategory"       : "Book",
-    "productDescription"    : "The story behind our first product"
+    "productId"             : 42,
+    "productTitle"          : "",
+    "productCategory"       : "",
+    "productSize"           : 0,
+    "productColor"          : "#000000",
+    "productDescription"    : ""
 }

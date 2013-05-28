@@ -4,20 +4,25 @@
 
 module Main where
 
-import Import
-import Yesod.Default.Config
-import Yesod.Test
-import Test.Hspec (hspec)
-import Application (makeFoundation)
+--import Ecom.Import
+--import Yesod.Default.Config
+--import Yesod.Test
+import Test.Hspec (hspec, describe)
+--import Ecom.Application (makeFoundation)
 
-import HomeTest
+--import HomeTest
+import ModelTest
 
 main :: IO ()
 main = do
-    conf <- Yesod.Default.Config.loadConfig $ (configSettings Testing)
-                { csParseExtra = parseExtra
-                }
-    foundation <- makeFoundation conf
+    --conf <- Yesod.Default.Config.loadConfig $ (configSettings Testing)
+    --            { csParseExtra = parseExtra
+    --            }
+    --foundation <- makeFoundation conf
     hspec $ do
-        yesodSpec foundation $ do
-            homeSpecs
+        --yesodSpec foundation $ do
+        --    homeSpecs
+
+
+        describe "parse product" $ do
+            modelSpecs

@@ -6,6 +6,6 @@ module TestImport
     ) where
 
 import Yesod.Test
-import Foundation
+import Ecom.Foundation as Foundation
 
-type Specs = YesodSpec App
+type Specs = YesodSpec Ecom
