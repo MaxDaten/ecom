@@ -77,6 +77,8 @@ library
                  , aeson-pretty                  >= 0.7
                  , safecopy                      == 0.8.*
                  , ixset                         == 1.0.*
+                 , containers                    == 0.4.*
+                 , vector                        == 0.10.*
 
                  , conduit                       >= 1.0
                  , monad-logger                  >= 0.3
@@ -125,9 +127,14 @@ test-suite test
 
     build-depends: base
                  , ecom
+
                  , yesod-test               >= 1.2 && < 1.3
-                 , bytestring               >= 0.9        && < 0.11
                  , yesod-core
-                 , aeson                    == 0.6.*
                  , yesod
+
                  , hspec
+                 , mtl                      == 2.1.*
+
+                 , bytestring               >= 0.9        && < 0.11
+                 , aeson                    == 0.6.*
+                 , uuid                     == 1.2.*
