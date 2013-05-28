@@ -1,6 +1,7 @@
 {-# LANGUAGE CPP, UnicodeSyntax, TemplateHaskell, QuasiQuotes, DeriveDataTypeable
 , GeneralizedNewtypeDeriving, TypeFamilies, OverloadedStrings, RecordWildCards, FlexibleInstances,
 TypeSynonymInstances, DeriveGeneric, DefaultSignatures, StandaloneDeriving #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 -- mainly inspired by
 -- https://github.com/HalfWayMan/meadowstalk.com/blob/a386797b7b1e470d841dbc9c2cc83b77de63fcab/src/Meadowstalk/Model.hs
 -- Model.hs
@@ -21,15 +22,12 @@ import qualified Data.Aeson                 as Aeson
 import qualified Data.Aeson.Encode.Pretty   as Aeson ()
 import           Data.String
 
-import qualified Data.ByteString.Lazy       as BS ()
 import           Data.Text                  (Text, unpack, pack)
 import           Data.Colour                ()
 import           Data.Colour.SRGB
 
 import           Data.SafeCopy              (SafeCopy (..), base, deriveSafeCopy)
-import           Data.ByteString.Lazy       as BS
-import           Data.Text                  (Text)
-import           Data.SafeCopy              (SafeCopy, base, deriveSafeCopy)
+import qualified Data.ByteString.Lazy       as BS
 import           GHC.Generics
 ----------------------------------------------------------------------------------------------------
 import           Yesod.Core
