@@ -18,7 +18,6 @@ import           Data.IxSet                 (Indexable (..), IxSet, (@=), Proxy 
 import qualified Data.IxSet                 as IxSet
 import           Data.Set                   (Set)
 import qualified Data.Set                   as Set
-import qualified Data.Vector                as Vector
 import           Data.Data
 import           Data.Acid
 import qualified Data.Aeson                 as Aeson
@@ -33,7 +32,6 @@ import           Data.SafeCopy              (SafeCopy (..), base, deriveSafeCopy
 import           Data.UUID
 import           Data.UUID                  as UUID
 import           Data.UUID.V4
---import Control.Monad.Trans     ( MonadIO(liftIO) )
 import           GHC.Generics
 ----------------------------------------------------------------------------------------------------
 import           Yesod.Core
@@ -60,9 +58,9 @@ instance PathPiece UUID where
     fromPathPiece = UUID.fromString . unpack
     toPathPiece uuid = toPathPiece $ UUID.toString uuid
 
--- set for sizes, colors
-newtype ProductSize         = ProductSize        Int                deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
+
 newtype ProductColor        = ProductColor       (RGB Double)       deriving (Eq, Ord, Data, Typeable, Show, Generic)
+newtype ProductSize         = ProductSize        Int                deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
 newtype ProductTitle        = ProductTitle       Text               deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 newtype ProductCategory     = ProductCategory    Text               deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 newtype ProductDescription  = ProductDescription Text               deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
@@ -80,6 +78,7 @@ deriveSafeCopy 0 'base ''RGB
 deriveSafeCopy 0 'base ''ProductId
 deriveSafeCopy 0 'base ''UUID
 
+----------------------------------------------------------------------------------------------------
 instance Indexable Product where
     empty = ixSet
         [ ixFun $ \p -> [ productId          p ]
@@ -87,10 +86,9 @@ instance Indexable Product where
         , ixFun $ \p -> [ productCategory    p ]
         , ixFun $ \p -> Set.toList $ productSizes  p
         , ixFun $ \p -> Set.toList $ productColors p
-        --, ixFun $ \p -> [ productDescription p ]
         ]
+----------------------------------------------------------------------------------------------------
 
--- seems to neccessary, for Product FromJSON and ToJSON are not derivable
 instance FromJSON Product
 instance ToJSON Product
 
@@ -116,6 +114,7 @@ instance FromJSON (RGB Double) where
 instance ToJSON (RGB Double) where
     toJSON (RGB r g b) = Aeson.String . pack . sRGB24show $ sRGB r g b
 
+----------------------------------------------------------------------------------------------------
 
 mkProduct :: ProductId -> Product
 mkProduct pid =
@@ -123,7 +122,7 @@ mkProduct pid =
             , productTitle          = ""
             , productCategory       = ""
             , productColors         = Set.singleton (ProductColor $ RGB 0 0 0)
-            , productSizes          = Set.singleton (ProductSize 0) -- TODO: maybe we will find some kind of autoboxing, if desired?
+            , productSizes          = Set.singleton (ProductSize 0)
             , productDescription    = ""
             }
 
