@@ -6,5 +6,7 @@ $if null allProducts
 $else
     <ul>
         $forall product <- allProducts
-            <li>#{show product}
+            <li>
+                <a href="@{ProductR (productId product)}">
+                    #{show (productTitle product)}
 
