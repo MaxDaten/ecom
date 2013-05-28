@@ -2,7 +2,6 @@
 module Ecom.Handler.Home where
 
 import Ecom.Import
-import Data.Text hiding (null)
 
 -- This is a handler function for the GET request method on the HomeR
 -- resource pattern. All of your resource patterns are defined in
@@ -13,7 +12,7 @@ import Data.Text hiding (null)
 -- inclined, or create a single monolithic file.
 getHomeR :: Handler RepHtml
 getHomeR = do
-    allProducts               <- acidQuery (AllProducts)
+    allProducts <- acidQuery (AllProducts)
     defaultLayout $ do
         aDomId <- newIdent
         setTitle "Welcome To Yesod!"
