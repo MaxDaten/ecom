@@ -1,8 +1,8 @@
 {
-    "productId"             : 42,
+    "productId"             : "00000000-0000-0000-0000-000000000000",
     "productTitle"          : "",
     "productCategory"       : "",
-    "productSize"           : 0,
-    "productColor"          : "#000000",
+    "productSizes"          : [0],
+    "productColors"         : ["#000000"],
     "productDescription"    : ""
 }

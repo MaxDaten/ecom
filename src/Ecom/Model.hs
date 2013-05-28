@@ -1,4 +1,4 @@
-{-# LANGUAGE CPP, UnicodeSyntax, TemplateHaskell, QuasiQuotes, DeriveDataTypeable
+{-# LANGUAGE TemplateHaskell, QuasiQuotes, DeriveDataTypeable
 , GeneralizedNewtypeDeriving, TypeFamilies, OverloadedStrings, RecordWildCards, FlexibleInstances,
 TypeSynonymInstances, DeriveGeneric, DefaultSignatures, StandaloneDeriving #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
@@ -16,6 +16,9 @@ import           Control.Monad.State        (get, put)
 ----------------------------------------------------------------------------------------------------
 import           Data.IxSet                 (Indexable (..), IxSet, (@=), Proxy (..), getOne, ixFun, ixSet)
 import qualified Data.IxSet                 as IxSet
+import           Data.Set                   (Set)
+import qualified Data.Set                   as Set
+import qualified Data.Vector                as Vector
 import           Data.Data
 import           Data.Acid
 import qualified Data.Aeson                 as Aeson
@@ -40,8 +43,8 @@ data Product = Product
     { productId             :: ProductId
     , productTitle          :: ProductTitle
     , productCategory       :: ProductCategory
-    , productSize           :: ProductSize
-    , productColor          :: ProductColor
+    , productSizes          :: ProductSizes
+    , productColors         :: ProductColors
     , productDescription    :: ProductDescription
     }
     deriving (Eq, Ord, Data, Typeable, Show, Generic)
@@ -57,9 +60,10 @@ instance PathPiece UUID where
     fromPathPiece = UUID.fromString . unpack
     toPathPiece uuid = toPathPiece $ UUID.toString uuid
 
-newtype ProductSize         = ProductSize        Int            deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
+-- set for sizes, colors
+newtype ProductSizes        = ProductSizes       (Set Int)        deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
 newtype ProductTitle        = ProductTitle       Text           deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
-newtype ProductColor        = ProductColor      (RGB Double)    deriving (Eq, Ord, Data, Typeable, Show, Generic)
+newtype ProductColors       = ProductColors      (Set (RGB Double))    deriving (Eq, Ord, Data, Typeable, Show, Generic)
 newtype ProductCategory     = ProductCategory    Text           deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 newtype ProductDescription  = ProductDescription Text           deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 
@@ -71,7 +75,7 @@ deriving instance Ord a => Ord (RGB a)
 
 -- TH magic
 deriveSafeCopy 0 'base ''Product
-deriveSafeCopy 0 'base ''ProductColor
+deriveSafeCopy 0 'base ''ProductColors
 deriveSafeCopy 0 'base ''RGB
 deriveSafeCopy 0 'base ''ProductId
 deriveSafeCopy 0 'base ''UUID
@@ -81,8 +85,8 @@ instance Indexable Product where
         [ ixFun $ \p -> [ productId          p ]
         , ixFun $ \p -> [ productTitle       p ]
         , ixFun $ \p -> [ productCategory    p ]
-        , ixFun $ \p -> [ productSize        p ]
-        , ixFun $ \p -> [ productColor       p ]
+        , ixFun $ \p -> [ productSizes       p ]
+        , ixFun $ \p -> [ productColors      p ]
         --, ixFun $ \p -> [ productDescription p ]
         ]
 
@@ -106,12 +110,21 @@ instance ToJSON ProductId where
 
 
 -- custom json: we will write/read hex codes
-instance FromJSON ProductColor where
-    parseJSON (Aeson.String v) = return $ ProductColor . toSRGB . sRGB24read . unpack $ v
+instance FromJSON ProductColors where
+    parseJSON (Aeson.Array a) = do
+        parsedColors <- mapM parseJSON (Vector.toList a)
+        let colors = map unProductColor parsedColors
+        return $ ProductColors $ Set.unions colors
+        where unProductColor (ProductColors colorSet) = colorSet
+
+    parseJSON (Aeson.String s) = return $ ProductColors . Set.singleton . toSRGB . sRGB24read . unpack $ s
     parseJSON _ = mzero
 
-instance ToJSON ProductColor where
-    toJSON (ProductColor (RGB r g b)) = Aeson.String . pack . sRGB24show $ sRGB r g b
+instance ToJSON ProductColors where
+    toJSON (ProductColors (colorSet)) = Aeson.Array $ Vector.fromList $ map toJSON $ Set.elems colorSet
+
+instance ToJSON (RGB Double) where
+    toJSON (RGB r g b) = Aeson.String . pack . sRGB24show $ sRGB r g b
 
 
 mkProduct :: ProductId -> Product
@@ -119,10 +132,15 @@ mkProduct pid =
     Product { productId             = pid
             , productTitle          = ""
             , productCategory       = ""
-            , productColor          = ProductColor $ RGB 0 0 0
-            , productSize           = ProductSize 0 -- TODO: maybe we will find some kind of autoboxing, if desired?
+            , productColors         = ProductColors $ Set.singleton (RGB 0 0 0)
+            , productSizes           = ProductSizes $ Set.singleton 0 -- TODO: maybe we will find some kind of autoboxing, if desired?
             , productDescription    = ""
             }
+
+genProduct :: (MonadIO m) => m Product
+genProduct = do
+    uuid <- liftIO nextRandom
+    return $ mkProduct (ProductId uuid)
 
 ----------------------------------------------------------------------------------------------------
 
