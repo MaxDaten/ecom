@@ -17,16 +17,19 @@ import           Data.IxSet                 (Indexable (..), IxSet, (@=), Proxy 
 import qualified Data.IxSet                 as IxSet
 import           Data.Data
 import           Data.Acid
---import           Data.Aeson                 ((.=), (.:))
 import qualified Data.Aeson                 as Aeson
 import qualified Data.Aeson.Encode.Pretty   as Aeson ()
 import           Data.String
+
 import qualified Data.ByteString.Lazy       as BS ()
 import           Data.Text                  (Text, unpack, pack)
 import           Data.Colour                ()
 import           Data.Colour.SRGB
---import           Text.Blaze                 (ToHtml)
+
 import           Data.SafeCopy              (SafeCopy (..), base, deriveSafeCopy)
+import           Data.ByteString.Lazy       as BS
+import           Data.Text                  (Text)
+import           Data.SafeCopy              (SafeCopy, base, deriveSafeCopy)
 import           GHC.Generics
 ----------------------------------------------------------------------------------------------------
 import           Yesod.Core
@@ -129,11 +132,11 @@ putState = put
 newProduct :: Update EcomState Product
 newProduct = do
     ecom@EcomState{..} <- get
-    let product = mkProduct nextProductId
+    let p = mkProduct nextProductId
     put $ ecom { nextProductId  = succ nextProductId
-               , catalog        = IxSet.insert product catalog
+               , catalog        = IxSet.insert p catalog
                }
-    return product
+    return p
 
 
 updateProduct :: Product -> Update EcomState ()
