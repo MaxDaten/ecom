@@ -43,8 +43,8 @@ data Product = Product
     { productId             :: ProductId
     , productTitle          :: ProductTitle
     , productCategory       :: ProductCategory
-    , productSizes          :: ProductSizes
-    , productColors         :: ProductColors
+    , productSizes          :: Set ProductSize
+    , productColors         :: Set ProductColor
     , productDescription    :: ProductDescription
     }
     deriving (Eq, Ord, Data, Typeable, Show, Generic)
@@ -61,11 +61,11 @@ instance PathPiece UUID where
     toPathPiece uuid = toPathPiece $ UUID.toString uuid
 
 -- set for sizes, colors
-newtype ProductSizes        = ProductSizes       (Set Int)        deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
-newtype ProductTitle        = ProductTitle       Text           deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
-newtype ProductColors       = ProductColors      (Set (RGB Double))    deriving (Eq, Ord, Data, Typeable, Show, Generic)
-newtype ProductCategory     = ProductCategory    Text           deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
-newtype ProductDescription  = ProductDescription Text           deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
+newtype ProductSize         = ProductSize        Int                deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
+newtype ProductColor        = ProductColor       (RGB Double)       deriving (Eq, Ord, Data, Typeable, Show, Generic)
+newtype ProductTitle        = ProductTitle       Text               deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
+newtype ProductCategory     = ProductCategory    Text               deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
+newtype ProductDescription  = ProductDescription Text               deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 
 
 deriving instance Data a => Data (RGB a)
@@ -75,7 +75,7 @@ deriving instance Ord a => Ord (RGB a)
 
 -- TH magic
 deriveSafeCopy 0 'base ''Product
-deriveSafeCopy 0 'base ''ProductColors
+deriveSafeCopy 0 'base ''ProductColor
 deriveSafeCopy 0 'base ''RGB
 deriveSafeCopy 0 'base ''ProductId
 deriveSafeCopy 0 'base ''UUID
@@ -85,8 +85,8 @@ instance Indexable Product where
         [ ixFun $ \p -> [ productId          p ]
         , ixFun $ \p -> [ productTitle       p ]
         , ixFun $ \p -> [ productCategory    p ]
-        , ixFun $ \p -> [ productSizes       p ]
-        , ixFun $ \p -> [ productColors      p ]
+        , ixFun $ \p -> Set.toList $ productSizes  p
+        , ixFun $ \p -> Set.toList $ productColors p
         --, ixFun $ \p -> [ productDescription p ]
         ]
 
@@ -94,6 +94,8 @@ instance Indexable Product where
 instance FromJSON Product
 instance ToJSON Product
 
+deriving instance FromJSON ProductColor
+deriving instance ToJSON ProductColor
 
 
 instance FromJSON ProductId where
@@ -107,21 +109,9 @@ instance FromJSON ProductId where
 instance ToJSON ProductId where
     toJSON (ProductId uuid) = Aeson.String . pack . toString $ uuid
 
-
-
--- custom json: we will write/read hex codes
-instance FromJSON ProductColors where
-    parseJSON (Aeson.Array a) = do
-        parsedColors <- mapM parseJSON (Vector.toList a)
-        let colors = map unProductColor parsedColors
-        return $ ProductColors $ Set.unions colors
-        where unProductColor (ProductColors colorSet) = colorSet
-
-    parseJSON (Aeson.String s) = return $ ProductColors . Set.singleton . toSRGB . sRGB24read . unpack $ s
+instance FromJSON (RGB Double) where
+    parseJSON (Aeson.String s) = return $ toSRGB . sRGB24read . unpack $ s
     parseJSON _ = mzero
-
-instance ToJSON ProductColors where
-    toJSON (ProductColors (colorSet)) = Aeson.Array $ Vector.fromList $ map toJSON $ Set.elems colorSet
 
 instance ToJSON (RGB Double) where
     toJSON (RGB r g b) = Aeson.String . pack . sRGB24show $ sRGB r g b
@@ -132,8 +122,8 @@ mkProduct pid =
     Product { productId             = pid
             , productTitle          = ""
             , productCategory       = ""
-            , productColors         = ProductColors $ Set.singleton (RGB 0 0 0)
-            , productSizes           = ProductSizes $ Set.singleton 0 -- TODO: maybe we will find some kind of autoboxing, if desired?
+            , productColors         = Set.singleton (ProductColor $ RGB 0 0 0)
+            , productSizes          = Set.singleton (ProductSize 0) -- TODO: maybe we will find some kind of autoboxing, if desired?
             , productDescription    = ""
             }
 
