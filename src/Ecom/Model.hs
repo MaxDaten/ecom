@@ -1,6 +1,6 @@
 {-# LANGUAGE CPP, UnicodeSyntax, TemplateHaskell, QuasiQuotes, DeriveDataTypeable
 , GeneralizedNewtypeDeriving, TypeFamilies, OverloadedStrings, RecordWildCards, FlexibleInstances,
-TypeSynonymInstances, DeriveGeneric, DefaultSignatures #-}
+TypeSynonymInstances, DeriveGeneric, DefaultSignatures, StandaloneDeriving #-}
 -- mainly inspired by
 -- https://github.com/HalfWayMan/meadowstalk.com/blob/a386797b7b1e470d841dbc9c2cc83b77de63fcab/src/Meadowstalk/Model.hs
 -- Model.hs
@@ -9,24 +9,24 @@ module Ecom.Model where
 --import           Prelude.Unicode
 import           Prelude
 import           Control.Applicative
-import           Control.Arrow
 import           Control.Monad              (mzero)
 import           Control.Monad.Reader       (ask)
 import           Control.Monad.State        (get, put)
 ----------------------------------------------------------------------------------------------------
-import           Data.IxSet                 (Indexable (..), IxSet, (@=), (@<), (@>), Proxy (..), getOne, ixFun, ixSet)
+import           Data.IxSet                 (Indexable (..), IxSet, (@=), Proxy (..), getOne, ixFun, ixSet)
 import qualified Data.IxSet                 as IxSet
 import           Data.Data
 import           Data.Acid
-import           Data.Acid.Memory
-import           Data.Aeson                 ((.=), (.:))
+--import           Data.Aeson                 ((.=), (.:))
 import qualified Data.Aeson                 as Aeson
-import qualified Data.Aeson.Encode.Pretty   as Aeson
+import qualified Data.Aeson.Encode.Pretty   as Aeson ()
 import           Data.String
-import           Data.ByteString.Lazy       as BS
-import           Data.Text                  (Text)
+import qualified Data.ByteString.Lazy       as BS ()
+import           Data.Text                  (Text, unpack, pack)
+import           Data.Colour                ()
+import           Data.Colour.SRGB
 --import           Text.Blaze                 (ToHtml)
-import           Data.SafeCopy              (SafeCopy, base, deriveSafeCopy)
+import           Data.SafeCopy              (SafeCopy (..), base, deriveSafeCopy)
 import           GHC.Generics
 ----------------------------------------------------------------------------------------------------
 import           Yesod.Core
@@ -47,16 +47,24 @@ newtype ProductId = ProductId { unPostId :: Integer }
 
 instance PathPiece ProductId where
     fromPathPiece x             = ProductId <$> fromPathPiece x
-    toPathPiece (ProductId id)  = toPathPiece id
+    toPathPiece (ProductId pid)  = toPathPiece pid
 
-newtype ProductSize         = ProductSize        Int    deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
-newtype ProductTitle        = ProductTitle       Text   deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
-newtype ProductColor        = ProductColor       Text   deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
-newtype ProductCategory     = ProductCategory    Text   deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
-newtype ProductDescription  = ProductDescription Text   deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
+newtype ProductSize         = ProductSize        Int            deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
+newtype ProductTitle        = ProductTitle       Text           deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
+newtype ProductColor        = ProductColor      (RGB Double)    deriving (Eq, Ord, Data, Typeable, Show, Generic)
+newtype ProductCategory     = ProductCategory    Text           deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
+newtype ProductDescription  = ProductDescription Text           deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
+
+
+deriving instance Data a => Data (RGB a)
+deriving instance Typeable1 RGB
+deriving instance Ord a => Ord (RGB a)
+
 
 -- TH magic
 deriveSafeCopy 0 'base ''Product
+deriveSafeCopy 0 'base ''ProductColor
+deriveSafeCopy 0 'base ''RGB
 
 instance Indexable Product where
     empty = ixSet
@@ -69,15 +77,24 @@ instance Indexable Product where
         ]
 
 -- seems to neccessary, for Product FromJSON and ToJSON are not derivable
-instance FromJSON Product where
-instance ToJSON Product where
+instance FromJSON Product
+instance ToJSON Product
+
+-- custom json: we will write/read hex codes
+instance FromJSON ProductColor where
+    parseJSON (Aeson.String v) = return $ ProductColor . toSRGB . sRGB24read . unpack $ v
+    parseJSON _ = mzero
+
+instance ToJSON ProductColor where
+    toJSON (ProductColor (RGB r g b)) = Aeson.String . pack . sRGB24show $ sRGB r g b
+
 
 mkProduct :: ProductId -> Product
-mkProduct id =
-    Product { productId             = id
+mkProduct pid =
+    Product { productId             = pid
             , productTitle          = ""
             , productCategory       = ""
-            , productColor          = ""
+            , productColor          = ProductColor $ RGB 0 0 0
             , productSize           = ProductSize 0 -- TODO: maybe we will find some kind of autoboxing, if desired?
             , productDescription    = ""
             }
@@ -127,14 +144,14 @@ updateProduct p = do
 
 allProducts :: Query EcomState [Product]
 allProducts = do
-    ecom@EcomState{..} <- ask
+    EcomState{..} <- ask
     return $ IxSet.toDescList (Proxy :: Proxy ProductId) catalog
 
 
 productById :: ProductId -> Query EcomState (Maybe Product)
-productById porductId = do
-    ecom@EcomState{..} <- ask
-    return $ getOne $ catalog @= productId
+productById pid = do
+    EcomState{..} <- ask
+    return $ getOne $ catalog @= pid
 
 
 makeAcidic ''EcomState [ 'fetchState, 'putState
