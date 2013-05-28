@@ -27,7 +27,10 @@ import           Data.Colour                ()
 import           Data.Colour.SRGB
 
 import           Data.SafeCopy              (SafeCopy (..), base, deriveSafeCopy)
-import qualified Data.ByteString.Lazy       as BS
+import           Data.UUID
+import           Data.UUID                  as UUID
+import           Data.UUID.V4
+--import Control.Monad.Trans     ( MonadIO(liftIO) )
 import           GHC.Generics
 ----------------------------------------------------------------------------------------------------
 import           Yesod.Core
@@ -43,12 +46,16 @@ data Product = Product
     }
     deriving (Eq, Ord, Data, Typeable, Show, Generic)
 
-newtype ProductId = ProductId { unPostId :: Integer }
-    deriving (Eq, Ord, Data, Enum, Typeable, SafeCopy, Read, Show, Generic, ToJSON, FromJSON)
+newtype ProductId = ProductId { unPostId :: UUID }
+    deriving (Eq, Ord, Data, Typeable, Read, Show, Generic)
 
 instance PathPiece ProductId where
     fromPathPiece x             = ProductId <$> fromPathPiece x
     toPathPiece (ProductId pid)  = toPathPiece pid
+
+instance PathPiece UUID where
+    fromPathPiece = UUID.fromString . unpack
+    toPathPiece uuid = toPathPiece $ UUID.toString uuid
 
 newtype ProductSize         = ProductSize        Int            deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
 newtype ProductTitle        = ProductTitle       Text           deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
@@ -66,6 +73,8 @@ deriving instance Ord a => Ord (RGB a)
 deriveSafeCopy 0 'base ''Product
 deriveSafeCopy 0 'base ''ProductColor
 deriveSafeCopy 0 'base ''RGB
+deriveSafeCopy 0 'base ''ProductId
+deriveSafeCopy 0 'base ''UUID
 
 instance Indexable Product where
     empty = ixSet
@@ -80,6 +89,21 @@ instance Indexable Product where
 -- seems to neccessary, for Product FromJSON and ToJSON are not derivable
 instance FromJSON Product
 instance ToJSON Product
+
+
+
+instance FromJSON ProductId where
+    parseJSON (Aeson.String v) = do
+        let mUuid = UUID.fromString . unpack $ v
+        case mUuid of
+            (Just uuid) -> return $ ProductId uuid
+            _ -> mzero
+    parseJSON _ = mzero
+
+instance ToJSON ProductId where
+    toJSON (ProductId uuid) = Aeson.String . pack . toString $ uuid
+
+
 
 -- custom json: we will write/read hex codes
 instance FromJSON ProductColor where
@@ -103,8 +127,7 @@ mkProduct pid =
 ----------------------------------------------------------------------------------------------------
 
 data EcomState = EcomState
-    { nextProductId :: ProductId
-    , catalog       :: IxSet Product
+    { catalog       :: IxSet Product
     }
     deriving (Data, Typeable)
 
@@ -112,8 +135,7 @@ deriveSafeCopy 0 'base ''EcomState
 
 
 initialEcomState :: EcomState
-initialEcomState = EcomState { nextProductId = ProductId 1
-                             , catalog = IxSet.empty
+initialEcomState = EcomState { catalog = IxSet.empty
                              }
 
 ----------------------------------------------------------------------------------------------------
@@ -127,13 +149,13 @@ putState :: EcomState -> Update EcomState ()
 putState = put
 
 
-newProduct :: Update EcomState Product
-newProduct = do
+insertProduct :: Product -> Update EcomState Product
+insertProduct p = do
     ecom@EcomState{..} <- get
-    let p = mkProduct nextProductId
-    put $ ecom { nextProductId  = succ nextProductId
-               , catalog        = IxSet.insert p catalog
-               }
+    --nextProductId <- liftIO nextRandom
+    --let p = mkProduct $ ProductId nextProductId
+
+    put $ ecom { catalog = IxSet.insert p catalog }
     return p
 
 
@@ -156,7 +178,7 @@ productById pid = do
 
 
 makeAcidic ''EcomState [ 'fetchState, 'putState
-                       , 'newProduct
+                       , 'insertProduct
                        , 'updateProduct
                        , 'allProducts
                        , 'productById
@@ -176,8 +198,10 @@ main = do
     allP <- query state AllProducts
     print $ "currently all products: " ++ show allP
 
-    newP@Product{..} <- update state NewProduct
-    update state (UpdateProduct newP {productTitle = "The Book about Worms", productCategory = "Book", productDescription = "a book about worms"})
+    uuid <- nextRandom
+    let prod = mkProduct (ProductId uuid)
+    newP@Product{..} <- update state (InsertProduct prod)
+    --update state (UpdateProduct newP {productTitle = "The Book about Worms", productCategory = "Book", productDescription = "a book about worms"})
 
     allP <- query state AllProducts
     print $ "now all products: " ++ show allP
