@@ -49,8 +49,8 @@ mostly folderwise explanations:
 * `.ghci` : language pragams for a ghci session
 * `.gitignore` : all mateched files will be ignored by git [.gitignore](https://www.kernel.org/pub/software/scm/git/docs/gitignore.html)
 * `devel.hs` : yesod generated (just sligtly modified by MaxDaten)
+* `app` : the main wrapper of the Ecom lib
 * `src` : added by me for the really important source files (it's a way better than dangling files in root (see a yesod init project)
-    * `Main` : Just a hook for yesod (mostly to ignore)
     * `Ecom`
         * `Application` : just app creation and settings reading
         * `Foundations` : binding important yesod functions for operation
@@ -64,6 +64,7 @@ mostly folderwise explanations:
 * `static` : static files like images and css libs, we shouldn't care to much about it
 * `template` : awesome shakespeare templates to generate annoying html, js, css files with
 * `test` : just testing, i guess we will ignore this mostly ;)
+* `tools` : tools for cmd-line programs (ex. managment of persistence, import data-samples)
 * `messages` : just language translation support (wayne for us too)
 * `yesod-devel`, `dist`, `deploy` : just ignore this
 * `config` : configuration files (see modules description for `Settings` for differences to config files)
