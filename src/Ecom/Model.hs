@@ -10,7 +10,7 @@ module Ecom.Model where
 --import           Prelude.Unicode
 import           Prelude
 import           Control.Applicative
-import           Control.Monad              (mzero)
+import           Control.Monad              (mzero, when, guard)
 import           Control.Monad.Reader       (ask)
 import           Control.Monad.State        (get, put)
 ----------------------------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ import           Data.Acid
 import qualified Data.Aeson                 as Aeson
 import qualified Data.Aeson.Encode.Pretty   as Aeson ()
 import           Data.String
-
+import qualified Data.ByteString.Lazy       as BS
 import           Data.Text                  (Text, unpack, pack)
 import           Data.Colour                ()
 import           Data.Colour.SRGB
@@ -32,6 +32,7 @@ import           Data.SafeCopy              (SafeCopy (..), base, deriveSafeCopy
 import           Data.UUID
 import           Data.UUID                  as UUID
 import           Data.UUID.V4
+import           Data.UUID.V5
 import           GHC.Generics
 ----------------------------------------------------------------------------------------------------
 import           Yesod.Core
@@ -101,7 +102,7 @@ instance FromJSON ProductId where
         let mUuid = UUID.fromString . unpack $ v
         case mUuid of
             (Just uuid) -> return $ ProductId uuid
-            _ -> mzero
+            _ ->    mzero
     parseJSON _ = mzero
 
 instance ToJSON ProductId where
@@ -131,19 +132,19 @@ genProduct = do
     uuid <- liftIO nextRandom
     return $ mkProduct (ProductId uuid)
 
+genUUIDFromProduct :: Product -> UUID
+genUUIDFromProduct p = generateNamed namespaceOID $ BS.unpack (Aeson.encode p)
+
 ----------------------------------------------------------------------------------------------------
 
-data EcomState = EcomState
-    { catalog       :: IxSet Product
-    }
+data EcomState = EcomState { catalog :: IxSet Product }
     deriving (Data, Typeable)
 
 deriveSafeCopy 0 'base ''EcomState
 
 
 initialEcomState :: EcomState
-initialEcomState = EcomState { catalog = IxSet.empty
-                             }
+initialEcomState = EcomState { catalog = IxSet.empty }
 
 ----------------------------------------------------------------------------------------------------
 
@@ -156,20 +157,17 @@ putState :: EcomState -> Update EcomState ()
 putState = put
 
 
-insertProduct :: Product -> Update EcomState Product
+insertProduct :: Product -> Update EcomState ()
 insertProduct p = do
+    let prod = if (invalidId p) then p {productId = ProductId (genUUIDFromProduct p)} else p
     ecom@EcomState{..} <- get
-    --nextProductId <- liftIO nextRandom
-    --let p = mkProduct $ ProductId nextProductId
-
-    put $ ecom { catalog = IxSet.insert p catalog }
-    return p
+    put $ ecom { catalog = IxSet.updateIx (productId prod) prod catalog }
+    where
+        invalidId = UUID.null . unPostId . productId
 
 
 updateProduct :: Product -> Update EcomState ()
-updateProduct p = do
-    ecom@EcomState{..} <- get
-    put $ ecom { catalog = IxSet.updateIx (productId p) p catalog }
+updateProduct = insertProduct
 
 
 allProducts :: Query EcomState [Product]
