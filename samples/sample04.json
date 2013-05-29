@@ -1,0 +1,8 @@
+{
+    "productId"             : "00000000-0000-0000-0000-000000000000",
+    "productTitle"          : "Gestreiftes Hemd",
+    "productCategory"       : "Abendmode",
+    "productSizes"          : [37, 40, 55],
+    "productColors"         : ["#888888", "#335566"],
+    "productDescription"    : "Hemd mit Sterling-Silber Streifen\n+3 kritische Treffer"
+}
