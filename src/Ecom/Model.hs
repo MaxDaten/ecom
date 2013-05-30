@@ -48,7 +48,7 @@ data Product = Product
     }
     deriving (Eq, Ord, Data, Typeable, Show, Generic)
 
-newtype ProductId = ProductId { unPostId :: UUID }
+newtype ProductId = ProductId { unProductId :: UUID }
     deriving (Eq, Ord, Data, Typeable, Read, Show, Generic)
 
 instance PathPiece ProductId where
@@ -163,7 +163,7 @@ insertProduct p = do
     ecom@EcomState{..} <- get
     put $ ecom { catalog = IxSet.updateIx (productId prod) prod catalog }
     where
-        invalidId = UUID.null . unPostId . productId
+        invalidId = UUID.null . unProductId . productId
 
 
 updateProduct :: Product -> Update EcomState ()
