@@ -63,6 +63,8 @@ main = do
 		(closeAcidState)
 		(runStateManager args)
 
+----------------------------------------------------------------------------------------------------
+-- | Import
 runStateManager :: SMModes -> AcidState EcomState -> IO ()
 runStateManager Import{..} state = do
 	when purge $ update state (PutState initialEcomState)
@@ -96,14 +98,17 @@ runStateManager Import{..} state = do
 		decodeSamples :: BS.ByteString -> Maybe Product
 		decodeSamples = Aeson.decode
 
-
+----------------------------------------------------------------------------------------------------
+-- | Import
 runStateManager arg@Query{..} state = do
 	stateProducts <- query state AllProducts
 	print "all products:"
 	mapM_ print stateProducts
-
+----------------------------------------------------------------------------------------------------
+-- | Purge
 runStateManager arg@Purge{..} state = update state (PutState initialEcomState)
-
+----------------------------------------------------------------------------------------------------
+-- | Export
 runStateManager arg@Export{..} state = do
     stateProducts <- query state AllProducts
 
