@@ -15,13 +15,16 @@ import 				Data.Acid
 import 				Data.Acid.Advanced
 import qualified 	Data.Aeson                 as Aeson
 import qualified	Data.ByteString.Lazy	   as BS
+import qualified    Data.UUID                  as UUID
 ----------------------------------------------------------------------------------------------------
 import 				Ecom.Model
 ----------------------------------------------------------------------------------------------------
 
 data SMModes 		= Import { inDir :: String
-							 , purge :: Bool 
-							 } 
+							 , purge :: Bool
+							 }
+                    | Export { outDir :: String
+                             }
 			 		| Query  { all :: Bool }
 			 		| Purge
 	deriving (Show, Data, Typeable)
@@ -30,15 +33,21 @@ data SMModes 		= Import { inDir :: String
 defDir = "samples"
 queryDef  = Query  	{ all = True &= help "query everything in current state" }
 importDef = Import 	{ inDir = defDir
-							&= opt defDir 
-							&= typDir 
+							&= opt defDir
+							&= typDir
 							&= help ("input directory for samples [default: \"" ++ defDir ++ "\"]")
 			    	, purge = def &= help "delete current state before import"
 			 	    }
 purgeDef  = Purge
+exportDef = Export  { outDir = defDir
+                             &= opt defDir
+                             &= typDir
+                             &= help ("output directory for exported state [default: \"" ++ defDir ++ "\"]")
+                    }
 
 argDef = modes $ [ queryDef  	&= help "query state" &= auto
-				 , importDef 	&= help "import json samples in to state"
+                 , importDef    &= help "import json samples in to state"
+				 , exportDef 	&= help "export state to json"
 				 , purgeDef		&= help "empty current state"
 				 ] &= summary "state-manager v0.1"
 				   &= program "state-manager"
@@ -46,10 +55,10 @@ argDef = modes $ [ queryDef  	&= help "query state" &= auto
 ----------------------------------------------------------------------------------------------------
 
 main :: IO ()
-main = do 
+main = do
 	args <- cmdArgs argDef
 	print args
-	bracket 
+	bracket
 		(openLocalState initialEcomState)
 		(closeAcidState)
 		(runStateManager args)
@@ -73,17 +82,17 @@ runStateManager Import{..} state = do
 
 	print "products in state"
 	mapM_ print stateProducts
-	
-	where 
+
+	where
 		filterSamples :: [FilePath] -> [FilePath]
 		filterSamples = filter (\s -> isSample s && (not . isHidden) s)
-		
+
 		appendFolder :: FilePath -> [FilePath] -> [FilePath]
 		appendFolder sampleFolder = map (combine sampleFolder)
-		
+
 		isSample = \s -> ".json" == takeExtension s
 		isHidden = isPrefixOf "."
-		
+
 		decodeSamples :: BS.ByteString -> Maybe Product
 		decodeSamples = Aeson.decode
 
@@ -94,3 +103,23 @@ runStateManager arg@Query{..} state = do
 	mapM_ print stateProducts
 
 runStateManager arg@Purge{..} state = update state (PutState initialEcomState)
+
+runStateManager arg@Export{..} state = do
+    stateProducts <- query state AllProducts
+
+    print "export following entries:"
+    mapM_ print stateProducts
+
+
+
+    createDirectoryIfMissing True outDir
+
+    let jsonProducts = zip stateProducts $ map Aeson.encode stateProducts
+    mapM_ (writeEncoded outDir) jsonProducts
+
+    where
+        writeEncoded :: FilePath -> (Product, BS.ByteString) -> IO ()
+        writeEncoded outDir (prod, jsonString) = BS.writeFile (combine outDir (getProductFilename prod)) jsonString
+        getProductFilename prod = (UUID.toString . unProductId . productId $ prod) <.> "json"
+
+
