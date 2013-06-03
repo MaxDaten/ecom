@@ -89,7 +89,7 @@ mostly folderwise explanations:
     1. download the latest [Haskell Platform](http://www.haskell.org/platform/linux.html) `tar.gz` and a [prebuild ghc](http://www.haskell.org/ghc/download_ghc_7_6_3) for your architecture (for haskell-platform 2013+ you will need ghc-7.6+)
     2. unpack the ghc archive: ex. `tar -xvf ghc-7.6.3-x86_64-unknown-linux.tar.bz2`
         1. `cd ghc-7.6.3`
-        2. `./configure && make install` the new ghc version is now installed (in `/usr/bin`)
+        2. `./configure && make install` the new ghc version is now installed (in `/usr/local/bin`)
     3. unpack the haskell-platform archive
         1. `cd haskell-platform-2013.2.0.0`
         2. `./configure && make`
