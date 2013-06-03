@@ -77,7 +77,7 @@ library
                  , aeson-pretty                  >= 0.7
                  , safecopy                      == 0.8.*
                  , ixset                         == 1.0.*
-                 , containers                    == 0.4.*
+                 , containers
                  , vector                        == 0.10.*
 
                  , conduit                       >= 1.0
@@ -118,6 +118,7 @@ executable         state-manager
                      , acid-state               == 0.8.*
                      , bytestring               >= 0.9        && < 0.11
                      , aeson                    == 0.6.*
+                     , uuid                     == 1.2.*
 
     ghc-options:       -threaded -O2
 
