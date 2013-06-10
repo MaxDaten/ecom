@@ -31,13 +31,15 @@ data SMModes 		= Import { inDir :: String
 
 ----------------------------------------------------------------------------------------------------
 defDir = "samples"
-queryDef  = Query  	{ all = True &= help "query everything in current state" }
-importDef = Import 	{ inDir = defDir
-							&= opt defDir
-							&= typDir
-							&= help ("input directory for samples [default: \"" ++ defDir ++ "\"]")
-			    	, purge = def &= help "delete current state before import"
-			 	    }
+products = "products"
+asscos = "assocs"
+queryDef  = Query  { all = True &= help "query everything in current state" }
+importDef = Import { inDir = defDir
+                  &= opt defDir
+                  &= typDir
+                  &= help ("input directory for samples [default: \"" ++ defDir ++ "\"]")
+                   , purge = def &= help "delete current state before import"
+                   }
 purgeDef  = Purge
 exportDef = Export  { outDir = defDir
                              &= opt defDir
@@ -67,36 +69,56 @@ main = do
 -- | Import
 runStateManager :: SMModes -> AcidState EcomState -> IO ()
 runStateManager Import{..} state = do
-	when purge $ update state (PutState initialEcomState)
-
-	sampleFiles <- getDirectoryContents inDir >>= return . (appendFolder inDir) . filterSamples
-
-	print "read from: "
-	mapM_ print sampleFiles
-
-	products <- mapM ((liftM decodeSamples) . BS.readFile) sampleFiles
-
-	print "parsed products:"
-	mapM_ print products
-
-	groupUpdates state $ map InsertProduct (catMaybes products)
-	stateProducts <- query state AllProducts
-
-	print "products in state"
-	mapM_ print stateProducts
-
-	where
-		filterSamples :: [FilePath] -> [FilePath]
-		filterSamples = filter (\s -> isSample s && (not . isHidden) s)
-
-		appendFolder :: FilePath -> [FilePath] -> [FilePath]
-		appendFolder sampleFolder = map (combine sampleFolder)
-
-		isSample = \s -> ".json" == takeExtension s
-		isHidden = isPrefixOf "."
-
-		decodeSamples :: BS.ByteString -> Maybe Product
-		decodeSamples = Aeson.decode
+  when purge $ update state (PutState initialEcomState)
+  
+  productFiles <- getDirectoryContents pDir >>= return . (appendFolder pDir) . filterSamples
+  assocFiles   <- getDirectoryContents aDir >>= return . (appendFolder aDir) . filterSamples
+  
+  print "read from: "
+  mapM_ print productFiles
+  
+  products <- mapM ((liftM decodeProducts) . BS.readFile) productFiles
+  
+  print "parsed products:"
+  mapM_ print products
+  
+  print "read from: "
+  mapM_ print assocFiles
+  
+  assocs <- mapM ((liftM decodeAssocs) . BS.readFile) assocFiles
+  
+  print "parsed assocs:"
+  mapM_ print assocs
+  
+  groupUpdates state $ map InsertProduct (catMaybes products)
+  groupUpdates state $ map CombineAssoc  (catMaybes assocs)
+  
+  print "products in state"
+  stateProducts <- query state AllProducts
+  mapM_ print stateProducts
+  
+  print "assocs in state"
+  stateAssocs <- query state AllAssocs
+  mapM_ print stateAssocs
+  
+  where
+    filterSamples :: [FilePath] -> [FilePath]
+    filterSamples = filter (\s -> isSample s && (not . isHidden) s)
+    
+    appendFolder :: FilePath -> [FilePath] -> [FilePath]
+    appendFolder sampleFolder = map (combine sampleFolder)
+    
+    isSample = \s -> ".json" == takeExtension s
+    isHidden = isPrefixOf "."
+    
+    decodeProducts :: BS.ByteString -> Maybe Product
+    decodeProducts = Aeson.decode
+    
+    decodeAssocs   :: BS.ByteString -> Maybe Association
+    decodeAssocs   = Aeson.decode
+    
+    pDir = inDir ++ "/" ++ products
+    aDir = inDir ++ "/" ++ asscos
 
 ----------------------------------------------------------------------------------------------------
 -- | Import

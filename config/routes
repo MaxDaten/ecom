@@ -5,3 +5,4 @@
 
 /                       HomeR           GET
 /prod/#ProductId        ProductR        GET
+/assoc/#ProductId       ProductAssocR   GET
