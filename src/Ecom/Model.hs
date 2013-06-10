@@ -48,6 +48,12 @@ data Product = Product
     }
     deriving (Eq, Ord, Data, Typeable, Show, Generic)
 
+data Association = Association
+    { assocCategory         :: ProductCategory
+    , assocedCategories     :: Set ProductCategory
+    }
+    deriving (Eq, Ord, Data, Typeable, Show, Generic)
+
 newtype ProductId = ProductId { unProductId :: UUID }
     deriving (Eq, Ord, Data, Typeable, Read, Show, Generic)
 
@@ -66,7 +72,6 @@ newtype ProductTitle        = ProductTitle       Text               deriving (Eq
 newtype ProductCategory     = ProductCategory    Text               deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 newtype ProductDescription  = ProductDescription Text               deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 
-
 deriving instance Data a => Data (RGB a)
 deriving instance Typeable1 RGB
 deriving instance Ord a => Ord (RGB a)
@@ -78,6 +83,7 @@ deriveSafeCopy 0 'base ''ProductColor
 deriveSafeCopy 0 'base ''RGB
 deriveSafeCopy 0 'base ''ProductId
 deriveSafeCopy 0 'base ''UUID
+deriveSafeCopy 0 'base ''Association
 
 ----------------------------------------------------------------------------------------------------
 instance Indexable Product where
@@ -88,10 +94,18 @@ instance Indexable Product where
         , ixFun $ \p -> Set.toList $ productSizes  p
         , ixFun $ \p -> Set.toList $ productColors p
         ]
+
+instance Indexable Association where
+    empty = ixSet
+        [ ixFun $ \a -> [ assocCategory a ]
+        , ixFun $ \a -> Set.toList $ assocedCategories a
+        ]
 ----------------------------------------------------------------------------------------------------
 
 instance FromJSON Product
 instance ToJSON Product
+instance FromJSON Association
+instance ToJSON Association
 
 deriving instance FromJSON ProductColor
 deriving instance ToJSON ProductColor
@@ -137,14 +151,18 @@ genUUIDFromProduct p = generateNamed namespaceOID $ BS.unpack (Aeson.encode p)
 
 ----------------------------------------------------------------------------------------------------
 
-data EcomState = EcomState { catalog :: IxSet Product }
+data EcomState = EcomState { catalog :: IxSet Product
+                           , assocs  :: IxSet Association
+                           }
     deriving (Data, Typeable)
 
 deriveSafeCopy 0 'base ''EcomState
 
 
 initialEcomState :: EcomState
-initialEcomState = EcomState { catalog = IxSet.empty }
+initialEcomState = EcomState { catalog = IxSet.empty
+                             , assocs  = IxSet.empty
+                             }
 
 ----------------------------------------------------------------------------------------------------
 
@@ -182,12 +200,68 @@ productById pid = do
     return $ getOne $ catalog @= pid
 
 
+productByCategory :: ProductCategory -> Query EcomState [Product]
+productByCategory = productByWhatever
+
+
+productByWhatever :: (Typeable a) => a -> Query EcomState [Product]
+productByWhatever x = do
+    EcomState{..} <- ask
+    return . IxSet.toList $ catalog @= x
+
+
+insertAssoc :: Association -> Update EcomState ()
+insertAssoc a = do
+    ecom@EcomState{..} <- get
+    put $ ecom { assocs = IxSet.updateIx (assocCategory a) a assocs }
+
+
+combineAssoc :: Association -> Update EcomState ()
+combineAssoc a = do
+    ecom@EcomState{..} <- get
+    let assoced    = map assocedCategories . IxSet.toList $ assocs @= (assocCategory a)
+        newAssoced = foldr Set.union (assocedCategories a) assoced
+    insertAssoc (Association { assocCategory = assocCategory a, assocedCategories = newAssoced })
+
+
+allAssocs :: Query EcomState [Association]
+allAssocs = do
+    EcomState{..} <- ask
+    return $ IxSet.toList assocs
+
+
+assocByCategory :: ProductCategory -> Query EcomState [Association]
+assocByCategory pCategory = do
+    EcomState{..} <- ask
+    return . IxSet.toList $ assocs @= pCategory
+
+
 makeAcidic ''EcomState [ 'fetchState, 'putState
                        , 'insertProduct
                        , 'updateProduct
                        , 'allProducts
                        , 'productById
+                       , 'insertAssoc
+                       , 'combineAssoc
+                       , 'allAssocs
+                       , 'assocByCategory
                        ]
+
+
+associatedProducts :: Product -> Query EcomState [Product]
+associatedProducts p = do
+    ecom@EcomState{..} <- ask
+    let categories = concatMap (Set.toList . assocedCategories) $ IxSet.toList $ assocs @= (productCategory p)
+        products   = concatMap (\pc -> IxSet.toList $ catalog @= pc) categories
+    return products
+
+
+similarProducts :: Product -> Query EcomState [Product]
+similarProducts p = do
+    ecom@EcomState{..} <- ask
+    let matchingSize  = IxSet.toSet $ catalog @= (productSizes p)
+        matchingColor = IxSet.toSet $ catalog @= (productColors p)
+    return . Set.toList $ matchingSize `Set.union` matchingColor
 
 ----------------------------------------------------------------------------------------------------
 
