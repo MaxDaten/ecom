@@ -7,9 +7,9 @@ getProductAssocR :: ProductId -> Handler RepHtml
 getProductAssocR pid = do
   product         <- acidQuery (ProductById pid)
   case product of
-    Nothing              -> notFound
-    Just (p@Product{..}) -> do
-                              assocedProducts <- acidQuery (AssociatedProducts p)
-                              defaultLayout $ do
-                                setTitle $ toHtml (show productTitle)
-                                $(widgetFile "productAssoc")
+    Nothing -> notFound
+    Just p  -> do
+                  assocedProducts <- acidQuery (AssociatedProducts p)
+                  defaultLayout $ do
+                                    setTitle $ toHtml (show $ productTitle p)
+                                    $(widgetFile "productAssoc")

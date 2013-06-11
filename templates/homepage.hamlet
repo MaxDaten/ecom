@@ -9,4 +9,3 @@ $else
             <li>
                 <a href="@{ProductR (productId product)}">
                     #{show (productTitle product)}
-
