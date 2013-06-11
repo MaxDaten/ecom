@@ -22,7 +22,7 @@ yesod is our framework of choiceand I recommend acid-state for the data-holding.
 
 ### Haskell Setup
 
-+ you have install yesod with cabal, so you will have to install the haskell platform [Haskell Platform](http://www.haskell.org/platform/) or 
++ you have install yesod with cabal, so you will have to install the haskell platform [Haskell Platform](http://www.haskell.org/platform/) or
 just download ghc and compile the 'haskell platform' on your own (see FAQ 4) - remmeber to add `.cabal/bin` to your Path env
 + with a working haskell platform installation:
     + `cabal install yesod-platform yesod-bin`
@@ -84,7 +84,10 @@ mostly folderwise explanations:
 2. I can't reach the development server or I see a ugly page (css files are missing)
     2. if you run the devel server not on your localhost, change the `config/settings.yml` settings to the LAN host (for me ex: `approot: "http://192.168.178.200:3000"`)
 3. How do I add routes?
-    3. create a Handler in `src/Ecom.Handler`, import this Handler into the `Ecom.Application` module, add route definition in `config/routes`
+    1. create a Handler in `src/Ecom.Handler`
+    2. import this Handler into the `Ecom.Application` module
+    3. add route definition in `config/routes`
+    4. add Module to cabal section `other-modules`
 4. How can I build the haskell platform on my own (linux)
     1. download the latest [Haskell Platform](http://www.haskell.org/platform/linux.html) `tar.gz` and a [prebuild ghc](http://www.haskell.org/ghc/download_ghc_7_6_3) for your architecture (for haskell-platform 2013+ you will need ghc-7.6+)
     2. unpack the ghc archive: ex. `tar -xvf ghc-7.6.3-x86_64-unknown-linux.tar.bz2`
