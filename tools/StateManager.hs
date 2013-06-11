@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, DeriveDataTypeable, RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings, DeriveDataTypeable, RecordWildCards, TypeFamilies #-}
 
 module StateManager where
 
@@ -13,7 +13,8 @@ import				Data.Maybe 								(catMaybes)
 ----------------------------------------------------------------------------------------------------
 import 				Data.Acid
 import 				Data.Acid.Advanced
-import qualified 	Data.Aeson                 as Aeson
+import qualified    Data.Aeson                 as Aeson
+import           	Data.Aeson                 (FromJSON)
 import qualified	Data.ByteString.Lazy	   as BS
 import qualified    Data.UUID                  as UUID
 ----------------------------------------------------------------------------------------------------
@@ -25,15 +26,23 @@ data SMModes 		= Import { inDir :: String
 							 }
                     | Export { outDir :: String
                              }
-			 		| Query  { all :: Bool }
+			 		| Query  { all               :: Bool
+                             , queryProducts     :: Bool
+                             , queryAssosiations :: Bool
+                             }
 			 		| Purge
 	deriving (Show, Data, Typeable)
 
 ----------------------------------------------------------------------------------------------------
-defDir = "samples"
-products = "products"
-asscos = "assocs"
-queryDef  = Query  { all = True &= help "query everything in current state" }
+-- | directory definitions
+defDir      = "samples"
+productDir  = \i -> combine i "products"
+asscoDir    = \i -> combine i "assocs"
+
+-- | programm mode definitions
+queryDef  = Query  { all = True                &= help "query everything in current state"
+                   , queryProducts      = def  &= name "products"         &= help "show all products in state"
+                   , queryAssosiations  = def  &= name "assosiations"     &= help "show all assosiations" }
 importDef = Import { inDir = defDir
                   &= opt defDir
                   &= typDir
@@ -69,63 +78,67 @@ main = do
 -- | Import
 runStateManager :: SMModes -> AcidState EcomState -> IO ()
 runStateManager Import{..} state = do
-  when purge $ update state (PutState initialEcomState)
-  
-  productFiles <- getDirectoryContents pDir >>= return . (appendFolder pDir) . filterSamples
-  assocFiles   <- getDirectoryContents aDir >>= return . (appendFolder aDir) . filterSamples
-  
-  print "read from: "
-  mapM_ print productFiles
-  
-  products <- mapM ((liftM decodeProducts) . BS.readFile) productFiles
-  
-  print "parsed products:"
-  mapM_ print products
-  
-  print "read from: "
-  mapM_ print assocFiles
-  
-  assocs <- mapM ((liftM decodeAssocs) . BS.readFile) assocFiles
-  
-  print "parsed assocs:"
-  mapM_ print assocs
-  
-  groupUpdates state $ map InsertProduct (catMaybes products)
-  groupUpdates state $ map CombineAssoc  (catMaybes assocs)
-  
-  print "products in state"
-  stateProducts <- query state AllProducts
-  mapM_ print stateProducts
-  
-  print "assocs in state"
-  stateAssocs <- query state AllAssocs
-  mapM_ print stateAssocs
-  
-  where
-    filterSamples :: [FilePath] -> [FilePath]
-    filterSamples = filter (\s -> isSample s && (not . isHidden) s)
-    
-    appendFolder :: FilePath -> [FilePath] -> [FilePath]
-    appendFolder sampleFolder = map (combine sampleFolder)
-    
-    isSample = \s -> ".json" == takeExtension s
-    isHidden = isPrefixOf "."
-    
-    decodeProducts :: BS.ByteString -> Maybe Product
-    decodeProducts = Aeson.decode
-    
-    decodeAssocs   :: BS.ByteString -> Maybe Association
-    decodeAssocs   = Aeson.decode
-    
-    pDir = inDir ++ "/" ++ products
-    aDir = inDir ++ "/" ++ asscos
+    when purge $ update state (PutState initialEcomState)
+
+    -- import with [State-Update] from [Directory] - [Maybe Query] to check state
+    importWith InsertProduct (productDir inDir) $ Just AllProducts
+    importWith CombineAssoc (asscoDir inDir) $ Just AllAssocs
+
+    where
+        filterSamples :: [FilePath] -> [FilePath]
+        filterSamples = filter (\s -> isSample s && (not . isHidden) s)
+
+        appendFolder :: FilePath -> [FilePath] -> [FilePath]
+        appendFolder sampleFolder = map (combine sampleFolder)
+
+        isSample = \s -> ".json" == takeExtension s
+        isHidden = isPrefixOf "."
+
+        -- what a hell of types families and instances :) hell yea
+        importWith :: ( UpdateEvent updateEvent, MethodState updateEvent ~ EcomState                                -- our updateEvent is an official UpdateEvent and works in our EcomState
+                      , QueryEvent queryEvent, MethodState queryEvent ~ EcomState, MethodResult queryEvent ~ [a]    -- our queryEvent is an offical QueryEvent, works in our EcomState and has a Resul like a (see next line)
+                      , FromJSON a, Show a)                                                                         -- our a is decodeable from JSON and just for fun showable
+                   => (a -> updateEvent) -> FilePath -> Maybe queryEvent -> IO ()
+        importWith stUpdate dir chkQuery = do
+            sampleFiles <- getDirectoryContents dir >>= return . (appendFolder dir) . filterSamples
+
+            samples <- mapM ((liftM Aeson.decode) . BS.readFile) sampleFiles
+
+            print "parsed samples:"
+            mapM_ print samples
+
+            print "read from: "
+            mapM_ print sampleFiles
+
+            groupUpdates state $ map stUpdate (catMaybes samples)
+
+            case chkQuery of
+                Just qry -> do
+                    print "samples in state"
+                    stateSamples <- query state qry
+                    mapM_ print stateSamples
+                _ -> return ()
 
 ----------------------------------------------------------------------------------------------------
 -- | Import
 runStateManager arg@Query{..} state = do
-	stateProducts <- query state AllProducts
-	print "all products:"
-	mapM_ print stateProducts
+    let all' = all `xor` (queryProducts || queryAssosiations)
+
+    when (all' || queryProducts) $ do
+        stateProducts <- query state AllProducts
+        print "all products:"
+        mapM_ print stateProducts
+
+    when (all' || queryAssosiations) $ do
+        stateAssocs <- query state AllAssocs
+        print "all assosiations:"
+        mapM_ print stateAssocs
+
+    where
+        xor :: Bool -> Bool -> Bool
+        xor True p = not p
+        xor False p = p
+
 ----------------------------------------------------------------------------------------------------
 -- | Purge
 runStateManager arg@Purge{..} state = update state (PutState initialEcomState)
@@ -136,8 +149,6 @@ runStateManager arg@Export{..} state = do
 
     print "export following entries:"
     mapM_ print stateProducts
-
-
 
     createDirectoryIfMissing True outDir
 
