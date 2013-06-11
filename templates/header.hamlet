@@ -1,0 +1,29 @@
+<h3>Shop
+<div .navbar>
+    <div .navbar-inner>
+        <div .container>
+            <ul .nav>
+                <li>
+                    <a href="@{HomeR}">Home
+                <li>
+                    <a href="">Cat1
+                <li>
+                    <a href="">Cat2
+                <li>
+                    <a href="">Cat3
+                <li>
+                    <a href="">Cat4
+            <ul .nav .pull-right>
+                <form .navbar-search .pull-left>
+                    <input type="text" .search-query placeholder=_{MsgSearch}>
+                <li .dropdown>
+                    <a href="#" .dropdown-toggle data-toggle="dropdown">
+                        _{MsgManage} #
+                        <b .carret>
+                    <ul .dropdown-menu>
+                        <li>
+                            <a href="@{ManageProductsR}">_{MsgManageProducts}
+                        <li>
+                            <a href="@{ManageAssocsR}">_{MsgManageAssocs}
+                        <li>
+                            <a href="@{ManageUsersR}">_{MsgManageUsers}
