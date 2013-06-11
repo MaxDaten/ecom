@@ -1,11 +1,13 @@
 $newline never
-<h1>_{MsgHello}
+<h1>_{MsgShopWellcome}
 
 $if null allProducts
-    <p>No Products!
+    <p>_{MsgNoProducts}
 $else
-    <ul>
+    <div .row>
         $forall product <- allProducts
-            <li>
-                <a href="@{ProductR (productId product)}">
-                    #{show (productTitle product)}
+            <div .span4 .product-tile>
+                <div .product-tile-content>
+                    <h3>
+                    <a href="@{ProductR (productId product)}">
+                        #{show (productTitle product)}

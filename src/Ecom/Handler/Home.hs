@@ -8,6 +8,6 @@ getHomeR = do
     allProducts <- acidQuery (AllProducts)
     defaultLayout $ do
         aDomId <- newIdent
-        setTitle "Welcome To Yesod!"
+        setTitle "Willkommen!"
         $(widgetFile "homepage")
 

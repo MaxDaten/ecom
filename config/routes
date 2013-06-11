@@ -6,3 +6,7 @@
 /                       HomeR           GET
 /prod/#ProductId        ProductR        GET
 /assoc/#ProductId       ProductAssocR   GET
+
+/manage/products        ManageProductsR GET
+/manage/users           ManageUsersR    GET
+/manage/assocs          ManageAssocsR   GET
