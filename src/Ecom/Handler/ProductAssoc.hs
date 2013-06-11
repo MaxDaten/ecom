@@ -5,10 +5,11 @@ import Ecom.Import
 
 getProductAssocR :: ProductId -> Handler RepHtml
 getProductAssocR pid = do
-	mProduct <- acidQuery (ProductById pid)
-
-	case mProduct of
-		Nothing 	 				-> notFound
-		Just (product@Product{..}) 	-> defaultLayout $ do
-			setTitle $ toHtml (show productTitle)
-			$(widgetFile "productAssoc")
+  product         <- acidQuery (ProductById pid)
+  case product of
+    Nothing              -> notFound
+    Just (p@Product{..}) -> do
+                              assocedProducts <- acidQuery (AssociatedProducts p)
+                              defaultLayout $ do
+                                setTitle $ toHtml (show productTitle)
+                                $(widgetFile "productAssoc")

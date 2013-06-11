@@ -236,18 +236,6 @@ assocByCategory pCategory = do
     return . IxSet.toList $ assocs @= pCategory
 
 
-makeAcidic ''EcomState [ 'fetchState, 'putState
-                       , 'insertProduct
-                       , 'updateProduct
-                       , 'allProducts
-                       , 'productById
-                       , 'insertAssoc
-                       , 'combineAssoc
-                       , 'allAssocs
-                       , 'assocByCategory
-                       ]
-
-
 associatedProducts :: Product -> Query EcomState [Product]
 associatedProducts p = do
     ecom@EcomState{..} <- ask
@@ -262,6 +250,20 @@ similarProducts p = do
     let matchingSize  = IxSet.toSet $ catalog @= (productSizes p)
         matchingColor = IxSet.toSet $ catalog @= (productColors p)
     return . Set.toList $ matchingSize `Set.union` matchingColor
+
+
+makeAcidic ''EcomState [ 'fetchState, 'putState
+                       , 'insertProduct
+                       , 'updateProduct
+                       , 'allProducts
+                       , 'productById
+                       , 'insertAssoc
+                       , 'combineAssoc
+                       , 'allAssocs
+                       , 'assocByCategory
+                       , 'associatedProducts
+                       , 'similarProducts
+                       ]
 
 ----------------------------------------------------------------------------------------------------
 

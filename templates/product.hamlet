@@ -1,5 +1,4 @@
 <h1>#{show productTitle}
     <div>
         <p>#{toHtml (show productDescription)}
-        <a href="@{ProductAssocR productId}">
-                    #{show productTitle}
+        <a href="@{ProductAssocR productId}">Dazu passende Produkte

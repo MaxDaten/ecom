@@ -1,3 +1,11 @@
-<h1>Assoc
+<h1>#{show productTitle}
     <div>
-        <p>Blabla
+
+$if null assocedProducts
+    <p>No Products!
+$else
+    <ul>
+        $forall product <- assocedProducts
+            <li>
+                <a href="@{ProductR productId}">
+                    #{show $ productTitle product}
