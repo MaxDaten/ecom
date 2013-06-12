@@ -1,18 +1,23 @@
 module Ecom.Handler.Manage where
 
+import Data.Colour (darken)
+
 import Ecom.Import
+import Ecom.Utils
 
 
 getManageUsersR :: Handler RepHtml
 getManageUsersR = defaultLayout $ do
-    setTitle "Manage Users"
-    $(widgetFile "manage-users")
+        setTitle "Manage Users"
+        $(widgetFile "manage-users")
 
 
 getManageProductsR :: Handler RepHtml
-getManageProductsR = defaultLayout $ do
-    setTitle "Manage Products"
-    $(widgetFile "manage-products")
+getManageProductsR = do
+    allProducts <- acidQuery (AllProducts)
+    defaultLayout $ do
+        setTitle "Manage Products"
+        $(widgetFile "manage-products")
 
 
 getManageAssocsR :: Handler RepHtml

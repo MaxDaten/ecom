@@ -1,5 +1,5 @@
-ShopWellcome: Willkommen in unserem Shop
-NoProducts: keine Produkte gefunden
+ShopWellcome         : Willkommen in unserem Shop
+NoProducts           : keine Produkte gefunden
 
 Manage               : Verwaltung
 ManageUsers          : Nutzer verwalten

@@ -9,6 +9,13 @@
     }
 }
 
+.color-preview {
+	display: inline-block;
+	border-radius: 3px;
+	border-style: solid;
+	border-width: 2px;
+}
+
 .h-section {
 	
 	text-align: center;

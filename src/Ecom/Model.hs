@@ -268,8 +268,8 @@ getProductDescription Product{..} = d
 getProductColors :: Product -> [Colour Double]
 getProductColors Product{..} = map unProductColor $ Set.toList productColors
 
-getProductSizes :: Product -> Set Int
-getProductSizes Product{..} = Set.map unProductSize productSizes
+getProductSizes :: Product -> [Int]
+getProductSizes Product{..} = map unProductSize $ Set.toList productSizes
 
 getProductCategory :: Product -> Text
 getProductCategory Product{..} = cat
@@ -281,8 +281,6 @@ unProductColor (ProductColor (RGB r g b)) = sRGB r g b
 unProductSize :: ProductSize -> Int
 unProductSize (ProductSize s) = s
 
-colorHex ::(RealFrac b, Floating b) => Colour b -> String
-colorHex = sRGB24show
 ----------------------------------------------------------------------------------------------------
 
 
