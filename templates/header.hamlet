@@ -22,8 +22,8 @@
                         <b .carret>
                     <ul .dropdown-menu>
                         <li>
-                            <a href="@{ManageProductsR}">_{MsgManageProducts}
+                            <a href="@{ManageProductsR}"><i class="icon-tag"></i> _{MsgManageProducts}
                         <li>
-                            <a href="@{ManageAssocsR}">_{MsgManageAssocs}
+                            <a href="@{ManageAssocsR}"><i class="icon-random"></i> _{MsgManageAssocs}
                         <li>
-                            <a href="@{ManageUsersR}">_{MsgManageUsers}
+                            <a href="@{ManageUsersR}"><i class="icon-user"></i> _{MsgManageUsers}

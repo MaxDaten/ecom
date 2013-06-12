@@ -11,3 +11,4 @@ RelatedProducts      : Zugehörige Produkte
 AddNewProduct        : Neues Produkt hinzufügen
 AddNewAssoc          : Neue Kategorie-Assoziation
 AddNewUser           : Neuen Nutzer hinzufügen
+BuyProduct           : Kaufen

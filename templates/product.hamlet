@@ -5,3 +5,4 @@
         <p>#{getProductDescription product}
         $forall color <- getProductColors product
             <span .color-preview style="background-color: #{colorHex color}; border-color: #{colorHex $ darken 0.7 color}">
+        <button .btn .btn-primary .btn-large .btn-buy .pull-right><i class="icon-shopping-cart icon-white"></i> _{MsgBuyProduct}
