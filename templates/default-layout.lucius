@@ -1,0 +1,20 @@
+.product-box {
+    background-color: #eee;
+    border-radius: 3px;
+
+    .product-box-content {
+        padding: 20px;
+        display: block;
+        height: 100%;
+    }
+}
+
+.h-section {
+	
+	text-align: center;
+}
+
+
+footer {
+	padding-top: 10px;
+}

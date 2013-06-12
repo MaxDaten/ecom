@@ -22,7 +22,8 @@ library
                      Ecom.Settings.StaticFiles
                      Ecom.Settings.Development
                      Ecom.Model
-    other-modules:   Ecom.Handler.Home
+    other-modules:   Ecom.Utils
+                     Ecom.Handler.Home
                      Ecom.Handler.Product
                      Ecom.Handler.ProductAssoc
                      Ecom.Handler.Manage
