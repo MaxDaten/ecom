@@ -1,2 +1,3 @@
 $newline never
 <h1>_{MsgManageProducts}
+<button .btn><i class=icon-plus-sign></i> _{MsgAddNewProduct}

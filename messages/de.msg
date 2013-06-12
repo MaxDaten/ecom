@@ -8,3 +8,6 @@ ManageAssocs         : Assoziationen verwalten
 
 Search               : Suchen
 RelatedProducts      : Zugehörige Produkte
+AddNewProduct        : Neues Produkt hinzufügen
+AddNewAssoc          : Neue Kategorie-Assoziation
+AddNewUser           : Neuen Nutzer hinzufügen
