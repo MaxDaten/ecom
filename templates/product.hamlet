@@ -1,4 +1,7 @@
-<h3>#{show productTitle}
-<div>
-    <p>#{toHtml (show productDescription)}
-    <a href="@{ProductAssocR productId}">Dazu passende Produkte
+<h1>#{getProductTitle product }
+<div .product-box>
+    <div .product-box-content>
+        ^{pageBody mainImg}
+        <p>#{getProductDescription product}
+        $forall color <- getProductColors product
+            <span .color-preview style="background-color: #{colorHex color}; border-color: #{colorHex $ darken 0.7 color}">

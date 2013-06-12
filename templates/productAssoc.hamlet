@@ -1,11 +1,12 @@
-<h1>#{show $ productTitle p}
-    <div>
-
-$if null assocedProducts
-    <p>No Products!
-$else
-    <ul>
-        $forall product <- assocedProducts
-            <li>
-                <a href="@{ProductR (productId product)}">
-                    #{show $ productTitle product}
+<div .related-products>
+    <h5 .h-section>_{MsgRelatedProducts}
+    <div .row>
+        $if null assocedProducts
+            <p .span12>_{MsgNoProducts}
+        $else
+            $forall product <- assocedProducts
+                <div .span4 .product-box .tile>
+                    <a href="@{ProductR (productId product)}">
+                        <span .product-box-content>
+                            <h6>#{getProductTitle product}
+                            ^{pageBody relImg}

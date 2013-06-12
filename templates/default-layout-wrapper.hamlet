@@ -21,5 +21,7 @@ $newline never
             <div id="main" role="main">
                 ^{pageBody pc}
             <footer>
-                #{extraCopyright $ appExtra $ settings master}
+                <a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.de">
+                    <img alt="Creative Commons Lizenzvertrag" style="border-width:0" src="http://i.creativecommons.org/l/by/3.0/80x15.png" />
+                <br />Dieses Werk bzw. Inhalt steht unter einer <a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.de">Creative Commons Namensnennung 3.0 Unported Lizenz</a>
 

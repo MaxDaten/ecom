@@ -7,3 +7,4 @@ ManageProducts       : Produkte verwalten
 ManageAssocs         : Assoziationen verwalten
 
 Search               : Suchen
+RelatedProducts      : Zugehörige Produkte

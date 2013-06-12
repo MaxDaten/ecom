@@ -1,5 +1,5 @@
 <h3>Shop
-<div .navbar>
+<div .navbar .navbar-inverse>
     <div .navbar-inner>
         <div .container>
             <ul .nav>

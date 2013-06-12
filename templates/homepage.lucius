@@ -4,13 +4,8 @@ h1 {
 h2##{aDomId} {
     color: #990
 }
-.product-tile {
-    background-color: #eee;
-    margin-top: 20px;
-    border-radius: 3px;
-    height: 300px;
 
-    .product-tile-content {
-        padding: 20px;
-    }
+.tile{
+    margin-top: 20px;
+    height: 300px;
 }

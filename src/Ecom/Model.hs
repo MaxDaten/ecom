@@ -10,7 +10,7 @@ module Ecom.Model where
 --import           Prelude.Unicode
 import           Prelude
 import           Control.Applicative
-import           Control.Monad              (mzero, when, guard)
+import           Control.Monad              (mzero)
 import           Control.Monad.Reader       (ask)
 import           Control.Monad.State        (get, put)
 ----------------------------------------------------------------------------------------------------
@@ -66,11 +66,11 @@ instance PathPiece UUID where
     toPathPiece uuid = toPathPiece $ UUID.toString uuid
 
 
-newtype ProductColor        = ProductColor       (RGB Double)       deriving (Eq, Ord, Data, Typeable, Show, Generic)
-newtype ProductSize         = ProductSize        Int                deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
-newtype ProductTitle        = ProductTitle       Text               deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
-newtype ProductCategory     = ProductCategory    Text               deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
-newtype ProductDescription  = ProductDescription Text               deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
+newtype ProductColor        = ProductColor      (RGB Double)     deriving (Eq, Ord, Data, Typeable, Show, Generic)
+newtype ProductSize         = ProductSize        Int             deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
+newtype ProductTitle        = ProductTitle       Text            deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
+newtype ProductCategory     = ProductCategory    Text            deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
+newtype ProductDescription  = ProductDescription Text            deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 
 deriving instance Data a => Data (RGB a)
 deriving instance Typeable1 RGB
@@ -218,7 +218,7 @@ insertAssoc a = do
 
 combineAssoc :: Association -> Update EcomState ()
 combineAssoc a = do
-    ecom@EcomState{..} <- get
+    EcomState{..} <- get
     let assoced    = map assocedCategories . IxSet.toList $ assocs @= (assocCategory a)
         newAssoced = foldr Set.union (assocedCategories a) assoced
     insertAssoc (Association { assocCategory = assocCategory a, assocedCategories = newAssoced })
@@ -238,7 +238,7 @@ assocByCategory pCategory = do
 
 associatedProducts :: Product -> Query EcomState [Product]
 associatedProducts p = do
-    ecom@EcomState{..} <- ask
+    EcomState{..} <- ask
     let categories = concatMap (Set.toList . assocedCategories) $ IxSet.toList $ assocs @= (productCategory p)
         products   = concatMap (\pc -> IxSet.toList $ catalog @= pc) categories
     return products
@@ -246,10 +246,44 @@ associatedProducts p = do
 
 similarProducts :: Product -> Query EcomState [Product]
 similarProducts p = do
-    ecom@EcomState{..} <- ask
+    EcomState{..} <- ask
     let matchingSize  = IxSet.toSet $ catalog @= (productSizes p)
         matchingColor = IxSet.toSet $ catalog @= (productColors p)
     return . Set.toList $ matchingSize `Set.union` matchingColor
+
+----------------------------------------------------------------------------------------------------
+-- annoying access -- maybe we will use some lenses?
+getProductId :: Product -> UUID
+getProductId Product{..} = pid
+    where (ProductId pid) = productId
+
+getProductTitle :: Product -> Text
+getProductTitle Product{..} = t
+    where (ProductTitle t) = productTitle
+
+getProductDescription :: Product -> Text
+getProductDescription Product{..} = d
+    where (ProductDescription d) = productDescription
+
+getProductColors :: Product -> [Colour Double]
+getProductColors Product{..} = map unProductColor $ Set.toList productColors
+
+getProductSizes :: Product -> Set Int
+getProductSizes Product{..} = Set.map unProductSize productSizes
+
+getProductCategory :: Product -> Text
+getProductCategory Product{..} = cat
+    where (ProductCategory cat) = productCategory
+
+unProductColor :: ProductColor -> Colour Double
+unProductColor (ProductColor (RGB r g b)) = sRGB r g b
+
+unProductSize :: ProductSize -> Int
+unProductSize (ProductSize s) = s
+
+colorHex ::(RealFrac b, Floating b) => Colour b -> String
+colorHex = sRGB24show
+----------------------------------------------------------------------------------------------------
 
 
 makeAcidic ''EcomState [ 'fetchState, 'putState
@@ -267,39 +301,3 @@ makeAcidic ''EcomState [ 'fetchState, 'putState
 
 ----------------------------------------------------------------------------------------------------
 
--- in place testing, will be removed later on :P
-
-{-
--- acid-state test
-main :: IO ()
-main = do
-    print "Hellow State"
-    state <- openLocalState initialEcomState
-    --state <- openMemoryState initialEcomState -- import           Data.Acid.Memory
-    allP <- query state AllProducts
-    print $ "currently all products: " ++ show allP
-
-    uuid <- nextRandom
-    let prod = mkProduct (ProductId uuid)
-    newP@Product{..} <- update state (InsertProduct prod)
-    --update state (UpdateProduct newP {productTitle = "The Book about Worms", productCategory = "Book", productDescription = "a book about worms"})
-
-    allP <- query state AllProducts
-    print $ "now all products: " ++ show allP
-
-    closeAcidState state
---}
-
-{- json test
-main :: IO ()
-main = do
-    print "parse json"
-
-    --print bs
-    mP <- BS.readFile "samples/product.json" >>= return . Aeson.decode
-    case mP of
-        Nothing -> print $ "error"
-        Just p  -> do
-                    print $ "Product: " ++ show (p :: Product)
-                    BS.writeFile "samples/out.json" (Aeson.encodePretty p)
---}

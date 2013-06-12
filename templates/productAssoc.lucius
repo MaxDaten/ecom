@@ -1,3 +1,6 @@
 .related-products {
 	margin-top: 20px;
+
+	.related-product {
+	}
 }

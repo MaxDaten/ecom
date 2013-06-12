@@ -91,7 +91,6 @@ instance Yesod Ecom where
                 [ css_normalize_css
                 , css_bootstrap_css
                 ])
-
             $(widgetFile "default-layout")
         hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")
 

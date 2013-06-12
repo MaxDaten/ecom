@@ -6,8 +6,8 @@ $if null allProducts
 $else
     <div .row>
         $forall product <- allProducts
-            <div .span4 .product-tile>
-                <div .product-tile-content>
-                    <h3>
-                    <a href="@{ProductR (productId product)}">
-                        #{show (productTitle product)}
+            <div .span4 .product-box .tile>
+                <a href="@{ProductR (productId product)}">
+                    <span .product-box-content>
+                        <h5>#{getProductTitle product}
+                        ^{pageBody prodImg}
