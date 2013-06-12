@@ -1,8 +1,10 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Ecom.Utils where
 
-import Data.Colour
-import Data.UUID
-import Data.Colour.SRGB (sRGB24show)
+import           Data.Colour
+import qualified Data.Text as T
+import           Data.UUID
+import           Data.Colour.SRGB (sRGB24show)
 
 import Ecom.Import
 
@@ -14,12 +16,15 @@ placeholditWidget width height = let (w, h) = (show width, show height) in
 colorPreview :: (RealFrac b, Floating b) => Colour b -> Int -> Int -> WidgetT site IO ()
 colorPreview color width height = let (w, h) = (show width, show height) in do
     toWidget [hamlet| <span .color-preview style="background-color: #{colorHex color}; border-color: #{colorHex $ darken 0.7 color}"> |]
-    toWidget [lucius| .color-preview{ width: #{w}px; height: #{h}px} |]
+    toWidget [lucius| .color-preview { width: #{w}px; height: #{h}px; } |]
 
 
 
 shortenUUID :: Int -> UUID -> String
 shortenUUID n uuid = let s = toString uuid in (take n s) ++ "..." ++ (take n $ reverse s)
+
+shortenDescription :: Int -> Text -> Text
+shortenDescription n = (flip T.append $ "...") . T.strip . (T.take n)
 
 
 colorHex :: (RealFrac b, Floating b) => Colour b -> String

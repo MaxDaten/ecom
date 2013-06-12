@@ -18,6 +18,7 @@ getManageProductsR = do
     defaultLayout $ do
         setTitle "Manage Products"
         $(widgetFile "manage-products")
+        $(widgetFile "table")
 
 
 getManageAssocsR :: Handler RepHtml
