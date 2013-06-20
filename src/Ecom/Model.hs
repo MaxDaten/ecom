@@ -54,6 +54,13 @@ data Association = Association
     }
     deriving (Eq, Ord, Data, Typeable, Show, Generic)
 
+
+data User = User
+    { username              :: Text
+    , history               :: [Product]
+    }
+    deriving (Eq, Ord, Data, Typeable, Show, Generic)
+
 newtype ProductId = ProductId { unProductId :: UUID }
     deriving (Eq, Ord, Data, Typeable, Read, Show, Generic)
 
@@ -84,6 +91,7 @@ deriveSafeCopy 0 'base ''RGB
 deriveSafeCopy 0 'base ''ProductId
 deriveSafeCopy 0 'base ''UUID
 deriveSafeCopy 0 'base ''Association
+deriveSafeCopy 0 'base ''User
 
 ----------------------------------------------------------------------------------------------------
 instance Indexable Product where
@@ -100,12 +108,22 @@ instance Indexable Association where
         [ ixFun $ \a -> [ assocCategory a ]
         , ixFun $ \a -> Set.toList $ assocedCategories a
         ]
+
+instance Indexable User where
+    empty = ixSet
+        [ ixFun $ \u -> [ username u ]
+        , ixFun $ \u -> history u
+        ]
 ----------------------------------------------------------------------------------------------------
 
 instance FromJSON Product
 instance ToJSON Product
+
 instance FromJSON Association
 instance ToJSON Association
+
+instance FromJSON User
+instance ToJSON User
 
 deriving instance FromJSON ProductColor
 deriving instance ToJSON ProductColor
@@ -153,6 +171,7 @@ genUUIDFromProduct p = generateNamed namespaceOID $ BS.unpack (Aeson.encode p)
 
 data EcomState = EcomState { catalog :: IxSet Product
                            , assocs  :: IxSet Association
+                           , users   :: IxSet User
                            }
     deriving (Data, Typeable)
 
@@ -162,6 +181,7 @@ deriveSafeCopy 0 'base ''EcomState
 initialEcomState :: EcomState
 initialEcomState = EcomState { catalog = IxSet.empty
                              , assocs  = IxSet.empty
+                             , users   = IxSet.empty
                              }
 
 ----------------------------------------------------------------------------------------------------
