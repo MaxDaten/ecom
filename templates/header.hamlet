@@ -18,12 +18,12 @@
                     <input type="text" .search-query placeholder=_{MsgSearch}>
                 <li .dropdown>
                     <a href="#" .dropdown-toggle data-toggle="dropdown">
-                        _{MsgManage} #
+                        _{MsgAdmin} #
                         <b .carret>
                     <ul .dropdown-menu>
                         <li>
-                            <a href="@{ManageProductsR}"><i class="icon-tag"></i> _{MsgManageProducts}
+                            <a href="@{AdminProductsR}"><i class="icon-tag"></i> _{MsgAdminProducts}
                         <li>
-                            <a href="@{ManageAssocsR}"><i class="icon-random"></i> _{MsgManageAssocs}
+                            <a href="@{AdminAssocsR}"><i class="icon-random"></i> _{MsgAdminAssocs}
                         <li>
-                            <a href="@{ManageUsersR}"><i class="icon-user"></i> _{MsgManageUsers}
+                            <a href="@{AdminAllUsersR}"><i class="icon-user"></i> _{MsgAdminUsers}

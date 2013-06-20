@@ -4,10 +4,10 @@ NoProducts           : keine Produkte gefunden
 Submit				 : Absenden
 Back				 : Zurück
 
-Manage               : Verwaltung
-ManageUsers          : Nutzer verwalten
-ManageProducts       : Produkte verwalten
-ManageAssocs         : Assoziationen verwalten
+Admin                : Verwaltung
+AdminUsers           : Nutzer verwalten
+AdminProducts        : Produkte verwalten
+AdminAssocs          : Assoziationen verwalten
 
 Search               : Suchen
 RelatedProducts      : Zugehörige Produkte

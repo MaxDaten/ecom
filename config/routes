@@ -1,15 +1,19 @@
-/static                 StaticR         Static getStatic
+/static                 	StaticR         	Static getStatic
 
-/favicon.ico            FaviconR        GET
-/robots.txt             RobotsR         GET
+/favicon.ico            	FaviconR        	GET
+/robots.txt             	RobotsR         	GET
 
-/                       HomeR           GET
-/prod/#ProductId        ProductR        GET
-/assoc/#ProductId       ProductAssocR   GET
+/                       	HomeR           	GET
+/prod/#ProductId        	ProductR        	GET
+/assoc/#ProductId       	ProductAssocR   	GET
 
-/manage/products        ManageProductsR GET
-/manage/users           ManageUsersR    GET
-/manage/assocs          ManageAssocsR   GET
+/admin/products        		AdminProductsR  	GET
+/admin/users           		AdminAllUsersR      GET POST
+/admin/assocs         		AdminAssocsR    	GET
 
-/user/#Text				UserR 			GET
-/create/user 			CreateUserR 	GET	POST
+/admin/create/user 			AdminCreateUserR 	GET
+/admin/delete/user/#Text 	AdminDeleteUserR   	GET
+/admin/users/#Text 			AdminUserR 			GET
+
+/user/#Text					UserR 				GET
+

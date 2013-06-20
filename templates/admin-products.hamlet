@@ -1,5 +1,5 @@
 $newline never
-<h1>_{MsgManageProducts}
+<h1>_{MsgAdminProducts}
 <button .btn><i class=icon-plus-sign></i> _{MsgAddNewProduct}
 <table .table .table-striped .table-hover>
     <thead>
