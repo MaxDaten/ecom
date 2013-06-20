@@ -55,6 +55,13 @@ data Association = Association
     }
     deriving (Eq, Ord, Data, Typeable, Show, Generic)
 
+
+data User = User
+    { username              :: Text
+    , history               :: [Product]
+    }
+    deriving (Eq, Ord, Data, Typeable, Show, Generic)
+
 newtype ProductId = ProductId { unProductId :: UUID }
     deriving (Eq, Ord, Data, Typeable, Read, Show, Generic)
 
@@ -85,6 +92,7 @@ deriveSafeCopy 0 'base ''RGB
 deriveSafeCopy 0 'base ''ProductId
 deriveSafeCopy 0 'base ''UUID
 deriveSafeCopy 0 'base ''Association
+deriveSafeCopy 0 'base ''User
 
 ----------------------------------------------------------------------------------------------------
 instance Indexable Product where
@@ -101,12 +109,22 @@ instance Indexable Association where
         [ ixFun $ \a -> [ assocCategory a ]
         , ixFun $ \a -> Set.toList $ assocedCategories a
         ]
+
+instance Indexable User where
+    empty = ixSet
+        [ ixFun $ \u -> [ username u ]
+        , ixFun $ \u -> history u
+        ]
 ----------------------------------------------------------------------------------------------------
 
 instance FromJSON Product
 instance ToJSON Product
+
 instance FromJSON Association
 instance ToJSON Association
+
+instance FromJSON User
+instance ToJSON User
 
 deriving instance FromJSON ProductColor
 deriving instance ToJSON ProductColor
@@ -149,10 +167,14 @@ genProduct = do
 genUUIDFromProduct :: Product -> UUID
 genUUIDFromProduct p = generateNamed namespaceOID $ BS.unpack (Aeson.encode p)
 
+mkUser :: Text -> User
+mkUser name = User name []
+
 ----------------------------------------------------------------------------------------------------
 
 data EcomState = EcomState { catalog :: IxSet Product
                            , assocs  :: IxSet Association
+                           , users   :: IxSet User
                            }
     deriving (Data, Typeable)
 
@@ -162,6 +184,7 @@ deriveSafeCopy 0 'base ''EcomState
 initialEcomState :: EcomState
 initialEcomState = EcomState { catalog = IxSet.empty
                              , assocs  = IxSet.empty
+                             , users   = IxSet.empty
                              }
 
 ----------------------------------------------------------------------------------------------------
@@ -197,7 +220,7 @@ allProducts = do
 productById :: ProductId -> Query EcomState (Maybe Product)
 productById pid = do
     EcomState{..} <- ask
-    return $ getOne $ catalog @= pid
+    return . getOne $ catalog @= pid
 
 
 productByCategory :: ProductCategory -> Query EcomState [Product]
@@ -262,7 +285,33 @@ p1 -? p2 = minimum [dist c1 c2 | c1 <- colors p1, c2 <- colors p2]
                colors          = map c2l . Set.toList . productColors
                c2l (ProductColor (RGB r g b)) = [r, g, b]
 
+
+allUsers :: Query EcomState [User]
+allUsers = do
+    EcomState{..} <- ask
+    return . IxSet.toList $ users
+
+
+insertUser :: User -> Update EcomState ()
+insertUser u = do
+    ecom@EcomState{..} <- get
+    put $ ecom { users = IxSet.updateIx (username u) u users }
+
+
+userByName :: Text -> Query EcomState (Maybe User)
+userByName name = do
+    EcomState{..} <- ask
+    return . getOne $ users @= name
+
+
+usersByProducts :: [Product] -> Query EcomState [User]
+usersByProducts ps = do
+    EcomState{..} <- ask
+    return . IxSet.toList $ users @+ ps
+
+
 ----------------------------------------------------------------------------------------------------
+
 -- annoying access -- maybe we will use some lenses?
 getProductId :: Product -> UUID
 getProductId Product{..} = pid
@@ -296,18 +345,23 @@ unProductCategory (ProductCategory p) = p
 
 ----------------------------------------------------------------------------------------------------
 
-
 makeAcidic ''EcomState [ 'fetchState, 'putState
                        , 'insertProduct
                        , 'updateProduct
                        , 'allProducts
                        , 'productById
+                       
                        , 'insertAssoc
                        , 'combineAssoc
                        , 'allAssocs
                        , 'assocByCategory
                        , 'associatedProducts
                        , 'similarProducts
+
+                       , 'insertUser
+                       , 'allUsers
+                       , 'userByName
+                       , 'usersByProducts
                        ]
 
 ----------------------------------------------------------------------------------------------------

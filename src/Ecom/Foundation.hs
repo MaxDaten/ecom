@@ -11,6 +11,7 @@ import              Yesod.Default.Util          (addStaticContentExternal)
 import              Network.HTTP.Conduit        (Manager)
 import              Text.Jasmine                (minifym)
 import              Text.Hamlet                 (hamletFile)
+import              Data.Text                   (Text)
 import              System.Log.FastLogger       (Logger)
 ----------------------------------------------------------------------------------------------------
 import              Data.Acid

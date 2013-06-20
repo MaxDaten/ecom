@@ -10,3 +10,6 @@
 /manage/products        ManageProductsR GET
 /manage/users           ManageUsersR    GET
 /manage/assocs          ManageAssocsR   GET
+
+/user/#Text				UserR 			GET
+/create/user 			CreateUserR 	GET	POST

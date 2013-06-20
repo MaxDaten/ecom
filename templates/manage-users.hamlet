@@ -1,3 +1,15 @@
 $newline never
 <h1>_{MsgManageUsers}
-<button .btn><i class=icon-plus-sign></i> _{MsgAddNewUser}
+<a .btn href=@{CreateUserR}><i class=icon-plus-sign></i> _{MsgAddNewUser}
+<table .table .table-striped .table-hover>
+    <thead>
+        <tr>
+            <th>_{MsgUsername}
+            <th>_{MsgBoughtProducts}
+            <th>_{MsgActions}
+    <tbody>
+        $forall u <- allUsers
+            <tr>
+                <td><a href=@{UserR (username u)}>#{username u}
+                <td>#{show $ length $ history u}
+                <td>---

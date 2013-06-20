@@ -9,3 +9,4 @@ yesod-devel/
 state/
 *.sublime-*
 static/combined
+.DS_Store
