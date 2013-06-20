@@ -1,0 +1,6 @@
+$newline never
+<h1>#{username user}
+<hr>
+<h2>_{MsgBoughtProducts}
+$forall product <- history user
+    <a href=@{ProductR (productId product)}>#{getProductDescription product}

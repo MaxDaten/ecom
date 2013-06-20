@@ -14,7 +14,7 @@ import           Control.Monad              (mzero)
 import           Control.Monad.Reader       (ask)
 import           Control.Monad.State        (get, put)
 ----------------------------------------------------------------------------------------------------
-import           Data.IxSet                 (Indexable (..), IxSet, (@=), Proxy (..), getOne, ixFun, ixSet)
+import           Data.IxSet                 (Indexable (..), IxSet, (@=), (@+), Proxy (..), getOne, ixFun, ixSet)
 import qualified Data.IxSet                 as IxSet
 import           Data.Set                   (Set)
 import qualified Data.Set                   as Set
@@ -220,7 +220,7 @@ allProducts = do
 productById :: ProductId -> Query EcomState (Maybe Product)
 productById pid = do
     EcomState{..} <- ask
-    return $ getOne $ catalog @= pid
+    return . getOne $ catalog @= pid
 
 
 productByCategory :: ProductCategory -> Query EcomState [Product]
@@ -274,7 +274,33 @@ similarProducts p = do
         matchingColor = IxSet.toSet $ catalog @= (productColors p)
     return . Set.toList $ matchingSize `Set.union` matchingColor
 
+
+allUsers :: Query EcomState [User]
+allUsers = do
+    EcomState{..} <- ask
+    return . IxSet.toList $ users
+
+
+insertUser :: User -> Update EcomState ()
+insertUser u = do
+    ecom@EcomState{..} <- get
+    put $ ecom { users = IxSet.updateIx (username u) u users }
+
+
+userByName :: Text -> Query EcomState (Maybe User)
+userByName name = do
+    EcomState{..} <- ask
+    return . getOne $ users @= name
+
+
+usersByProducts :: [Product] -> Query EcomState [User]
+usersByProducts ps = do
+    EcomState{..} <- ask
+    return . IxSet.toList $ users @+ ps
+
+
 ----------------------------------------------------------------------------------------------------
+
 -- annoying access -- maybe we will use some lenses?
 getProductId :: Product -> UUID
 getProductId Product{..} = pid
@@ -306,18 +332,23 @@ unProductSize (ProductSize s) = s
 
 ----------------------------------------------------------------------------------------------------
 
-
 makeAcidic ''EcomState [ 'fetchState, 'putState
                        , 'insertProduct
                        , 'updateProduct
                        , 'allProducts
                        , 'productById
+                       
                        , 'insertAssoc
                        , 'combineAssoc
                        , 'allAssocs
                        , 'assocByCategory
                        , 'associatedProducts
                        , 'similarProducts
+
+                       , 'insertUser
+                       , 'allUsers
+                       , 'userByName
+                       , 'usersByProducts
                        ]
 
 ----------------------------------------------------------------------------------------------------
