@@ -1,7 +1,7 @@
 {
     "productId"             : "00000000-0000-0000-0000-000000000000",
     "productTitle"          : "Unterhemd Fuel",
-    "productCategory"       : "Unterwäsche",
+    "productCategories"     : ["Unterwäsche"],
     "productSizes"          : [12, 14, 15, 16],
     "productColors"         : ["#335566", "#000000"],
     "productDescription"    : "Ein modisches Unterhemd für Herren"

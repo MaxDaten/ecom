@@ -1,7 +1,7 @@
 {
     "productId"             : "00000000-0000-0000-0000-000000000000",
     "productTitle"          : "Lederhandschuhe",
-    "productCategory"       : "Winter",
+    "productCategories"     : ["Winter"],
     "productSizes"          : [12, 13, 14],
     "productColors"         : ["#ffffff"],
     "productDescription"    : "Wollhandschuhe mit Wärmkissen-Einlage"

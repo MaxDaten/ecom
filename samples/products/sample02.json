@@ -1,7 +1,7 @@
 {
     "productId"             : "00000000-0000-0000-0000-000000000000",
     "productTitle"          : "Dulci & Gibbon Pumps",
-    "productCategory"       : "Schuhe",
+    "productCategories"     : ["Schuhe"],
     "productSizes"          : [30, 31, 32, 33, 34, 35],
     "productColors"         : ["#000000", "#ffffff"],
     "productDescription"    : "Sündhaftteure Pumps mit Schleifchen"

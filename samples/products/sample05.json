@@ -1,7 +1,7 @@
 {
     "productId"             : "00000000-0000-0000-0000-000000000000",
     "productTitle"          : "Spagetti Krawatte",
-    "productCategory"       : "Abendmode",
+    "productCategories"     : ["Abendmode"],
     "productSizes"          : [0],
     "productColors"         : ["#992222"],
     "productDescription"    : "Schmale Krawatte vom Modehaus Spagetti"

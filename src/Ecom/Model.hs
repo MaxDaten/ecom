@@ -16,7 +16,8 @@ import           Control.Monad.State        (get, put)
 ----------------------------------------------------------------------------------------------------
 import           Data.IxSet                 (Indexable (..), IxSet, (@=), (@+), Proxy (..), getOne, ixFun, ixSet)
 import qualified Data.IxSet                 as IxSet
-import           Data.Set                   (Set)
+import           Data.List                  ((\\), sort)
+import           Data.Set                   (Set, intersection)
 import qualified Data.Set                   as Set
 import           Data.Data
 import           Data.Acid
@@ -41,7 +42,7 @@ import           Yesod.Core
 data Product = Product
     { productId             :: ProductId
     , productTitle          :: ProductTitle
-    , productCategory       :: ProductCategory
+    , productCategories     :: Set ProductCategory
     , productSizes          :: Set ProductSize
     , productColors         :: Set ProductColor
     , productDescription    :: ProductDescription
@@ -98,7 +99,7 @@ instance Indexable Product where
     empty = ixSet
         [ ixFun $ \p -> [ productId          p ]
         , ixFun $ \p -> [ productTitle       p ]
-        , ixFun $ \p -> [ productCategory    p ]
+        , ixFun $ \p -> Set.toList $ productCategories p
         , ixFun $ \p -> Set.toList $ productSizes  p
         , ixFun $ \p -> Set.toList $ productColors p
         ]
@@ -128,7 +129,6 @@ instance ToJSON User
 deriving instance FromJSON ProductColor
 deriving instance ToJSON ProductColor
 
-
 instance FromJSON ProductId where
     parseJSON (Aeson.String v) = do
         let mUuid = UUID.fromString . unpack $ v
@@ -153,7 +153,7 @@ mkProduct :: ProductId -> Product
 mkProduct pid =
     Product { productId             = pid
             , productTitle          = ""
-            , productCategory       = ""
+            , productCategories     = Set.singleton (ProductCategory "")
             , productColors         = Set.singleton (ProductColor $ RGB 0 0 0)
             , productSizes          = Set.singleton (ProductSize 0)
             , productDescription    = ""
@@ -262,17 +262,28 @@ assocByCategory pCategory = do
 associatedProducts :: Product -> Query EcomState [Product]
 associatedProducts p = do
     EcomState{..} <- ask
-    let categories = concatMap (Set.toList . assocedCategories) $ IxSet.toList $ assocs @= (productCategory p)
+    let categories = concatMap (Set.toList . assocedCategories) $ IxSet.toList $ assocs @+ (Set.toList $ productCategories p)
         products   = concatMap (\pc -> IxSet.toList $ catalog @= pc) categories
     return products
 
 
-similarProducts :: Product -> Query EcomState [Product]
-similarProducts p = do
+similarProducts :: [Product] -> Double -> Query EcomState [Product]
+similarProducts ps t = do
     EcomState{..} <- ask
-    let matchingSize  = IxSet.toSet $ catalog @= (productSizes p)
-        matchingColor = IxSet.toSet $ catalog @= (productColors p)
-    return . Set.toList $ matchingSize `Set.union` matchingColor
+    let otherProducts = (\\ ps) . IxSet.toList $ catalog
+        similarities  = [(p1 -? p2, p2) | p1 <- ps, p2 <- otherProducts, p1 `matchHard` p2]
+    return $ map snd . filter ((<=t) . fst) . sort $ similarities
+
+matchHard :: Product -> Product -> Bool
+matchHard p1 p2 = not . Set.null $ (productSizes p1) `intersection` (productSizes p2)
+
+-- calculate similarity between products
+(-?) :: Product -> Product -> Double
+p1 -? p2 = minimum [dist c1 c2 | c1 <- colors p1, c2 <- colors p2]
+             where
+               dist c1 c2      = foldr (+) 0 . map (^2) $ zipWith (-) c1 c2
+               colors          = map c2l . Set.toList . productColors
+               c2l (ProductColor (RGB r g b)) = [r, g, b]
 
 
 allUsers :: Query EcomState [User]
@@ -330,15 +341,17 @@ getProductColors Product{..} = map unProductColor $ Set.toList productColors
 getProductSizes :: Product -> [Int]
 getProductSizes Product{..} = map unProductSize $ Set.toList productSizes
 
-getProductCategory :: Product -> Text
-getProductCategory Product{..} = cat
-    where (ProductCategory cat) = productCategory
+getProductCategories :: Product -> [Text]
+getProductCategories Product{..} = map unProductCategory $ Set.toList productCategories
 
 unProductColor :: ProductColor -> Colour Double
 unProductColor (ProductColor (RGB r g b)) = sRGB r g b
 
 unProductSize :: ProductSize -> Int
 unProductSize (ProductSize s) = s
+
+unProductCategory :: ProductCategory -> Text
+unProductCategory (ProductCategory p) = p
 
 ----------------------------------------------------------------------------------------------------
 
