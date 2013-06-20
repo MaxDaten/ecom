@@ -167,6 +167,9 @@ genProduct = do
 genUUIDFromProduct :: Product -> UUID
 genUUIDFromProduct p = generateNamed namespaceOID $ BS.unpack (Aeson.encode p)
 
+mkUser :: Text -> User
+mkUser name = User name []
+
 ----------------------------------------------------------------------------------------------------
 
 data EcomState = EcomState { catalog :: IxSet Product
