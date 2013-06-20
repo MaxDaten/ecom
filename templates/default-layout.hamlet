@@ -1,3 +1,7 @@
+$maybe msg <- emsg
+    <div #message>#{msg}
+$maybe msg <- imsg
+    <div #message>#{msg}
 $maybe msg <- mmsg
     <div #message>#{msg}
 ^{widget}

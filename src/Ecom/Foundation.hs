@@ -12,6 +12,9 @@ import              Network.HTTP.Conduit        (Manager)
 import              Text.Jasmine                (minifym)
 import              Text.Hamlet                 (hamletFile)
 import              Data.Text                   (Text)
+import qualified    Data.Text                   as T
+import qualified    Data.Text.Lazy              as LT
+import qualified    Text.Blaze.Html.Renderer.Text as RenderText
 import              System.Log.FastLogger       (Logger)
 ----------------------------------------------------------------------------------------------------
 import              Data.Acid
@@ -76,6 +79,8 @@ instance Yesod Ecom where
     defaultLayout widget = do
         master <- getYesod
         mmsg <- getMessage
+        imsg <- getInfoMessage
+        emsg <- getErrorMessage
 
         -- We break up the default layout into two components:
         -- default-layout is the contents of the body tag, and
@@ -131,6 +136,48 @@ instance RenderMessage Ecom FormMessage where
 -- | Get the 'Extra' value, used to hold data from the settings.yml file.
 getExtra :: Handler Extra
 getExtra = fmap (appExtra . settings) getYesod
+
+----------------------------------------------------------------------------------------------------
+
+infoMessageId :: Text
+infoMessageId = "_MSIMSG"
+
+errorMessageId :: Text
+errorMessageId = "_MSEMSG"
+
+setMessageHtml:: (MonadHandler m) => Text -> Html -> m ()
+setMessageHtml msgId = 
+    setSession msgId . T.concat . LT.toChunks . RenderText.renderHtml
+
+getMessageHtml :: (MonadHandler m) => Text -> m (Maybe Html)
+getMessageHtml msgId = do
+    mMsg <- fmap (fmap preEscapedToMarkup) $ lookupSession msgId
+    deleteSession msgId
+    return mMsg
+
+setErrorMessage :: (MonadHandler m) => Html -> m ()
+setErrorMessage = setMessageHtml errorMessageId
+
+setErrorMessageI :: (MonadHandler m, RenderMessage (HandlerSite m) msg)
+                 => msg -> m ()
+setErrorMessageI msg = do
+    mr <- getMessageRender
+    setErrorMessage (toHtml (mr msg))
+
+getErrorMessage :: MonadHandler m => m (Maybe Html)
+getErrorMessage = getMessageHtml errorMessageId
+
+setInfoMessage :: (MonadHandler m) => Html -> m ()
+setInfoMessage = setMessageHtml infoMessageId
+
+setInfoMessageI :: (MonadHandler m, RenderMessage (HandlerSite m) msg)
+                 => msg -> m ()
+setInfoMessageI msg = do
+    mr <- getMessageRender
+    setInfoMessage (toHtml (mr msg))
+
+getInfoMessage :: MonadHandler m => m (Maybe Html)
+getInfoMessage = getMessageHtml infoMessageId
 
 ----------------------------------------------------------------------------------------------------
 

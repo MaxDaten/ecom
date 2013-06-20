@@ -6,6 +6,8 @@ import Data.Colour (darken)
 import Ecom.Import
 import Ecom.Utils
 
+import qualified Data.Text as T
+
 
 getAdminAllUsersR :: Handler RepHtml
 getAdminAllUsersR = do
@@ -25,18 +27,11 @@ postAdminAllUsersR = do
             case mUser of
                 Nothing -> do
                     acidUpdate (InsertUser user)
-                    defaultLayout [whamlet|
-                            <p>created: #{show $ username user}
-                            <a .btn href=@{AdminAllUsersR}>_{MsgAdminUsers}
-                          |]
-                _ -> defaultLayout [whamlet|
-                            <p>_{MsgUserAlreadyExisting}: <a href=@{AdminUserR (username user)}>#{username user}
-                            <a .btn href=@{AdminAllUsersR}>_{MsgAdminUsers}
-                           |]
-        _ -> defaultLayout [whamlet|
-                                <p>Falsche Eingabe
-                                ^{basicUserForm widget enctype}
-                            |]
+                    setInfoMessageI $ MsgUserCreated (username user)
+                _ -> setErrorMessageI MsgUserAlreadyExisting
+        _ -> do
+            setErrorMessageI MsgInvalidInput
+    redirect AdminAllUsersR
 
 
 
@@ -51,7 +46,7 @@ getAdminCreateUserR = do
 getAdminDeleteUserR :: Text -> Handler RepHtml
 getAdminDeleteUserR name = do
     acidUpdate (DeleteUserByName name)
-    getAdminAllUsersR
+    redirect AdminAllUsersR
 
 
 getAdminUserR :: Text -> Handler RepHtml
