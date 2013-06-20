@@ -287,6 +287,16 @@ insertUser u = do
     put $ ecom { users = IxSet.updateIx (username u) u users }
 
 
+deleteUser :: User -> Update EcomState ()
+deleteUser u = deleteUserByName (username u)
+
+
+deleteUserByName :: Text -> Update EcomState ()
+deleteUserByName name = do
+    ecom@EcomState{..} <- get
+    put $ ecom { users = IxSet.deleteIx name users }
+
+
 userByName :: Text -> Query EcomState (Maybe User)
 userByName name = do
     EcomState{..} <- ask
@@ -346,6 +356,8 @@ makeAcidic ''EcomState [ 'fetchState, 'putState
                        , 'similarProducts
 
                        , 'insertUser
+                       , 'deleteUser
+                       , 'deleteUserByName
                        , 'allUsers
                        , 'userByName
                        , 'usersByProducts
