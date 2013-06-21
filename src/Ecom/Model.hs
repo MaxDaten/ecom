@@ -320,6 +320,11 @@ usersByProducts ps = do
     return . IxSet.toList $ users @+ ps
 
 
+addProductToUserHistory :: Product -> User -> Update EcomState ()
+addProductToUserHistory product user = let hs = history user in
+    insertUser $ user { history = product:hs }
+
+
 ----------------------------------------------------------------------------------------------------
 
 -- annoying access -- maybe we will use some lenses?
@@ -374,6 +379,7 @@ makeAcidic ''EcomState [ 'fetchState, 'putState
                        , 'allUsers
                        , 'userByName
                        , 'usersByProducts
+                       , 'addProductToUserHistory
                        ]
 
 ----------------------------------------------------------------------------------------------------

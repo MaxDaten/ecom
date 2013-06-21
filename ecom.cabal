@@ -27,6 +27,7 @@ library
                      Ecom.Handler.Product
                      Ecom.Handler.ProductAssoc
                      Ecom.Handler.Admin
+                     Ecom.Handler.Auth
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

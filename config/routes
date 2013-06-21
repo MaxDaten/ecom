@@ -5,6 +5,8 @@
 
 /                       	HomeR           	GET
 /prod/#ProductId        	ProductR        	GET
+/prod/buy/#ProductId		BuyProductR			GET
+
 /assoc/#ProductId       	ProductAssocR   	GET
 
 /admin/products        		AdminProductsR  	GET
@@ -17,3 +19,4 @@
 
 /user/#Text					UserR 				GET
 
+/auth/login/#Text			LoginUserR			GET

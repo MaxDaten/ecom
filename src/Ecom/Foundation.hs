@@ -81,6 +81,7 @@ instance Yesod Ecom where
         mmsg <- getMessage
         imsg <- getInfoMessage
         emsg <- getErrorMessage
+        loggedInUser <- lookupSession "name"
 
         -- We break up the default layout into two components:
         -- default-layout is the contents of the body tag, and

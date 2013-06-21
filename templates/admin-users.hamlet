@@ -12,4 +12,8 @@ $newline never
             <tr>
                 <td><a href=@{AdminUserR (username u)}>#{username u}
                 <td>#{show $ length $ history u}
-                <td><a href=@{AdminDeleteUserR (username u)}><i class="icon-remove-circle"></i>
+                <td><a href=@{AdminDeleteUserR (username u)}>
+                        <i class="icon-remove-circle">
+                    <a href=@{LoginUserR (username u)}>
+                        <i class="icon-eye-open">
+

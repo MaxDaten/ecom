@@ -22,4 +22,28 @@ getProductR pid = do
                 $(widgetFile "productAssoc")
 
 
+getBuyProductR :: ProductId -> Handler RepHtml
+getBuyProductR pid = do
+    mUser <- lookupSession "name"
+    case mUser of
+        Just username -> do
+            mUser' <- acidQuery (UserByName username)
+            
+            case mUser' of
+                Nothing -> do
+                    setErrorMessageI MsgInvalidUser
+                    notAuthenticated
+                Just user -> do
+                    mProd <- acidQuery (ProductById pid)
+
+                    case mProd of
+                        Nothing -> notFound
+                        Just product -> do
+                                setInfoMessageI (MsgProductBought product)
+                                acidUpdate (AddProductToUserHistory product user)
+                                redirect $ ProductR pid
+        Nothing -> do
+            setErrorMessageI MsgPleaseLogin
+            notAuthenticated
+ 
 --productWidget :: Product ->

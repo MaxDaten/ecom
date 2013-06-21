@@ -5,4 +5,5 @@
         <p>#{getProductDescription product}
         $forall color <- getProductColors product
             ^{colorPreview color 50 50}
-        <button .btn .btn-primary .btn-large .btn-buy .pull-right><i class="icon-shopping-cart icon-white"></i> _{MsgBuyProduct}
+        <a .btn .btn-primary .btn-large .btn-buy .pull-right href=@{BuyProductR (productId product)}>
+            <i class="icon-shopping-cart icon-white"></i> _{MsgBuyProduct}

@@ -1,7 +1,9 @@
 $maybe msg <- emsg
-    <div #message>#{msg}
+    <div #error-msg>#{msg}
 $maybe msg <- imsg
-    <div #message>#{msg}
+    <div #info-msg>#{msg}
 $maybe msg <- mmsg
     <div #message>#{msg}
+$maybe user <- loggedInUser
+    <div #logged-user>#{user}
 ^{widget}
