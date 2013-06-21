@@ -1,9 +1,15 @@
-$maybe msg <- emsg
-    <div #error-msg>#{msg}
-$maybe msg <- imsg
-    <div #info-msg>#{msg}
-$maybe msg <- mmsg
-    <div #message>#{msg}
 $maybe user <- loggedInUser
-    <div #logged-user>#{user}
+    <div .alert .alert-success #logged-user>_{MsgLoginAs user}
+$maybe msg <- emsg
+    <div .alert .alert-error #error-msg>
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        #{msg}
+$maybe msg <- imsg
+    <div .alert .alert-info #info-msg>
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        #{msg}
+$maybe msg <- mmsg
+    <div .alert #message>
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        #{msg}
 ^{widget}
