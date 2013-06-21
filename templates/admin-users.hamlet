@@ -11,9 +11,11 @@ $newline never
         $forall u <- allUsers
             <tr>
                 <td><a href=@{AdminUserR (username u)}>#{username u}
-                <td>#{show $ length $ history u}
+                <td><span class="badge badge-success">#{show $ length $ history u}
                 <td><a href=@{AdminDeleteUserR (username u)}>
                         <i class="icon-remove-circle">
                     <a href=@{LoginUserR (username u)}>
                         <i class="icon-eye-open">
+                    <a href="">
+                        <i class="icon-trash">
 
