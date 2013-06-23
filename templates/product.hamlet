@@ -1,7 +1,9 @@
 <h1>#{getProductTitle product }
 <div .product-box>
     <div .product-box-content .clearfix>
-        ^{pageBody mainImg}
-        <p>#{getProductDescription product}
-        ^{basicBuyForm (productId product) formWidget enc}
+        <div .span8 .product-image-container>
+            ^{pageBody mainImg}
+            <p>#{getProductDescription product}
+        <div .span3 .buy-form-container .pull-right>
+                ^{basicBuyForm (productId product) formWidget enc}
 

@@ -74,7 +74,7 @@ sizesField = selectField . return . mkOptionList . (map mkSizeOption) . Set.toLi
 
 
 colorField :: Product -> Field Handler ProductColor
-colorField = radioField . return . mkOptionList . (map mkColorOption) . Set.toList . productColors
+colorField = colorRadioField . return . mkOptionList . (map mkColorOption) . Set.toList . productColors
 
 
 productBuyForm :: Product -> Html -> MForm Handler (FormResult Product, Widget)
@@ -104,3 +104,26 @@ mkSizeOption psize@(ProductSize s) = Option
     , optionExternalValue = pack.show $ s
     }
 
+colorRadioField :: Handler (OptionList ProductColor)
+                -> Field Handler ProductColor
+colorRadioField = selectFieldHelper
+    -- outside
+    (\theId _name _attrs inside -> [whamlet|
+$newline never
+<div ##{theId}>^{inside}
+|])
+    -- onOpt
+    (\theId name isSel -> [whamlet|
+$newline never
+<label .radio for=#{theId}-none>
+    <div>
+        <input id=#{theId}-none type=radio name=#{name} value=none :isSel:checked>
+        _{MsgSelectNone}
+|])
+    -- inside
+    (\theId name attrs pcolor value isSel text -> [whamlet| 
+<label .radio for=#{theId}-#{value}>
+    <div>
+        <input id=#{theId}-#{value} type=radio name=#{name} value=#{value} :isSel:checked *{attrs}>
+        \^{colorPreview (unProductColor pcolor) 25 25}
+|])
