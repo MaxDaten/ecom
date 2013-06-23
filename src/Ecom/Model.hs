@@ -1,7 +1,7 @@
 {-# LANGUAGE TemplateHaskell, QuasiQuotes, DeriveDataTypeable
 , GeneralizedNewtypeDeriving, TypeFamilies, OverloadedStrings, RecordWildCards, FlexibleInstances,
 TypeSynonymInstances, DeriveGeneric, DefaultSignatures, StandaloneDeriving #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -fno-warn-orphans -fwarn-name-shadowing -fwarn-hi-shadowing #-}
 -- mainly inspired by
 -- https://github.com/HalfWayMan/meadowstalk.com/blob/a386797b7b1e470d841dbc9c2cc83b77de63fcab/src/Meadowstalk/Model.hs
 -- Model.hs
@@ -10,10 +10,9 @@ module Ecom.Model where
 --import           Prelude.Unicode
 import           Prelude
 import           Control.Applicative
-import           Control.Monad              (mzero, liftM, join)
+import           Control.Monad              (mzero)
 import           Control.Monad.Reader       (ask)
 import           Control.Monad.State        (get, put)
-import           Data.Maybe
 ----------------------------------------------------------------------------------------------------
 import           Data.IxSet                 (Indexable (..), IxSet, (@=), (@+), Proxy (..), getOne, ixFun, ixSet)
 import qualified Data.IxSet                 as IxSet

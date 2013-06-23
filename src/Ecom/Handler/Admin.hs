@@ -1,12 +1,9 @@
 {-# LANGUAGE TupleSections, OverloadedStrings, RecordWildCards #-}
+{-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 module Ecom.Handler.Admin where
-
-import Data.Colour (darken)
 
 import Ecom.Import
 import Ecom.Utils
-
-import qualified Data.Text as T
 
 
 getAdminAllUsersR :: Handler RepHtml
@@ -20,7 +17,7 @@ getAdminAllUsersR = do
 
 postAdminAllUsersR :: Handler RepHtml
 postAdminAllUsersR = do
-    ((result, widget), enctype) <- runFormPost userForm
+    ((result, _), _) <- runFormPost userForm
     case result of
         FormSuccess user -> do
             mUser <- acidQuery (UserByName (username user))

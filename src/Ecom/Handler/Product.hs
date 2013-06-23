@@ -5,14 +5,9 @@ import Ecom.Import
 import Ecom.Utils
 
 import qualified Data.Set as Set
-import Data.Set (Set)
-import Data.Text (pack, unpack)
-import qualified Data.UUID as UUID
-import Data.Maybe
+import Data.Text (pack)
 
-import Data.Colour.SRGB (sRGB24show, sRGB24read, toSRGB)
-import Data.Colour (darken)
-
+import Data.Colour.SRGB (sRGB24show)
 
 getProductR :: ProductId -> Handler RepHtml
 getProductR pid = do
@@ -37,7 +32,6 @@ getProductR pid = do
 postBuyProductR :: ProductId -> Handler RepHtml
 postBuyProductR baseProductId = do
     mUser <- lookupSession "name"
-    mProduct <- acidQuery (ProductById baseProductId)
 
     case mUser of
         Nothing -> setErrorMessageI MsgPleaseLogin >> redirect HomeR
@@ -52,7 +46,7 @@ postBuyProductR baseProductId = do
                     case mProduct of
                         Nothing -> setErrorMessageI MsgProductNotFound >> notFound
                         Just product -> do
-                            ((result, widget), enctype) <- runFormPost (productBuyForm product)
+                            ((result, _), _) <- runFormPost (productBuyForm product)
                             case result of
                                 FormSuccess product -> do
                                     acidUpdate (AddProductToUserHistory product user)
@@ -97,7 +91,7 @@ basicBuyForm pid widget enctype = toWidget $
     |]
 
 mkColorOption :: ProductColor -> Option ProductColor
-mkColorOption pcolor@(ProductColor c) = Option 
+mkColorOption pcolor = Option 
     { optionDisplay = pack.sRGB24show.unProductColor $ pcolor
     , optionInternalValue = pcolor
     , optionExternalValue = pack.sRGB24show.unProductColor $ pcolor
