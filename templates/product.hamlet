@@ -1,8 +1,7 @@
 <h1>#{getProductTitle product }
 <div .product-box>
-    <div .product-box-content>
+    <div .product-box-content .clearfix>
         ^{pageBody mainImg}
         <p>#{getProductDescription product}
-        $forall color <- getProductColors product
-            ^{colorPreview color 50 50}
-        <button .btn .btn-primary .btn-large .btn-buy .pull-right><i class="icon-shopping-cart icon-white"></i> _{MsgBuyProduct}
+        ^{basicBuyForm (productId product) formWidget enc}
+

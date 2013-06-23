@@ -1,7 +1,7 @@
 {-# LANGUAGE TemplateHaskell, QuasiQuotes, DeriveDataTypeable
 , GeneralizedNewtypeDeriving, TypeFamilies, OverloadedStrings, RecordWildCards, FlexibleInstances,
 TypeSynonymInstances, DeriveGeneric, DefaultSignatures, StandaloneDeriving #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -fno-warn-orphans -fwarn-name-shadowing -fwarn-hi-shadowing #-}
 -- mainly inspired by
 -- https://github.com/HalfWayMan/meadowstalk.com/blob/a386797b7b1e470d841dbc9c2cc83b77de63fcab/src/Meadowstalk/Model.hs
 -- Model.hs
@@ -320,6 +320,25 @@ usersByProducts ps = do
     return . IxSet.toList $ users @+ ps
 
 
+addProductToUserHistory :: Product -> User -> Update EcomState ()
+addProductToUserHistory product user = let hs = history user in
+    insertUser $ user { history = product:hs }
+
+
+clearUserHistory :: User -> Update EcomState ()
+clearUserHistory user =
+    insertUser $ user { history = []}
+
+{-- 
+withUsernameUpdate :: Text -> (User -> Update EcomState a) -> Update EcomState (Maybe a)
+withUsernameUpdate username f = do
+    mUser <- runQuery (userByName username)
+    case mUser of
+        Nothing -> return Nothing
+        (Just user) -> f user >>= return . Just
+--}
+-- narf i dont get it ....
+--   runQuery (userByName username) >>= (fmap f) >>= return
 ----------------------------------------------------------------------------------------------------
 
 -- annoying access -- maybe we will use some lenses?
@@ -374,6 +393,9 @@ makeAcidic ''EcomState [ 'fetchState, 'putState
                        , 'allUsers
                        , 'userByName
                        , 'usersByProducts
+                       , 'addProductToUserHistory
+                       , 'clearUserHistory
+                       --, 'withUsernameUpdate
                        ]
 
 ----------------------------------------------------------------------------------------------------

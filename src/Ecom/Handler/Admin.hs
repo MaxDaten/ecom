@@ -1,7 +1,6 @@
 {-# LANGUAGE TupleSections, OverloadedStrings, RecordWildCards #-}
+{-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 module Ecom.Handler.Admin where
-
-import Data.Colour (darken)
 
 import Ecom.Import
 import Ecom.Utils
@@ -18,25 +17,29 @@ getAdminAllUsersR = do
 
 postAdminAllUsersR :: Handler RepHtml
 postAdminAllUsersR = do
-    ((result, widget), enctype) <- runFormPost userForm
+    ((result, _), _) <- runFormPost userForm
     case result of
         FormSuccess user -> do
             mUser <- acidQuery (UserByName (username user))
             case mUser of
                 Nothing -> do
                     acidUpdate (InsertUser user)
-                    defaultLayout [whamlet|
-                            <p>created: #{show $ username user}
-                            <a .btn href=@{AdminAllUsersR}>_{MsgAdminUsers}
-                          |]
-                _ -> defaultLayout [whamlet|
-                            <p>_{MsgUserAlreadyExisting}: <a href=@{AdminUserR (username user)}>#{username user}
-                            <a .btn href=@{AdminAllUsersR}>_{MsgAdminUsers}
-                           |]
-        _ -> defaultLayout [whamlet|
-                                <p>Falsche Eingabe
-                                ^{basicUserForm widget enctype}
-                            |]
+                    setInfoMessageI $ MsgUserCreated (username user)
+                _ -> setErrorMessageI MsgUserAlreadyExisting
+        _ -> setErrorMessageI MsgInvalidInput
+    redirect AdminAllUsersR
+
+
+postAdminClearHistoryR :: Text -> Handler RepHtml
+postAdminClearHistoryR username = do
+    mUser <- acidQuery (UserByName username)
+    case mUser of
+        Nothing -> setErrorMessageI MsgInvalidUser
+        Just user -> do
+            setInfoMessageI MsgUserHistoryCleared
+            acidUpdate (ClearUserHistory user)
+    redirect AdminAllUsersR
+            
 
 
 
@@ -51,7 +54,7 @@ getAdminCreateUserR = do
 getAdminDeleteUserR :: Text -> Handler RepHtml
 getAdminDeleteUserR name = do
     acidUpdate (DeleteUserByName name)
-    getAdminAllUsersR
+    redirect AdminAllUsersR
 
 
 getAdminUserR :: Text -> Handler RepHtml
