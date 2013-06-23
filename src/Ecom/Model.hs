@@ -10,9 +10,10 @@ module Ecom.Model where
 --import           Prelude.Unicode
 import           Prelude
 import           Control.Applicative
-import           Control.Monad              (mzero)
+import           Control.Monad              (mzero, liftM, join)
 import           Control.Monad.Reader       (ask)
 import           Control.Monad.State        (get, put)
+import           Data.Maybe
 ----------------------------------------------------------------------------------------------------
 import           Data.IxSet                 (Indexable (..), IxSet, (@=), (@+), Proxy (..), getOne, ixFun, ixSet)
 import qualified Data.IxSet                 as IxSet
@@ -325,6 +326,20 @@ addProductToUserHistory product user = let hs = history user in
     insertUser $ user { history = product:hs }
 
 
+clearUserHistory :: User -> Update EcomState ()
+clearUserHistory user =
+    insertUser $ user { history = []}
+
+{-- 
+withUsernameUpdate :: Text -> (User -> Update EcomState a) -> Update EcomState (Maybe a)
+withUsernameUpdate username f = do
+    mUser <- runQuery (userByName username)
+    case mUser of
+        Nothing -> return Nothing
+        (Just user) -> f user >>= return . Just
+--}
+-- narf i dont get it ....
+--   runQuery (userByName username) >>= (fmap f) >>= return
 ----------------------------------------------------------------------------------------------------
 
 -- annoying access -- maybe we will use some lenses?
@@ -380,6 +395,8 @@ makeAcidic ''EcomState [ 'fetchState, 'putState
                        , 'userByName
                        , 'usersByProducts
                        , 'addProductToUserHistory
+                       , 'clearUserHistory
+                       --, 'withUsernameUpdate
                        ]
 
 ----------------------------------------------------------------------------------------------------

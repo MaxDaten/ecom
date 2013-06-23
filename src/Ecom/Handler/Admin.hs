@@ -29,9 +29,20 @@ postAdminAllUsersR = do
                     acidUpdate (InsertUser user)
                     setInfoMessageI $ MsgUserCreated (username user)
                 _ -> setErrorMessageI MsgUserAlreadyExisting
-        _ -> do
-            setErrorMessageI MsgInvalidInput
+        _ -> setErrorMessageI MsgInvalidInput
     redirect AdminAllUsersR
+
+
+postAdminClearHistoryR :: Text -> Handler RepHtml
+postAdminClearHistoryR username = do
+    mUser <- acidQuery (UserByName username)
+    case mUser of
+        Nothing -> setErrorMessageI MsgInvalidUser
+        Just user -> do
+            setInfoMessageI MsgUserHistoryCleared
+            acidUpdate (ClearUserHistory user)
+    redirect AdminAllUsersR
+            
 
 
 

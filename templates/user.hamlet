@@ -4,4 +4,9 @@ $newline never
 <h2>_{MsgBoughtProducts}
 <ul>
     $forall product <- history user
-        <li><a href=@{ProductR (productId product)}>#{getProductDescription product}
+        <li><a href=@{ProductR (productId product)}>#{getProductTitle product}</a>
+            <ul>
+                <li>
+                    #{show $ map colorHex $ getProductColors product}
+                <li>
+                    #{show $ getProductSizes product}

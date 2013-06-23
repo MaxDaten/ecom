@@ -5,7 +5,7 @@
 
 /                       	HomeR           	GET
 /prod/#ProductId        	ProductR        	GET
-/prod/buy/#ProductId		BuyProductR			GET
+/buy/prod/#ProductId		BuyProductR			POST
 
 /assoc/#ProductId       	ProductAssocR   	GET
 
@@ -16,7 +16,9 @@
 /admin/create/user 			AdminCreateUserR 	GET
 /admin/delete/user/#Text 	AdminDeleteUserR   	GET
 /admin/users/#Text 			AdminUserR 			GET
+/admin/delete/history/#Text AdminClearHistoryR	POST
 
 /user/#Text					UserR 				GET
 
 /auth/login/#Text			LoginUserR			GET
+/auth/logout				LogoutR				GET

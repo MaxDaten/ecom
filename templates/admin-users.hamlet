@@ -12,10 +12,14 @@ $newline never
             <tr>
                 <td><a href=@{AdminUserR (username u)}>#{username u}
                 <td><span class="badge badge-success">#{show $ length $ history u}
-                <td><a href=@{AdminDeleteUserR (username u)}>
-                        <i class="icon-remove-circle">
-                    <a href=@{LoginUserR (username u)}>
-                        <i class="icon-eye-open">
-                    <a href="">
-                        <i class="icon-trash">
+                <td>
+                    <form method=get action=@{AdminDeleteUserR (username u)}>
+                        <button .btn .btn-small type=submit>
+                            <i class="icon-remove-circle">
+                    <form method=get action=@{LoginUserR (username u)}>
+                        <button .btn .btn-small type=submit>
+                            <i class="icon-eye-open"></i>
+                    <form method=post action=@{AdminClearHistoryR (username u)}>
+                        <button .btn .btn-small type=submit>
+                            <i class="icon-trash"></i>
 

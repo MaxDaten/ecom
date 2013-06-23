@@ -2,6 +2,7 @@ module Ecom.Foundation where
 
 import              Prelude
 import              Control.Applicative
+import              Data.Maybe                  (isJust)
 ----------------------------------------------------------------------------------------------------
 import              Yesod
 import              Yesod.Static
@@ -133,6 +134,11 @@ instance Yesod Ecom where
 -- achieve customized and internationalized form validation messages.
 instance RenderMessage Ecom FormMessage where
     renderMessage _ _ = defaultFormMessage
+
+isLoggedIn :: Handler Bool
+isLoggedIn = do
+    mUser <- lookupSession "name"
+    return . isJust $ mUser
 
 -- | Get the 'Extra' value, used to hold data from the settings.yml file.
 getExtra :: Handler Extra
