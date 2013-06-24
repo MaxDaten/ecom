@@ -36,11 +36,22 @@ postAdminClearHistoryR username = do
     case mUser of
         Nothing -> setErrorMessageI MsgInvalidUser
         Just user -> do
-            setInfoMessageI MsgUserHistoryCleared
             acidUpdate (ClearUserHistory user)
+            setInfoMessageI MsgUserHistoryCleared
     redirect AdminAllUsersR
             
 
+postAdminDeleteHistoryEntry :: Text -> Int -> Handler RepHtml
+postAdminDeleteHistoryEntry username i = do
+    mUser <- acidQuery (UserByName username)
+    case mUser of
+        Nothing -> do 
+            setErrorMessageI MsgInvalidUser
+            redirect AdminAllUsersR
+        Just user -> do
+            acidUpdate (DeleteHistoryEntry user i)
+            setInfoMessageI MsgUserHistoryEntryDeleted
+            redirect (AdminUserR username)
 
 
 getAdminCreateUserR :: Handler RepHtml
@@ -69,6 +80,7 @@ getUserR name = do
         (Just user) -> defaultLayout $ do
             setTitle $ toHtml $ "User: " ++ show (username user)
             $(widgetFile "user")
+    where idxList = zip ([0..])
 
 
 userAForm :: AForm Handler User

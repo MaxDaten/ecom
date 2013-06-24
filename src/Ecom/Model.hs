@@ -19,6 +19,7 @@ import qualified Data.IxSet                 as IxSet
 import           Data.List                  ((\\), sort)
 import           Data.Set                   (Set, intersection)
 import qualified Data.Set                   as Set
+import           Data.Maybe                 (listToMaybe)
 import           Data.Data
 import           Data.Acid
 import qualified Data.Aeson                 as Aeson
@@ -329,6 +330,13 @@ clearUserHistory :: User -> Update EcomState ()
 clearUserHistory user =
     insertUser $ user { history = []}
 
+deleteHistoryEntry :: User -> Int -> Update EcomState (Maybe Product)
+deleteHistoryEntry user i = do
+    insertUser $ user { history = h1++(drop 1 h2) }
+    return . listToMaybe $ h2
+    where
+        (h1, h2) = splitAt i $ history user
+
 {-- 
 withUsernameUpdate :: Text -> (User -> Update EcomState a) -> Update EcomState (Maybe a)
 withUsernameUpdate username f = do
@@ -395,6 +403,7 @@ makeAcidic ''EcomState [ 'fetchState, 'putState
                        , 'usersByProducts
                        , 'addProductToUserHistory
                        , 'clearUserHistory
+                       , 'deleteHistoryEntry
                        --, 'withUsernameUpdate
                        ]
 

@@ -3,8 +3,11 @@ $newline never
 <hr>
 <h2>_{MsgBoughtProducts}
 <ul>
-    $forall product <- history user
-        <li><a href=@{ProductR (productId product)}>#{getProductTitle product}</a>
+    $forall (i, product) <- idxList (history user) 
+        <li><a href=@{ProductR (productId product)}>#{getProductTitle product}</a> 
+            <form method=post action=@{AdminDeleteHistoryEntry (username user) i}>
+                <button .btn .btn-mini .btn-danger" type=submit>
+                    <i class="icon-remove-circle">
             <ul>
                 <li>
                     $forall color <- getProductColors product
