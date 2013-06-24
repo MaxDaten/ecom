@@ -1,1 +1,9 @@
+.product-box-content {
+	position: relative;
 
+	.buy-form-container {
+		position: absolute;
+		bottom: 0;
+		right: 20px; /* dirty hack */
+	}
+}

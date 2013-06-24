@@ -5,6 +5,8 @@ import           Data.Colour
 import qualified Data.Text as T
 import           Data.UUID
 import           Data.Colour.SRGB (sRGB24show)
+import 			 Data.Maybe (listToMaybe)
+import 			 Control.Monad (unless)
 
 import Ecom.Import
 
@@ -29,3 +31,43 @@ shortenDescription n = (flip T.append $ "...") . T.strip . (T.take n)
 
 colorHex :: (RealFrac b, Floating b) => Colour b -> String
 colorHex = sRGB24show
+
+
+-- copied from :/
+-- http://hackage.haskell.org/packages/archive/yesod-form/1.3.0/doc/html/src/Yesod-Form-Fields.html#selectFieldHelper
+-- modified by me to gain access to the raw value
+selectFieldHelper
+        :: (Eq a, RenderMessage site FormMessage)
+        => (Text -> Text -> [(Text, Text)] -> WidgetT site IO () -> WidgetT site IO ())
+        -> (Text -> Text -> Bool -> WidgetT site IO ())
+        -> (Text -> Text -> [(Text, Text)] -> a -> Text -> Bool -> Text -> WidgetT site IO ())
+        -> HandlerT site IO (OptionList a)
+        -> Field (HandlerT site IO) a
+selectFieldHelper outside onOpt inside opts' = Field
+    { fieldParse = \x _ -> do
+        opts <- opts'
+        return $ selectParser opts x
+    , fieldView = \theId name attrs val isReq -> do
+        opts <- fmap olOptions $ handlerToWidget opts'
+        outside theId name attrs $ do
+            unless isReq $ onOpt theId name $ not $ render opts val `elem` map optionExternalValue opts
+            flip mapM_ opts $ \opt -> inside
+                theId
+                name
+                attrs
+                (optionInternalValue opt)
+                (optionExternalValue opt)
+                ((render opts val) == optionExternalValue opt)
+                (optionDisplay opt)
+    , fieldEnctype = UrlEncoded
+    }
+  where
+    render _ (Left _) = ""
+    render opts (Right a) = maybe "" optionExternalValue $ listToMaybe $ filter ((== a) . optionInternalValue) opts
+    selectParser _ [] = Right Nothing
+    selectParser opts (s:_) = case s of
+            "" -> Right Nothing
+            "none" -> Right Nothing
+            x -> case olReadExternal opts x of
+                    Nothing -> Left $ SomeMessage $ MsgInvalidEntry x
+                    Just y -> Right $ Just y
