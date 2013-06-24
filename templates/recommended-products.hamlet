@@ -1,0 +1,5 @@
+$newline never
+<h2>_{MsgRecommendedProducts}
+<ul>
+    $forall rProduct <- recommendedProducts
+        <li>#{getProductTitle rProduct}

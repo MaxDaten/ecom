@@ -1,4 +1,6 @@
 ShopWellcome         		: Willkommen in unserem Shop
+RecommendedProducts			: Empfohlene Produkte
+ProductCatalog				: Produkt Katalog
 NoProducts           		: keine Produkte gefunden
 
 Submit				 		: Absenden
