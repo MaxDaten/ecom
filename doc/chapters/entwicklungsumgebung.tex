@@ -1,0 +1,73 @@
+\chapter{\index{Umfeld}Umfeld und Überblick}
+Die \emph{implico GmbH} entwickelt seit etwa 10 Jahren Software zur Distributionsplanung für die Öl- und Gasbranche auf der Grundlage von SAP-Systemen. Eines der entwickelten Produkte ist das \emph{Integrated Dispatch Management} (kurz: IDM). Das Ziel von IDM ist es, Ölkonzerne wie z.B. Shell oder Aral bei der Planung ihrer Liefertouren zu unterstützen. Für die Unternehmen besteht ein großer Vorteil von IDM darin, dass es sich nahtlos in SAP\index{SAP}-Systeme integrieren lässt und somit sämtliche Produktivdaten sowie die Planungswerkzeuge in ein und demselben System verfügbar macht. Dadurch können Geschäftsprozesse enorm vereinfacht und Kosten gesenkt werden. \\
+\\
+Im Rahmen dieser Arbeit soll das \emph{\underline{dy}namic \underline{o}ptimization \underline{n}ature-\underline{i}nspired \underline{sys}tem} \textsc{Dyonisys} entstehen, welches in Echtzeit auf Ereignisse der realen Welt reagiert und die Liefertouren an diese anpasst. Parallel werden von Timo Jürgens ein Terminvorschlags-System für den Telefonverkauf (\textsc{TermiDe}) und von Nicolas Woldt ein Tourenoptimierer (\textsc{IcedG}) entwickelt. Für die Kommunikation mit dem SAP-System wird die von André Bente entwickelte \emph{\underline{A}llgemeine \underline{T}ouren-\underline{O}primierungs \underline{S}chnittstelle} \textsc{ATOS} verwendet.
+
+
+\section{\index{ATOS}ATOS}
+\textsc{ATOS} wurde von André Bente im Rahmen seiner Bachelor-Arbeit entwickelte und kapselt sämtliche Kommunikation zwischen dem SAP-System und den Optimierungskomponenten. Durch die Verwendung von \textsc{ATOS} ist einerseits die zentrale Datenhaltung im SAP-System möglich, andererseits können die Optimierer transparent mit den für die Planung nötigen Daten versorgt werden. Auch die Rückerfassung verplanter und nicht-verplanter Aufträge gestaltet sich auf diese Weise einfach.
+
+
+\section{\index{TermiDe}TermiDe}\label{chp:umfeld_termide}
+\textsc{TermiDe} soll in der Vordisposition\index{Vordisposition} eingesetzt werden und die Verkäufer beim Vergeben von Lieferterminen am Telefon unterstützen. Es wird dabei bereits für mehrere Wochen im Voraus ein grober Lieferplan erstellt und beim Eintreffen neuer Aufträge erweitert. \textsc{TermiDe} berechnet für jeden neuen Auftrag mögliche Lieferzeiten und schlägt sie dem Verkäufer vor, dieser macht dann einen Termin mit dem Kunden aus. \\
+\\
+Das Ziel von \textsc{TermiDe} ist es, einen vorläufigen Plan zu erstellen, der garantiert gültig ist, also unter Verwendung der vorhandenen Fahrzeuge und Produkte ausgeführt werden kann. Es soll auf diese Weise ausgeschlossen werden, dass in der nachfolgenden Optimierung durch \textsc{IcedG} unlösbare Szenarien verarbeitet werden müssen. Die Forderungen bezüglich der Antwortzeit von \textsc{TermiDe} sind dabei sehr hoch, es soll nach bereits wenigen Sekunden angegeben werden, ob ein Kunde am gewünschten Termin beliefert werden kann, um langes Warten am Telefon zu vermeiden.
+
+
+\section{\index{IcedG}IcedG}\label{chp:umfeld_icedg}
+\textsc{IcedG} erhält als Eingabe einen von \textsc{TermiDe} berechneten Plan, der garantiert gültig ist. Es sollen nun die Kosten minimiert werden, denn \textsc{TermiDe} macht keine Aussagen bezüglich der Qualität des Plans. \\
+\\
+Zur Optimierung setzt \textsc{IcedG} die Tabu-Suche\index{Tabu-Suche} ein. Dabei werden die Aufträge des bisherigen Plans solange miteinander getauscht, bis keine guten Vertauschungen mehr möglich sind. Vertauschungen werden als gut betrachtet, solange sie keine zu hohe Kostenverschlechterung bedeuten. Bereits durchgeführte sowie zu schlechte Vertauschungen werden in eine Tabu-Liste eingetragen und dürfen nicht erneut durchgeführt werden. Die Kosten des Plans werden dabei in der Regel gesenkt, das Finden des optimalen Plans ist möglich, kann aber nicht garantiert werden. \\
+\\
+Das Ziel von \textsc{IcedG} ist es, die Kosten des Plans zu minimieren. Dabei wird in Kauf genommen, dass die Berechnung sehr lange dauert und so findet die Optimierung mit \textsc{IcedG} jeweils in der Nacht vor dem Tag der Ausführung des Plans statt. Der durch \textsc{IcedG} optimierte Plan dient als Eingabe für \textsc{Dyonisys}.
+
+
+\section{\index{Dyonisys}Dyonisys}\label{chp:umfeld_dyonisys}
+\textsc{Dyonisys} erhält als Eingabe den von \textsc{IcedG} optimierten Plan für den aktuellen Tag und wartet dann auf weitere Eingaben. Tritt ein Ereignis ein, also fällt z.B. ein Fahrzeug aus oder ein neuer, hoch priorisierter Auftrag trifft ein, so wird \textsc{Dyonisys} darüber informiert. \textsc{Dyonisys} versucht dann, den Plan an die neue Situation anzupassen und dabei die Kosten möglichst gering zu halten. Es kann passieren, dass durch die eingetretenen Ereignisse Situationen entstehen, in denen nicht alle ursprünglich geplanten Kunden beliefert werden können. \\
+\\
+Ziel von \textsc{Dyonisys} ist es, innerhalb weniger Minuten einen neuen Plan zur Verfügung zu stellen. Da das Auffinden eines kostenminimalen Ersatzplans in der Kürze der Zeit nicht garantiert werden kann, werden auch weniger gute Pläne akzeptiert. Wichtig ist es, \emph{dass} ein Plan, und somit eine Entscheidungsgrundlage, vorhanden ist. \\
+\\
+Stell sich am Ende des Tages heraus, dass es Aufträge gibt, die hätten beliefert werden sollen, es aber nicht wurden, so wird \textsc{TermiDe} darüber informiert und plant die betroffenen Aufträge neu ein. \\
+\\
+Der Name \textsc{Dyonisys} zeigt einerseits, was das System tut, nämlich dynamische Problemstellungen mit einem Verfahren zu optimieren, das der Natur nachempfunden ist, andererseits ist er aber auch in Anlehnung an den griechischen Gott der Freude und Ernte gewählt, lediglich die Schreibweise ist etwas abgewandelt.
+
+
+\section{DOT\index{DOT}}\label{chp:dot}
+\textsc{DOT} ist das \emph{\underline{D}isposition \underline{O}ptimization \underline{T}oolset}, welches sich aus \textsc{TermiDe}, \textsc{IcedG} und \textsc{Dyonisys} zusammensetzt und die Funktionalität der drei Module zusammenfasst. Die Kommunikationswege, über die \textsc{DOT} mit Hilfe von \textsc{ATOS} einheitlich angesprochen und verwendet werden kann, sind in \figref{fig:dot} veranschaulicht. \\
+\\
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\textwidth]{img/kommunikation.pdf}
+  \caption{Interaktion von \textsc{TermiDe}, \textsc{IcedG} und \textsc{Dyonisys}}
+  \label{fig:dot}
+\end{figure}
+\nomenclature{DOT}{Disposition Optimization Toolset}
+
+
+\section{xServer\index{xServer}}\label{chp:x-server}
+Die xServer sind ein von der PTV AG hergestelltes Softwarepaket zur Verkehrsoptimierung. Sie stellen mit xMap, xLocate und xRoute verschiedene Funktionalitäten zur Verfügung. \\
+\\
+xMap liefert Kartenmaterial und bietet die Möglichkeit, dieses anzuzeigen. Mit xLocate lässt sich die Zuordnung von Adressen auf Geokoordinaten vornehmen. Über xRoute können Wege zwischen Geokoordinaten bestimmt werden. Die für das Routing verwendeten Kriterien sind dabei konfigurierbar.
+
+
+\section{Java\index{Java} und die Java Virtual Machine\index{Java Virtual Machine}}
+Als Programmiersprache für die Entwicklung von \textsc{DOT} soll \textsf{Java} verwendet werden. Ursprünglich standen auch die von der SAP entwickelte, proprietäre Programmiersprache \textsf{ABAP}\index{ABAP} und \textsf{C++}\index{C++++} zur Diskussion. Die Entscheidung gegen \textsf{ABAP} ist jedoch sehr schnell gefallen, da \textsf{ABAP} als Programmiersprache der 4. Generation\footnote{Als Programmiersprache der 4. Generation werden Sprachen bezeichnet, die ein hohes Abstraktionsniveau aufweisen und die Erstellung komplexer Anwendungen in wenigen Zeilen ermöglichen, es wird nicht beschrieben \textbf{wie} etwas gemacht werden soll, sondern \textbf{was} gemacht werden soll.\vspace*{-20pt}} ein hohes Abstraktionsniveau aufweist und somit für rechenintensive Optimierungsaufgaben und maschinennahe Programmierung potenziell eher ungeeignet ist. Außerdem konnte in Tests, wie z.B. am \textsc{Euklidischen Algorithmus}, gezeigt werden, dass die Performance von Programmen unter \textsf{ABAP} ihrem Pendant in \textsf{Java} und \textsf{C++} deutlich unterlegen ist. Dies lässt sich mit dem hohen Vorkommen arithmetischer Operationen und der Tatsache begründen, dass \textsf{ABAP} interpretiert, \textsf{Java} und \textsf{C++} aber kompiliert werden. \\
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+  \vspace{-20pt}
+  \begin{center}
+    \includegraphics[width=0.45\textwidth]{img/Java.pdf}
+  \end{center}
+  \vspace{-10pt}
+  \caption[Ausführung von \textsf{Java}-Programmen]{Vereinfachte Darstellung der Ausführung von \textsf{Java}-Programmen mit der \textsf{HotSpot JVM}}
+  \label{fig:manhattan}
+\end{wrapfigure}
+
+\noindent
+Zum einen fiel die Entscheidung schluss\-end\-lich auf \textsf{Java}, da hier die Entwicklung u.a. durch ein konsequenteres Sprachdesign und automatische Speicherverwaltung enorm erleichtert wird. Zum anderen spielen unternehmenspolitische Grunde eine Rolle, so lassen sich auf dem Arbeitsmarkt leichter \textsf{Java}-Entwickler als \textsf{C++}-Entwickler finden. \\
+\\
+Auch bezüglich der Performance müssen keine Bedenken bestehen, \textsf{Java} hat seinen schlechten Ruf in den vergangenen Jahren durch die Optimierung der \textsf{Java Virtual Machine} (kurz: \textsf{JVM}) wettmachen können. In \textsf{Java} geschriebene Programme werden zunächst in ein Zwischen-Format kompiliert, den sogenannten Bytecode\index{Bytecode}. Die \textsf{JVM} nimmt zur Ausführungszeit den Bytecode her und übersetzt ihn mit Hilfe eines \textsf{Just-In-Time}-Compilers (\textsf{JIT}) in Maschinencode, der dann direkt auf der Hardware zur Ausführung kommt. Während der Ausführung kann die \textsf{JVM} den Codeablauf verfolgen und analysieren und wird gegebenenfalls häufig benutzte Codebereiche (sogenannte \textsf{Hot\-Spots}) optimieren und den Maschinencode durch den optimierten ersetzen. Dies geschieht mit einem Verfahren, das \textsf{Hot Swapping} genannt wird und das Austauschen von Maschinencode während der Ausführung erlaubt. Das augeführte Programm kann mit dem optimierten Code unmittelbar weiterlaufen. \\
+\\
+Außerdem bietet sich der große Vorteil, dass \textsf{Java}-Bytecode auf jeder Architektur ausgeführt werden kann, für die eine \textsf{JVM} implementiert wurde. Portierungen gestalten sich auf diese Weise sehr einfach und erfordern aufgrund der Standardisierung der \textsf{JVM} (prinzipell) keine Anpassungen.
+\nomenclature{JVM}{Java Virtual Machine}
+\nomenclature{JIT}{Just In Time}

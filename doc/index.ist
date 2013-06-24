@@ -1,0 +1,19 @@
+% Macht einen Großbuchstaben vor jede Buchstabengruppe im Index
+headings_flag 1 % schaltet Überschriften ein (Großbuchstaben)
+
+% Diese Buchstaben auch fett... (dank an Stefan Benz)
+heading_prefix "{\\bfseries "
+heading_suffix "}\\nopagebreak\n"
+
+% Oder vergrößert und zentriert
+%heading_prefix "{\\bfseries\\Large\\hfill{}"
+%heading_suffix "\\hfill{}}\\nopagebreak\n"
+
+%...und Auffüllen mit Dots, zur Führung des Auges
+delim_0 "\\dotfill " delim_1 "\\dotfill " delim_2 "\\dotfill "
+
+% Damit 'deutsch' geordnet werden kann
+quote '+'
+
+symhead_negative "Symbole"
+symhead_positive "Symbole"

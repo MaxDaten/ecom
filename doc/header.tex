@@ -1,0 +1,180 @@
+% Einseitig A4, 12 Punkt Schriftgröße, Literatur-, Tabellen- und Abbildungsverzeichnis im Inhaltsverzeichnis
+% Kopf- und Fußzeile zählen zum Rand und nicht zum Textkörper, Bindekorrektur von 5 mm, zwischen den Absätzen
+% 0.5 zeiligen Abstand
+\documentclass[a4paper,12pt,headsepline,bibtotoc,liststotoc,headexclude,footexclude,BCOR5mm,halfparskip]{scrreprt} %draft
+
+% Umlaute können direkt als Umlaute geschrieben werden
+\usepackage[utf8x]{inputenc}
+
+% Silbentrennung etc. in neuer deutscher Rechtschreibung
+\usepackage[ngerman]{babel}
+
+% Zusätzliche Symbole
+\usepackage{textcomp}
+
+% Schickerer Satzspiegel mit KOMA-Script
+\usepackage{scrpage2}
+
+% Zum setzen des Zeilenabstands
+\usepackage{setspace}
+
+% Für Grafiken
+\usepackage{graphicx}
+
+% Rahmen in 0Pixel Entfernung zeichnen
+\setlength{\fboxsep}{0pt}
+
+% Tabellen mit automatischem Zeilenumbruch und multirow
+\usepackage{tabularx}
+\usepackage{multirow}
+
+% Für textumflossene Bilder
+\usepackage{float}
+\usepackage{wrapfig}
+
+% Für Listings
+\usepackage{listings}
+
+% Für Tabellen mit multirow
+\usepackage{multirow}
+
+% Für Formeln
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage[german, intoc]{nomencl}
+
+% Satzspiegel neu berechnen
+\typearea[current]{12}
+
+% Volle Seite verwenden
+%\usepackage{fullpage}
+
+% Standardseiten mit Kopfzeile ausgeben
+\pagestyle{scrheadings}
+
+% Listings sind in Java
+\lstset{language=Java, float, captionpos=b, numbersep=5pt, frame=single, tabsize=2, aboveskip=1em, framerule=0.1pt, numbers=left, numberblanklines=false, basicstyle=\ttfamily}
+
+% Alle Kopf- und Fußzeilen löschen
+\clearscrheadings
+\clearscrplain
+\clearscrheadfoot
+
+% Automatische Kopfzeile konfigureren mit Kapitelnamen und Abschnittsnamen
+\automark[section]{chapter}
+% Rechts unten immer Seitenzahl ausgeben
+\ofoot[\pagemark]{\pagemark}
+% In der Kopfzeile nur auf Seiten ohne neuen Kapitelanfang
+\ihead[]{\leftmark}
+\ohead[]{\rightmark}
+
+%usepackages einbinden
+\usepackage{float}
+\usepackage{sidecap}
+\usepackage{subfig}
+\usepackage{pdfpages}
+\usepackage{longtable}
+
+% URLs darstellen
+\usepackage{url}
+
+% Querformat
+\usepackage{lscape}
+
+% Schusterjunge & Hurenkind
+\clubpenalty = 10000
+\widowpenalty = 10000
+\displaywidowpenalty = 10000
+\hbadness = 10000
+
+% Satzspiegel vergrößern
+\addtolength{\textheight}{1.6em}
+
+% Kopfzeile nach unten verschieben
+\addtolength{\voffset}{1.4em}
+
+% markup definieren
+\usepackage[normalem]{ulem}
+\newcommand{\markup}[1]{\textbf{#1}}
+
+% Einzug einstellen
+\setlength{\parindent}{0.7em}
+
+% Einzug einstellen
+\setcapindent{1.5em}
+
+%eigene befehle
+\newcommand{\figref}[1]{(\figurename~\ref{#1},~S.~\pageref{#1})}
+\newcommand{\eqnref}[1]{(Gleichung~\ref{#1},~S.~\pageref{#1})}
+\newcommand{\defref}[1]{(Definition~\ref{#1},~S.~\pageref{#1})}
+\newcommand{\gueref}[1]{(Vermutung~\ref{#1},~S.~\pageref{#1})}
+\newcommand{\algref}[1]{(Algorithmus~\ref{#1},~S.~\pageref{#1})}
+\newcommand{\tblref}[1]{(\tablename~\ref{#1},~S.~\pageref{#1})}
+\newcommand{\chpref}[1]{(\chaptername~\ref{#1},~S.~\pageref{#1})}
+\newcommand{\appref}[1]{(\appendixname~\ref{#1},~S.~\pageref{#1})}
+
+\usepackage{makeidx}
+
+% pstricks Bilder erstellen
+\usepackage{pstricks}
+\usepackage{pst-node}
+
+% Darstellung für Algorithmen, nummeriert anhand der Sektion, in der sie auftreten
+\usepackage[section]{algorithm}
+\usepackage{algorithmic}
+
+% Ausgabe von Makros für Algorithmen verändern
+\floatname{algorithm}{Algorithmus}
+\renewcommand{\algorithmicrequire}{\textbf{Eingabe:}}
+\renewcommand{\algorithmicensure}{\textbf{Ausgabe:}}
+\renewcommand{\algorithmicwhile}{\textbf{solange}}
+\renewcommand{\algorithmicfor}{\textbf{für}}
+\renewcommand{\algorithmicdo}{\textbf{tue}}
+\renewcommand{\algorithmicif}{\textbf{wenn}}
+\renewcommand{\algorithmicthen}{\textbf{dann}}
+\renewcommand{\algorithmicelse}{\textbf{sonst}}
+\renewcommand{\algorithmicto}{\textbf{bis}}
+\renewcommand{\algorithmicend}{\textbf{ende}}
+\renewcommand{\algorithmicand}{\textbf{und}}
+\renewcommand{\algorithmicor}{\textbf{oder}}
+\renewcommand{\algorithmiccomment}[1]{// #1}
+
+% Erscheinungsbild von Beweisen, Vermutungen etc festlegen.
+\theoremstyle{theorem}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{corollary}[theorem]{Korollar}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{guess}[theorem]{Vermutung}
+
+% Deutsche Ausgabe
+\renewcommand{\listalgorithmname}{Algorithmenverzeichnis}
+\renewcommand{\nomname}{Abkürzungs- und Symbolverzeichnis}
+\newcommand{\definitionname}{Definition}
+\newcommand{\guessname}{Vermutung}
+
+% Nummerierungsarten
+\captionsetup{figurewithin=chapter,tablewithin=chapter}
+\numberwithin{equation}{chapter}
+\numberwithin{theorem}{chapter}
+\numberwithin{algorithm}{chapter}
+\numberwithin{table}{chapter}
+
+% Punkte zw. Abkürzung und Erklärung
+\setlength{\nomlabelwidth}{.20\hsize}
+\renewcommand{\nomlabel}[1]{#1 \dotfill}
+% Zeilenabstände verkleinern
+\setlength{\nomitemsep}{-\parsep}
+
+% ------------------------------------------------------------------------------
+%
+% ------------------------------------------------------------------------------
+\author{}
+\date{}
+\title{\textsc{DYONISYS} \\ Just-In-Time Optimierung des \\ Vehicle Routing Problem \\ \;}
+\subtitle{Bachelor-Thesis \\ von Christopher Blöcker \\ im Fachbereich Informatik \\ an der Fachhochschule Wedel}
+
+\makeindex
+\makenomenclature

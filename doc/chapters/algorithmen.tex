@@ -1,0 +1,137 @@
+\chapter{\index{Grundlagen}Grundlagen}
+Dieses Kapitel gibt einen Überblick über die Grundlagen, die zum Verständnis der weiteren Arbeit erforderlich sind. Wir werden einige Begriffe aus der Theorie betrachten und sie in Zusammenhang mit unserer Problemstellung bringen.
+
+
+% +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+% Graphentheorie
+% +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+\section{\index{Graphentheorie}Graphentheorie}\label{chp:graph}
+Die Graphentheorie bildet ein Teilgebiet der Mathematik, sie befasst sich mit der Untersuchung der Eigenschaften sogenannter Graphen. \index{Graph}Graphen bestehen aus einer Menge von Objekten, auch \index{Knoten}\emph{Knoten} genannt, und einer Menge von Verbindungen zwischen den Objekten, auch \index{Kante}\emph{Kanten} genannt. Die Kanten können \emph{gerichtet} oder \emph{ungerichtet} sein, d.h. eine Richtung besitzen oder nicht. Gerichtete Kanten symbolisieren wir durch einen Pfeil. \\
+
+\begin{wrapfigure}{r}{0.4\textwidth}
+  \vspace{-20pt}
+  \begin{center}
+    \includegraphics[width=0.33\textwidth]{img/Manhattan.pdf}
+  \end{center}
+  \vspace{-20pt}
+  \caption[Beispiel: Graph]{Ausschnitt des Straßennetzes von Manhattan mit Einbahnstraßen, modelliert als Graph.}
+  \vspace{-10pt}
+  \label{fig:manhattan}
+\end{wrapfigure}
+
+\noindent
+Wir können Graphen zur Modellierung verschiedener Dinge verwenden, z.B. für ein Straßennetz. Die Knoten entsprechen dann den Kreuzungen, die Kanten den Straßen zwischen den Kreuzungen. Auf ungerichteten Kanten kann in beide Richtungen verkehrt werden, während gerichtete Kanten Einbahnstraßen darstellen. \\
+\\
+Es ist auch möglich, dass die Kanten und Knoten mit einem Wert versehen sind, in diesem Fall sprechen wir von einem \emph{kanten}- bzw. \emph{knotenbewerteten} Graphen. In einem Straßennetzes kann der Wert einer Kante z.B. für ihre Länge stehen, der Wert eines Knoten für die Zeit, die gewartet werden muss, ehe die Kreuzung passiert werden kann. \\
+\\
+Einen Graphen, bei dem jedes Paar von Knoten miteinander verbunden ist, bezeichnen wir als \emph{vollständig}. Wenn es zwischen zwei Knoten eine Kante gibt, dann bezeichnen wir diese Knoten als \emph{adjazent}. Über eine Kante sagen wir, dass sie mit einem Knoten \emph{inzident} ist, wenn er einer der Endpunkt dieser Kante ist.
+
+\clearpage
+\begin{definition}[]{\textbf{Graph}} \newline
+Ein Graph $G = \left( V, E \right)$ ist ein Paar, bestehend aus einer Menge $V$ von Knoten und einer Menge $E$ von Kanten, die je zwei Knoten miteinander verbinden. Zusätzlich können Bewertungsfunktionen für die Kanten bzw. Knoten gegeben sein.
+\label{def:graph}
+\end{definition}
+
+\noindent
+In den nachfolgenden Kapiteln werden wir Graphen verwenden, um das Problem der Tourenplanung zu modellieren. Für weitere Informationen zum Thema Graphentheorie sei auf \cite{Beutelspacher} und \cite{Turau} verwiesen.
+\nomenclature{G}{Ein Graph}
+\nomenclature{V}{Menge von Knoten}
+\nomenclature{E}{Menge von Kanten}
+
+
+% +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+% Komplexitätstheorie
+% +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+\section{\index{Komplexitätstheorie}Komplexitätstheorie}\label{chp:complexity}
+Die \index{Komplexitätstheorie}Komplexitätstheorie untersucht die Schwierigkeit von Problemen und trifft Aussagen darüber, wie viel \emph{Zeit} und \emph{Speicherplatz} zur Lösung eines Problems mindestens notwendig sind. Um die Komplexität eines konkreten Problems festzustellen, werden die Algorithmen betrachtet, die es lösen. Der \emph{beste bekannte} Algorithmus gibt dann die Komplexität des Problems an. Es ist durchaus möglich, dass es noch bessere Algorithmen gibt, diese aber bisher nicht bekannt sind und somit die Komplexität des Problems geringer ist als vermutet. \\
+\\
+Die Komplexität eines Problems wird in der \emph{Anzahl an Rechenschritten} gemessen, die der beste bekannte Algorithmus machen muss, um es zu lösen. Es ist klar, dass wir für den praktischen Einsatz Algorithmen suchen, die schnell zu einem Ergebnis kommen. Da es im allgemeinen sehr schwierig ist, exakt anzugeben, wieviele Schritte ein Algorithmus benötigt, wird hierbei mit \emph{oberen Schranken} gerechnet. Diese Schranken werden in Abhängigkeit von der Eingabelänge in Form von Funktionen unter Verwendung der sogenannten $\mathcal{O}$-Notation\footnote{gesprochen: ``Groß-O-Notation''.} beschrieben. \\
+\\
+Die \emph{maximale} Anzahl an Rechenschritten, die ein Algorithmus $\mathcal{A}$ benötigt, um für Eingaben der Länge $n$ die Lösung zu berechnen, bezeichnen wir als $t_\mathcal{A} \left( n \right)$. Wenn es eine Funktion $f$ gibt, die für jedes $n \in \mathbb{N}$ größer ist als $t_\mathcal{A}$, dann schreiben wir dafür $t_\mathcal{A} \in \mathcal{O} \left( f \right)$\footnote{gesprochen: ``$t_\mathcal{A}$ ist von der Größenordnung $f$''.}. Wenn es sich bei $f$ um ein Polynom handelt, $f$ also geschrieben werden kann als
+\begin{equation}
+f \left( n \right) = a_i \cdot n^{c_i} + \ldots + a_0 \cdot n^{c_0},
+\end{equation}
+dann sagen wir, dass $\mathcal{A}$ in polynomieller Zeit läuft. Für gewöhnlich werden dabei Konstanten ignoriert und nur der größte Exponent betrachtet. So würden wir z.B. nicht $t_\mathcal{A} \in \mathcal{O} \left( 2 \cdot n^3 + n^2 \right)$ schreiben, sondern $t_\mathcal{A} \in \mathcal{O} \left( n^3 \right)$. \\
+\\
+Die Menge aller Algorithmen mit polynomieller Laufzeit bezeichnen wir als $\mathcal{P}$, dies sind genau die Algorithmen, die auf einem Computer in praxistauglicher Zeit zu einem Ergebnis kommen. Ist jedoch von einem Problem bekannt, dass zu dessen Lösung \emph{mindestens exponentielle} Laufzeit vonnöten ist, dann können wir es nicht in akzeptabler Zeit lösen. Probleme mit dieser Eigenschaft werden als $\mathcal{NP}$-Vollständig bezeichnet. Es ist gezeigt worden, dass alle Probleme mit dieser Eigenschaft gleich schwer sind \cite{Karp}. \\
+\\
+Bisher ist es nicht bekannt, ob sich $\mathcal{NP}$-Vollständige Probleme überhaupt mit einem Polynomialzeit-Algorithmus lösen lassen. Es wird jedoch weitgehend vermutet, dass dies nicht der Fall ist \cite{Cook}. Umfangreiche Informationen zum Thema Komplexitätstheorie können in \cite{GJ} und \cite{Sipser} gefunden werden.
+
+
+% +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+% Das Vehicle Routing Problem
+% +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+\section{\index{Vehicle Routing Problem}Das Vehicle Routing Problem}\label{chp:vrp}
+\nomenclature{VRP}{Vehicle Routing Problem}
+Das Problem der Tourenplanung ist in der Theorie bekannt als \textsc{Vehicle Routing Problem} (kurz: \textsc{VRP}) und wird mit Hilfe von Graphen beschrieben. \\
+\\
+Gegeben ist ein kanten- und knotenbewerteter, vollständiger Graph $G = \left( V, E \right)$ mit Funktionen zur Bewertung der Kanten und Knoten
+\begin{itemize}
+  \item $\phi \colon E \rightarrow \mathbb{N}$ : Die Bewertungsfunktion der Kanten (Reisekosten)
+  \item $\delta \colon V \rightarrow \mathbb{N}$ : Die Bewertungsfunktion der Knoten (Warennachfrage)
+\end{itemize}
+\vspace*{1em}
+
+\begin{wrapfigure}{r}{0.48\textwidth}
+  \vspace{-15pt}
+  \begin{center}
+    \includegraphics[width=0.38\textwidth]{img/VRP.png}
+  \end{center}
+  \vspace{-5pt}
+  \caption[Beispiel: \textsc{VRP}]{Eine Instanz des \textsc{VRP} mit 3 Fahrzeugen $f_0, f_1, f_2$, den zugeordneten Touren und dem Depot $v_0$.}
+  \label{fig:vrp}
+\end{wrapfigure}
+
+\noindent
+Zusätzlich gibt es $n_f$ Fahrzeuge $f_1, \ldots, f_{n_f}$ der Kapazität $k$. $v_0$ ist das Waren- und Fahrzeugdepot\footnote{Wenn nötig durch Umbenennung der Knoten.}, die restlichen Knoten sind Kunden. \\
+\\
+Für jedes Fahrzeug ist eine Tour gesucht, sodass insgesamt möglichst viele der Aufträge beliefert werden und die Gesamtkosten aller Touren minimal sind. Bei der Beladung der Fahrzeuge darf ihre Kapazität nicht überschritten werden. \\
+\\
+Das \textsc{VRP} ist $\mathcal{NP}$-Vollständig und somit liegt die Vermutung nahe, dass es nicht in Polynomialzeit gelöst werden kann. Weitere Informationen hierzu können in \cite{GJ} und \cite{TSP} gefunden werden.
+
+
+% +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+% Das Traveling Salesman Problem
+% +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+\section{\index{Traveling Salesman Problem}Das Traveling Salesman Problem}\label{chp:tsp}
+\nomenclature{TSP}{Traveling Salesman Problem}
+Das \textsc{Traveling Salesman Problem} (kurz: \textsc{TSP}) ist eng mit dem \textsc{VRP} verwandt und stellt eine ähnliche Problemstellung dar. Je nach Betrachtungsweise ist das \textsc{TSP} ein Sonderfall des \textsc{VRP} bzw. das \textsc{VRP} die Verallgemeinerung vom \textsc{TSP}. Wir werden das \textsc{TSP} im folgenden Kapitel heranziehen, um die Funktionsweise von Ameisen-Systemen zu erklären. \\
+\\
+Beim \textsc{TSP} geht es darum, dass ein Verkäufer eine Menge von Städten besuchen muss, um danach wieder zu seinem Startort zurückzukehren. Es gilt, die Reihenfolge der zu besuchenden Städte so zu bestimmen, dass die Reisekosten minimiert werden. \\
+
+\begin{wrapfigure}{r}{0.6\textwidth}
+  \vspace{-20pt}
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{img/TSP.pdf}
+  \end{center}
+  \vspace{-20pt}
+  \caption[Beispiel: \textsc{TSP}]{Links eine Instanz des \textsc{TSP} und rechts eine mögliche Lösung dazu.}
+  \vspace{-5pt}
+  \label{fig:tsp}
+\end{wrapfigure}
+
+\noindent
+Das \textsc{TSP} wird, genau wie das \textsc{VRP}, als Graph modelliert, bei dem die Knoten den Städten entsprechen und die Kanten den Wegen zwischen ihnen. Üblicherweise ist der Graph \emph{vollständig}. \\
+\\
+Das \textsc{TSP} ist, wie das \textsc{VRP}, ein $\mathcal{NP}$-vollständiges Problem, für das die optimale Lösung vermutlich nicht in akzeptabler Zeit bestimmt werden kann. Ein Buch, das sich fast ausschließlich mit dem \textsc{TSP} befasst, ist \cite{TSP}. Weitere Informationen können aber auch in \cite{GJ} und \cite{Wanka} gefunden werden.
+
+
+% +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+% Approximationsverfahren
+% +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+\section{\index{Approximationsverfahren}Approximationsverfahren}\label{chp:approx}
+Mit einem Approximationsverfahren\footnote{Lateinisch von \emph{proximus}: ``der Nächste''.} meinen wir ein Verfahren, das zu einem gegebenen Problem eine \emph{beliebige} Lösung berechnet. Es muss sich dabei \emph{nicht} um die beste Lösung handeln, sie muss lediglich gültig sein. \\
+\\
+Verzichtet man auf das Finden der optimalen Lösung, so kann die Laufzeit häufig enorm gesenkt werden und sogar für $\mathcal{NP}$-vollständige Probleme eine Lösung im Polynomialzeit gefunden werden. In der Regel wird der Ansatz verfolgt, dass, ausgehend von einer Startlösung, Schritt für Schritt eine Verbesserung erzielt werden soll und somit eine Annäherung an das Optimum erfolgt\footnote{Es handelt sich dabei um sogenannte ``iterative Verfahren''.}. \\
+\\
+Für viele Approximationsverfahren ist bekannt, wie nahe sie der optimalen Lösung kommen, es kann also eine Vorhersage über die Abweichung im schlimmsten Fall gemacht werden. Wir sprechen dabei von einer Gütegarantie. Ebenso gibt es aber auch Approximationsverfahren, für die eine derartige Vorhersage nicht bekannt oder nicht möglich ist. Ameisen-Systeme zählen zu Approximationsverfahren \emph{ohne} Gütegarantie. \\
+\\
+Zwei gute Bücher, die sich mit Approximationsverfahren beschäftigen sind \cite{Vazirani} und \cite{Wanka}.
+
+% +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+% Lösungsraum
+% +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+\section{\index{Lösungsraum}Lösungsraum}
+Als Lösungsraum eines Problems bezeichnen wir die Gesamtheit aller prinzipiell denkbarer Lösungen. Häufig sind viele der Lösungen aus dem Lösungsraum nicht gültig, da sie geforderte Eigenschaften nicht aufweisen. Im Fall der Suche nach einem Weg zwischen zwei Orten gibt es in der Regel viele Möglichkeiten, davon werden aber häufig nur wenige eine geforderte Maximallänge nicht überschreiten. Im Fall des \textsc{TSP} besteht der Lösungsraum aus allen möglichen Rundreisen. \\
+\\
+Intuitiv scheint es gegeben zu sein, dass ein Problem umso schwieriger ist, je größer der zugehörige Lösungsraum ist, da es dann auch länger dauert, ihn zu durchsuchen. Dies ist jedoch nicht der Fall. Die Schwierigkeit eines Problems hängt nicht von der Größe des Lösungsraumes ab, wie \cite{VV} gezeigt haben. Sie ist eine \emph{dem Problem immanente} Eigenschaft.

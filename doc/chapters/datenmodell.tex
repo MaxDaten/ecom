@@ -1,0 +1,396 @@
+\chapter{\index{Entwurf}\index{Implementierung}Entwurf und Implementierung}
+Der Entwurf und die Implementierung von \textsc{DOT} läuft in zwei Phasen ab. Da die von \textsc{Dyonisys}, \textsc{TermiDe} und \textsc{IcedG} zu verrichtende Arbeit sehr ähnlich ist und auf denselben Daten basiert, wird zunächst eine gemeinsame Basis in Teamarbeit von Christopher Blöcker, Timo Jürgens und Nicolas Woldt erstellt. Anschließend werden auf dieser Grundlage die \textsc{DOT}-Optimierer entwickelt. \\
+\\
+Bei der Erläuterung von Entwurf und Implementierung nehmen wir bewusst keine Trennung vor, sondern behandeln beides gemeinsam. Zum einen wäre die Unterscheidung in Entwurf und Implementierung künstlich herbeigeführt, da Entwicklung und Entwurf in einem iterativen Prozess stattgefunden haben, bei dem mehrfaches Redesign eine wichtige Rolle gespielt hat. Einige Problematiken und Notwendigkeiten sind erst mit der Zeit klar geworden. Zum anderen kann so direkt aufgezeigt werden, wie die Umsetzung stattgefunden hat und es werden identisch strukturierte Kapitel vermieden. Zur Veranschaulichung verwenden wir UML-Diagramme\index{UML-Diagramm} und machen Gebrauch von Entwurfsmustern\index{Entwurfsmuster}, die bei richtiger Anwendung das Entstehen modularer, wiederverwendbarer und erweiterbarer Software fördern. Dabei orientieren wir uns an \cite{Gamma} und kennzeichnen die verwendeten Entwurfsmuster im folgenden mit dem $\star$-Symbol, statt jedes Mal explizit auf \cite{Gamma} zu verweisen. \\
+\\
+An dieser Stelle sei noch einmal darauf hingewiesen, dass das entstehende System branchenunabhängig sein soll, um so die Möglichkeit offen zu halten, es nicht nur in der Öl- und Gasbranche einzusetzen, sondern auch den Transport von z.B. Tiefkühlkost oder Blumen planen zu können.
+\nomenclature{UML}{Unified Modelling Language}
+
+
+\section{Basis\index{Basis}}\label{chp:basis}
+In der Basis wird die Logik, die in Zusammenhang mit der Erstellung und Verwaltung von Liefertouren steht, umgesetzt. Durch die gemeinsame Entwicklung können sowohl die Zeit für die Entwicklung als auch der Wartungsaufwand von \textsc{DOT} reduziert werden. Die Validierung der Eingaben muss nicht durch die Optimierer, sondern kann in der Basis stattfinden. Werden Fehler entdeckt, so muss nicht jeder der Optimierer sondern nur die zugrundeliegende Basis angepasst werden. Dasselbe gilt für Änderungen, die an der Logik und Verarbeitung der Daten vorgenommen werden. \\
+\\
+Wir zeigen zunächst die wesentlichen Bestandteile der Basis auf und heben dabei die von Christopher Blöcker implementierte Funktionalität besonders hervor. Dazu zählen das Matching der Fahrzeugausrüstung mit den Kundenanforderungen \chpref{chp:equipment_requirement}, die Verwaltung der Kontingente \chpref{chp:contract}, die Beladung der Fahrzeuge \chpref{chp:load} und die Entwicklung des Parsers \chpref{chp:parser}. \\
+\\
+Danach folgt das Kernstück dieser Arbeit, der Entwurf und die Implementierung von \textsc{Dyonisys}, welches auf der gemeinsamen Basis aufbaut.
+
+
+\subsection{Fahrzeug\index{Fahrzeug}}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.96\textwidth]{img/uml_fahrzeug.png}
+  \caption{UML-Diagramm zum Fahrzeug}
+  \label{fig:uml_fahrzeug}
+\end{figure}
+
+\noindent
+Fahrzeuge werden für die Auslieferung von Waren an die Kunden verwendet. Ein Fahrzeug (\textsf{Vehicle}) verfügt über eine Reihe von Transporteinheiten\index{Transporteinheit} (\textsf{TransportUnit}), die als Anhänger betrachtet werden können und jeweils über Transportkammern\index{Transportkammer} (\textsf{Com\-part\-ment}) verfügen. Die Kapazität kann für jedes Fahrzeug unterschiedlich sein. In den Kammern werden die Produkte transportiert. Jedes Fahrzeug ist mit einer Ausrüstung\index{Ausrüstung} (\textsf{Equipment}) ausgestattet, die benötigt wird, um Kunden beliefern zu können. Die Benutzung des Fahrzeugs ist nur innerhalb der im Zeitplan\index{Zeitplan} (\textsf{Schedule}) angegebenen Arbeitszeiten möglich. \\
+\\
+Fahrzeuge verfügen über Informationen darüber, wie teuer ihr Einsatz ist, dabei wird unterschieden in z.B. Kosten pro Strecke (\textsf{m\_costsPerDistance}) oder pro Zeit (\textsf{m\_costs\-PerTime}). Außerdem sind ihnen ein Heimatdepot und ein Truckprofil\index{Truckprofil} in Form einer Identifikationsnummer zugeordnet. Über das Truckprofil kann festgestellt werden, wie schnell ein Fahrzeug auf welcher Art von Straßen verkehren darf und es dient zum Abrufen der Routing-Informationen vom xServer\footnote{siehe \chpref{chp:x-server}}. Anhand der maximalen Be\index{Beladerate}- und Entladerate\index{Entladerate} des Fahrzeugs kann festgestellt werden, wie schnell Betankungen und Lieferungen durchgeführt werden können. \\
+\\
+Die Kammern der Transporteinheiten\index{Transporteinheit} können über eine Anfangsbeladung\index{Anfangsbeladung} verfügen, die über eine Produktmenge (\textsf{ProductAmount}) abgebildet wird. Die Festlegung, welche Produkte in einem Fahrzeug transportiert werden dürfen, findet über eine Whitelist statt, die durch eine Menge (\textsf{m\_allowedProducts}) umgesetzt wird. \\
+\\
+Die Branchenunabhängigkeit wird hier dadurch erreicht, dass ein Fahrzeug mit genau der Ausprägung von \textsf{TransportUnit} ausgestattet werden kann, die für den jeweiligen Anwendungsfall erforderlich ist.
+
+
+\subsection{Fahrzeugdepot\index{Fahrzeugdepot}, Ladedepot\index{Ladedepot} und Lieferung\index{Lieferung}}
+Fahrzeugdepots (\textsf{TruckDepot}), Ladedepots (\textsf{LoadDepot}) und Lieferungen (\textsf{Delivery}) werden als Orte (\textsf{Location}) modelliert. Dadurch können über Vererbung gemeinsame Funktionalität und Datenfelder bereits in der beerbten Klasse \textsf{Location} implementiert werden. In \textsf{TruckDepot}, \textsf{LoadDepot} und \textsf{Delivery} werden weitere spezifische Attribute und Methoden ergänzt.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{img/uml_location.png}
+  \caption{UML-Diagramm zu den Orten}
+  \label{fig:uml_location}
+\end{figure}
+
+\noindent
+\textsf{LoadDepot} und \textsf{Delivery} verfügen über Anforderungen (\textsf{Requirement}), die ein Fahrzeug erfüllen muss, um sie anfahren zu können\footnote{mehr dazu in \chpref{chp:equipment_requirement}}, sie können mit der Methode \textsf{getRequirements} erfragt werden. Außerdem ist stets in einem Zeitplan\index{Zeitplan} (\textsf{Schedule}) angegeben, zu welchen Zeiten die Orte ``geöffnet'' sind. Über Methoden wie \textsf{getServiceTime} und \textsf{getWaitingTime} kann bestimmt werden, wie lange ein Fahrzeug an einem Ort verweilt. \\
+\\
+Jede \textsf{Delivery} hat eine Menge von Bestellungen\index{Bestellung} (\textsf{DeliveryPosition}), die durch die Fahrzeuge zu liefern sind. Es werden jeweils das geforderte Produkt und die dazugehörige Menge in einer \textsf{DeliveryPosition} gespeichert. \textsf{DeliveryPosition} und \textsf{ProductAmount} sind zwar strukturell identisch, jedoch wird aufgrund von möglichen zukünftigen Erweiterungen und aufgrund der logistischen Betrachtungsweise diese Unterscheidung getroffen. \\
+\\
+Ein \textsf{LoadDepot} verfügt über eine Menge von Kontingenten\index{Kontingent} (\textsf{Contingent}), in denen ver\-füg\-bare Warenmengen verwaltet werden. Dasselbe Kontingent kann an mehreren Depots vorkommen, sodass die Betankung an einem Depot auch Kontingente an anderen Depots beeinflussen kann. Die maximale Beladerate\index{Beladerate} \textsf{m\_maxLoadRate} gibt an, wie schnell Fahrzeuge am jeweiligen Depot beladen werden können. Für die Berechnung der Beladedauer wird dabei das Minimum von maximaler Beladerate vom \textsf{LoadDepot} und maximaler Beladerate vom Fahrzeug gebildet.
+
+
+\subsection{Anforderungen\index{Anforderung} und Ausrüstung\index{Ausrüstung}}\label{chp:equipment_requirement}
+Wie wir bereits gesehen haben, verfügt jedes Fahrzeug über eine Ausrüstung\index{Ausrüstung} (\textsf{Equipment}) und jede \textsf{Location} über Anforderungen\index{Anforderung} (\textsf{Requirement}). \\
+\\
+Um das \textsf{Equipment} abzubilden, wird jedem Ausrüstungsgegenstand eine Identifikationsnummer zugewiesen. Dem Programm ist nicht bekannt, welcher Aus\-rüs\-tungs\-ge\-gen\-stand sich hinter einer Nummer verbirgt. In eine Tabelle (\textsf{Map}) wird eingetragen, zu welchem Aus\-rüs\-tungs\-ge\-gen\-stand (also zu welcher Identifikationsnummer) welche Ausprägung vorhanden ist. Verfügt ein Fahrzeug z.B. über Schlauchlängen von $5$m und $10$m und ist $1$ die Identifikationsnummer für die Schlauchlänge, so werden in die Tabelle für den Schlüssel $1$ die Werte $5$ und $10$ eingetragen, siehe \tblref{tbl:equip}.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|r|l|}
+    \hline
+    Ausrüstung & Ausprägung \\
+    \hline
+    \hline
+    $1$ & $\{5, 10\}$ \\
+    \hline
+  \end{tabular}
+  \caption{Beispielausrüstung eines Fahrzeugs mit den Schlauchlängen $5$m und $10$m}
+  \label{tbl:equip}
+\end{table}
+
+\noindent
+Anforderungen\index{Anforderung} (\textsf{Requirement}) bestehen aus einer Menge von Einträgen (\textsf{Requirement\-Entry}), die in ihrer Gesamtheit definieren, welches \textsf{Equipment} vonnöten ist, um sie zu erfüllen. Zu jedem \textsf{RequirementEntry} sind eine Identifikationsnummer, eine Menge von Werten und ein \textsf{EquipmentOperator} gegeben. Die Identifikationsnummer gibt an, welchem Ausrüstungsgegenstand diese Anforderung entspricht. Die Werte geben an, welche Ausprägung seitens des \textsf{Equipment} verfügbar sein muss und der \textsf{EquipmentOperator} gibt an, welche Relation zwischen Ausrüstungsgegenstand und Anforderung bestehen soll. So lässt sich z.B. unter Verwendung des Operators \textsf{EquipmentOperatorGreaterOrEqual} ausdrücken, dass eine Mindestschlauchlänge gefordert ist, siehe \tblref{tbl:requirement}.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{|r|l|l|}
+    \hline
+    Anforderung & Ausprägung & Operator \\
+    \hline
+    \hline
+    $1$ & $\{5\}$ & $\geq$ \\
+    \hline
+  \end{tabular}
+  \caption{Anforderung an die Schlauchlänge: Sie soll mindestens $5$m betragen.}
+  \label{tbl:requirement}
+\end{table}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{img/uml_equipment_requirement.png}
+  \caption{UML-Diagramm zu den Anforderungen und der Fahrzeugausrüstung}
+  \label{fig:uml_equipment_requirement}
+\end{figure}
+
+\noindent
+Die Erzeugung der \textsf{EquipmentOperator}en kann nicht direkt stattfinden, da die Konstruktoren versteckt sind, sondern muss über die \textsf{EquipmentOperatorFactory} stattfinden, die als \index{Singleton}$Singleton^\star$ implementiert ist. Die Operatoren selbst sind \index{Fliegengewicht}$Fliegengewichte^\star$, da sie keinen intrinsischen Zustand aufweisen. Das Interface \textsf{EquipmentOperator} gibt vor, welche Funktionalität, nämlich das Matchen von \textsf{Requirement} und \textsf{Equipment}, durch die Operatoren zu implementieren ist. Die Operatoren können transparent gegeneinander ausgetaucht werden und somit unterschiedliche Funktionalität zur Verfügung stellen, es liegt eine \index{Strategie}$Strategie^\star$ vor. \\
+\\
+Das Abgleichen von Anforderungen und Ausrüstung wird als \emph{Matching}\index{Matching} bezeichnet und liefert als Ergebnis die entstehenden Strafkosten, die durch die Auslieferung mit dem jeweiligen Fahrzeug entstehen. Beim Matching werden die Anforderungen nacheinander überprüft, dabei werden jeweils die Einträge der Ausrüstung, die Anforderung und der jeweilige Operator herangezogen. Für weiche Restriktionen werden die durch die Ausrüstung verursachten Strafkosten aufsummiert. Wird eine harte Restriktion verletzt, bricht das Matching ab. Das Ergebnis wird in Form eines Objektes der Klasse \textsf{Match} geliefert. Über das Feld \textsf{m\_matches} kann geprüft werden, ob die Anforderungen erfüllt werden können, \textsf{m\_costs} gibt die Höhe der Strafkosten an.
+
+
+\subsection{Produkte\index{Produkt}}
+Bei den Produkten (\textsf{Product}) handelt es sich um den Gegenstand, dessen Auslieferung zu planen ist. Jedem Produkt ist eine eindeutige Identifikationsnummer sowie ein externer Identifikator, der durch \textsc{ATOS} erforderlich ist, zugeordnet. \\
+\begin{wrapfigure}{r}{0.35\textwidth}
+  \vspace{-20pt}
+  \begin{center}
+    \includegraphics[width=0.33\textwidth]{img/uml_product.png}
+  \end{center}
+  \vspace{-20pt}
+  \caption{UML-Diagramm zur Struktur der Produkte}
+  \vspace{-10pt}
+  \label{fig:uml_product}
+\end{wrapfigure}
+
+\vspace*{-1em}
+\noindent
+Produkte können aus mehreren anderen Produkten zusammengesetzt sein. In einer Tabelle (\textsf{m\_baseProducts}) wird eingetragen, welche Mengen anderer Produkte benötigt werden, um eine Einheit des betroffenen Produktes herzustellen. Dabei wird davon ausgegangen, dass ein zusammengesetztes Produkt nur aus Basisprodukten\index{Basisprodukt}, also aus solchen, die selbst nicht zusammengesetzt sind, besteht. \\
+\\
+Zu jedem Produkt gibt es eine Menge von Produkten (\textsf{m\_allowedProducts}), die gemeinsam mit ihm transportiert werden dürfen, die Produkte werden dabei anhand ihrer Identifikationsnummern in einer Whitelist\index{Whitelist} gespeichert. \\
+\\
+Bei der Beladung eines Fahrzeugs kann es vorkommen, dass Kammern aufgrund einer vorherigen Beladung zunächst gereinigt werden müssen. Abhängig davon, welches Produkt eingeladen werden soll und welches Produkt zuvor geladen war, fallen dabei Kosten unterschiedlicher Höhe an. Je Produkt werden in einer Liste Informationen darüber verwaltet, wie teuer die Reinigung\index{Reinigung} in Abhängigkeit zuvor geladener Produkte ist.
+
+
+\subsection{Kontrakt\index{Kontrakt} und Kontingente\index{Kontingent}}\label{chp:contract}
+Die Verwaltung sämtlicher Kontingente (\textsf{Contingent}), also der Verfügbaren Warenmengen an den Depots wird im Kontrakt (\textsf{Contract}) zusammengefasst. Da die Kontingente tagesübergreifend sein können, sich also ihre Verfügbarkeit über mehrere Tage erstrecken kann, gilt dasselbe für den Kontrakt. Der Kontrakt ist stets dem Plan zugeordnet.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{img/uml_contract_contingent.png}
+  \caption{UML-Diagramm zum Kontrakt und den Kontingenten}
+  \label{fig:uml_contract_contingent}
+\end{figure}
+
+\noindent
+Soll die Beladung\index{Beladung} eines Fahrzeugs an einem bestimmten Depot stattfinden, so muss dies über den Kontrakt geschehen. Es werden dann die am angegebenen Depot verfügbaren Kontingente in einen Cache (\textsf{m\_contingents}) geladen, die Auswertung findet also nur bei Bedarf (\emph{lazy}) statt. Dann wird geprüft, ob die geforderten Warenmengen unter Verwendung der verfügbaren Kontingente bereitgestellt werden können. Die Kontingente werden dafür aufsteigend nach ihrem Preis pro Liter sortiert. Es wird sequenziell nach dem ersten passenden Kontingent gesucht, mit dem die Beladung durchgeführt werden kann, hierbei kann es vorkommen, dass aus mehreren Kontingenten jeweils Teilmengen verwendet werden müssen. In der Tabelle \textsf{m\_free} wird eingetragen, welche Restmengen nach der Beladung in den jeweiligen Kontingenten noch verfügbar sind. \\
+\\
+Die Implementierung von \textsf{Contract} ist threadsicher, d.h. dass bei der Arbeit mit mehreren Threads stets ein gültiger Zustand garantiert wird. Dies wird dadurch erreicht, dass sämtliche öffentlichen Methoden synchronisiert sind und somit immer nur ein Thread zur Zeit Zugriff auf den \textsf{Contract} haben kann. \\
+\\
+Bei den Interfaces \textsf{Accumulator}, \textsf{Combinator} und \textsf{Mapper} handelt es sich um die Nachbildung anonymer Funktionen, inspiriert durch die funktionale Programmierung. Algorithmen zum Akkumulieren und zum Kombinieren von Werten wurden in Form von Objekten definiert, die einer gegebenen Schnittstelle gehorchen, es liegen hier $Befehle^\star$\index{Befehl} vor. Der \textsf{Mapper} wird verwendet, um auf jedes Element einer \textsf{Java Collection} dieselbe Funktion anzuwenden und aus den daraus entstehenden Werten eine neue \textsf{Collection} zu erzeugen. Ein \textsf{Combinator} kapselt eine Funktion zum Verknüpfen zweier beliebiger, aber gleichtypiger Werte zu einem und ein \textsf{Accumulator} akkumuliert eine Reihe gleichtypiger, numerischer Werte nach einem durch ihn festgelegten Verfahren.
+
+
+\subsection{Beladung\index{Beladung}}\label{chp:load}
+Die Beladung der Fahrzeuge (\textsf{Load}) findet pro Trip statt und kann nach unterschiedlichen Verfahren erfolgen. Gemeinsam ist den möglichen Fällen, dass eine Menge von eingeplanten Aufträgen (\textsf{m\_deliveries}) verwaltet wird. Über eine Whitelist\index{Whitelist} (\textsf{m\_allowed\-Products}) wird festgelegt, welche Produkte transportiert werden dürfen, diese Information wird aus dem für den Trip verwendeten Fahrzeug ausgelesen. Jede Beladung verfügt über Informationen darüber, welche Produktrestmengen (\textsf{m\_initial}) zum Beladungszeitpunkt noch in den Kammern vorhanden sind und welche Beladung (\textsf{m\_load}) nach dem Tanken am Depot \textsf{m\_loadDepot} vorhanden sein wird. Über die Methoden \textsf{add} und \textsf{remove} können Aufträge, und somit Produktmengen, zu der Beladung hinzugefügt bzw. von aus ihr entfernt werden. Die Methode \textsf{fits} prüft, ob das Hinzufügen eines Auftrags überhaupt noch möglich ist und mit der Invarianten \textsf{inv} kann geprüft werden, ob der Ladezustand gültig ist. \\
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{img/uml_load.png}
+  \caption{UML-Diagramm zur Beladung der Fahrzeuge}
+  \label{fig:uml_load}
+\end{figure}
+
+\noindent
+Liegt der Fall der Vorbeladung (\textsf{LoadPreload}) vor, so ist von vornherein festgelegt, welche Produkte in welche Kammern einzuladen sind. Bei jedem Nachtanken muss dieser Lade-Zustand wiederhergestellt werden. Die Belieferung der Aufträge findet dann in Abhängigkeit davon statt, welche Produkte geladen wurden. Die Begründung für die Verwendung dieser Beladeart können z.B. betriebliche Vorgaben sein. \\
+\\
+Beim Standard-Beladeverfahren (\textsf{LoadDefault}) wird abhängig von den zu beliefernden Aufträgen die Beladung bestimmt. Die tatsächliche Arbeit wird dabei an den \textsf{Loader} delegiert, der die Einplanung der Produktmengen auf Kammer-Ebene durchführt. \\
+\\
+Dem \textsf{Loader} werden die einzuplanenden Produktmengen übergeben und er versucht, sie nach dem \emph{Best Fit}\index{Best Fit} Prinzip einzuplanen. Dabei werden die einzuplanenden Produktmengen absteigend sortiert und in die am besten passende Kammer eingeplant, es wird mit der größten Menge begonnen. Als beste Kammer wird stets zunächst diejenige gewählt, die bereits das jeweilige Produkt geladen hat, aber noch nicht voll ist. Gibt es keine solche Kammer, wird diejenige gewählt, die die Menge komplett aufnehmen kann und nach der Beladung die kleinste freie Restmenge hat. Ist die Produktmenge für jede Kammer zu groß, so wird die größte Kammer ausgewählt. Der Ablauf des Verfahrens ist wie folgt:
+\begin{enumerate}
+  \item Wenn es eine Kammer gibt, die das jeweilige Produkt bereits enthält und noch freien Platz bietet, wird hier so viel wie möglich eingeladen.
+  \item Es wird solange die am besten passende Kammer ausgewählt und so viel wie möglich eingeladen bis alles eingeladen wurde oder es keine freien Kammern mehr gibt.
+  \item Wenn alle Mengen erfolgreich eingeladen wurden, dann stoppt das Verfahren mit Erfolg. Wenn es aber Mengen gibt, die nicht eingeladen werden konnten, dann wird die Beladung hergenommen und mit den zu ladenden Produktmengen zusammengefasst. Als nächstes wird die gesamte Beladung entfernt und es wird versucht, die zusammengefassten Mengen in die nun freien Kammern einzuplanen, dies erfolgt ebenfalls absteigend nach den Mengen sortiert. Scheitert dies auch, so können die zusätzlichen Mengen nicht eingeplant werden. Das Verfahren weist die Mengen zurück und stellt den vorherigen Beladezustand wieder her. \\
+\end{enumerate}
+
+\noindent
+Die hier aufgezeigten Beladeverfahren, \textsf{LoadPreload} und \textsf{LoadDefault}, sind bereits auf die Anwendung in der Öl- und Gasbranche ausgelegt und somit nicht branchenunabhängig. Im Bezug auf die Beladung wird es auch nicht möglich sein, eine allumfassende Lösung zu bieten, da es in jeder Branche Spezialanforderungen gibt. Um das System dennoch für andere Branchen verwenden zu können, wäre jeweils eine branchenspezifische Implementierung der \textsf{Load}-Klasse erforderlich.
+
+
+\subsection{Lieferplan\index{Lieferplan}}
+Der Lieferplan (\textsf{Plan}) stellt das Ergebnis der Berechnungen dar und wird sukzessive aufgebaut. Er besteht aus mehreren Touren\index{Tour} (\textsf{Tour}), die jeweils von genau einem Fahrzeug gefahren werden. Jedes Fahrzeug startet seine Tour an dem ihm zugeordneten Fahrzeugdepot (\textsf{TruckDepot}) und beendet sie auch dort. Eine Tour setzt sich aus mehreren Trips\index{Trip} (\textsf{Trip}) zusammen, die aus einer Reihe von Stops\index{Stop} (\textsf{Stop}) bestehen. Jeder Trip beginnt mit einem Stop zur Beladung (\textsf{StopLoad}), gefolgt von einer Reihe von Lieferungen (\textsf{StopDelivery}). \\
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{img/uml_plan.png}
+  \caption{UML-Diagramm zum Plan}
+  \label{fig:uml_plan}
+\end{figure}
+
+\vspace*{-1em}
+\noindent
+Die Erzeugung des Plans sowie der Touren und Trips geschieht über die jeweilige Implementierung der $Abstrakten$ $Fabrik^\star$\index{Abstrakte Fabrik} \textsf{Factory}, die für jeden der Optimierer zu erstellen ist. Beim Hinzufügen einer neuen Tour zum Plan mittels \textsf{add} bzw. eines neuen Trips zur Tour mittels \textsf{appendNewTrip} werden im Hintergrund die Methoden \textsf{createTour} bzw. \textsf{createTrip} der Fabrik aufgerufen. Durch das Bereitstellen dieser Schnittstelle und Verstecken der Konstruktoren von \textsf{Plan}, \textsf{Tour}, \textsf{Trip} und der \textsf{Stop}s wird verhindert, dass diese Klassen direkt instanziiert werden. So wird die Möglichkeit der Fehlbenutzung minimiert und ein höheres Abstraktionsniveau bei der Umsetzung der Optimierer erreicht. \\
+\\
+Um dem Plan eine neue Tour hinzuzufügen, muss angegeben werden, welches Fahrzeug dazu zu verwenden ist. Die Tour wird dann anhand der Identifikationsnummer des Fahrzeugs verwaltet, so ist ein unmittelbarer Bezug zwischen Fahrzeug und Tour hergestellt. Das Erstellen eines neuen Trips läuft über die Methode \textsf{appendNewTrip} von Tour ab, die im Hintergrund die Factory aufruft. Wird ein Stop an einen Trip angehängt, so werden sofort die dadurch entstehenden Kosten aktualisiert, die Beladung mit Hilfe des Loaders durchgeführt und die Änderung der Warenmengen am Kontrakt gebucht. \\
+\\
+Die Funktionalität des Plans und der zugehörigen Klassen, die die Verwaltung der Liefertouren bieten, ist so implementiert, dass niemals ein ungültiger Zustand entstehen kann. Würde das Einfügen eines weiteren Stops harte Bedingungen verletzen, so wird die Aktion verweigert. Zu jeden Zeitpunkt wird gewährleistet, dass der Plan in einem konsistenten Zustand und gültig ist.
+
+\subsection{Parser\index{Parser}}\label{chp:parser}
+\nomenclature{JSON}{JavaScript  Object Notation}
+Die Eingaben, die aus dem SAP\index{SAP}-System über \textsc{ATOS}\index{ATOS} an \textsc{DOT}\index{DOT} übergeben werden, sind in Form von \textsf{JSON}\index{JSON} codiert und werden mit Hilfe eines Parsers verarbeitet. Die Syntax, der die Eingaben für den Parser entsprechen müssen, kann der in \appref{app:json} definierten Grammatik entnommen werden. Die Verwendung von \textsf{JSON} begründet sich damit, dass ein einheitliches Kommunikationsformat verwendet werden soll und seitens des SAP-Systems auch ein \textsf{JSON}-Parser zur Verfügung steht. Außerdem bietet \textsf{JSON} im Vergleich zu \textsf{XML}\index{XML}, welches als Alternative in Betracht gezogen wurde, den Vorteil, dass es durch den Menschen wesentlich leichter zu lesen ist und ein weitaus geringeres Datenvolumen erzeugt. \\
+\\
+Wenn eine Eingabe von \textsc{ATOS} an \textsc{DOT} übergeben wird, analysiert zunächst der \textsf{Scanner}\index{Scanner} die Eingabe und zerlegt sie in \textsf{Token}. Der Scanner ist nicht von Hand implementiert, sondert mit \textsf{jflex} generiert worden. So kann eine spätere Anpassung von Token oder die Erweiterung der Sprachdefinition schnell und unkompliziert erfolgen. \\
+
+\begin{wrapfigure}{r}{0.6\textwidth}
+  \vspace{-20pt}
+  \begin{center}
+    \includegraphics[width=0.58\textwidth]{img/uml_parser.png}
+  \end{center}
+  \vspace{-20pt}
+  \caption{UML-Diagramm zum Parser}
+  \vspace{-10pt}
+\end{wrapfigure}
+
+\noindent
+Der durch den Scanner aus der Eingabe generierte Token-Stream wird als nächstes vom Parser\footnote{Genau genommen handelt es sich beim Parser um einen $Interpretierer^\star$. Prinzipiell hätte der Parser aus der \textsc{JSON}-Definition generiert werden können, jedoch wäre dann auch das Entwickeln weiterer Zwischenstrukturen nötig und die direkte Nutzung als Interpretierer nicht möglich gewesen.}\index{Interpretierer} verarbeitet. Der Parser ist direkt aus der Definition der Eingabesprache entwickelt worden. Bereits bei der Definition der Eingabesprache wurde darauf geachtet, eine \textsc{LL(0)} Sprache zu konstruieren, um so eine leichte Umsetzung des Parsers zu ermöglichen. \\
+\\
+Der Parser baut direkt beim Verarbeiten der Eingabe alle für die Arbeit mit den Daten nötigen Datenstrukturen auf. Da es Abhängigkeiten zwischen einzelnen Teilen der Eingabe gibt, ist die in \appref{app:json} festgelegte Sequenz der Eingabe signifikant. Für jeden syntaktischen Typ weist der Parser eine eigene Erkennunsprozedur auf, so werden z.B. Fahrzeuge mit der Methode \textsf{VEHICLE} verarbeitet. \\
+\\
+Die Struktur der Eingabedaten kann in drei voneinander abhängige Teile unterschieden werden:
+\begin{enumerate}
+  \item \textbf{Konfiguration} \\
+    Die Konfiguration enthält Parameter für die spätere Optimierung. Es werden beispielsweise die Höhe von Strafkosten, maximale Arbeitsdauer der Fahrer sowie die Anzahl von Fahrzeugen, Lieferungen etc. des Szenarios festgelegt. Eine vollständige Auflistung der Parameter für die Basis und für \textsc{Dyonisys} ist in \appref{app:eingabeparameter} zu finden.
+  \item \textbf{Daten} \\
+    Die Daten zur Optimierung umfassen die Informationen über die Produkte, Kontingente, Ladedepots, Fahrzeugdepots, Fahrzeuge und Lieferungen. Dabei ist u.a. enthalten, an welchen Geokoordinaten sich die Orte befinden. Sind die Daten fertig gelesen und verarbeitet, wird die Distanzmatrix für die eingegebenen Orte vom xServer abgerufen.
+  \item \textbf{Plan} \\
+    Es kann ein Ausgangsplan vorliegen, der als Grundlage für die Berechnungen bei der Optimierung dient. Der Plan \emph{darf} jedoch leer sein.
+\end{enumerate}
+
+
+\subsection{Datenbasis\index{Datenbasis} und Konfiguration\index{Konfiguration}}\label{chp:datapool_config}
+Die vom Parser eingelesenen Daten werden in der Datenbasis (\textsf{DataPool}) und der Konfiguration (\textsf{Config}) verwaltet, die beide abstrakt sind, da sie spezifisch für die jeweiligen Optimierer angepasst werden müssen. \\
+
+\begin{wrapfigure}{r}{0.6\textwidth}
+  \vspace{-56pt}
+  \begin{center}
+    \includegraphics[width=0.58\textwidth]{img/uml_datapool_config.png}
+  \end{center}
+  \vspace{-20pt}
+  \caption{UML-Diagramm zur Datenbasis und der Konfiguration}
+  \label{fig:dyonisys}
+ \vspace{-11pt}
+\end{wrapfigure}
+
+\noindent
+Während bei \textsc{IcedG} zur Laufzeit keine Veränderungen der Daten auftreten, die Anzahl der Fahrzeuge und Aufträge etc. also immer gleich bleibt, ist es für \textsc{TermiDe} und \textsc{Dyonisys} essenziell, dass z.B. neue Aufträge hinzugefügt werden können. Daher kann keine Datenstruktur gewählt werden, die für alle Optimierer gleichermaßen geeignet ist, sie muss individuell durch Beerben von \textsf{DataPool} festgelegt werden. Aus diesem Grund müssen auch die Zugriffsfunktionen auf die Datenstrukturen abstrakt sein und jeweils abhängig von der gewählten Datenstruktur implementiert werden. \\
+\\
+Ein ähnliches Bild zeigt sich bei der Konfiguration. Zwar kann hier eine große Obermenge für alle \textsc{DOT}-Optimierer gemeinsam implementiert werden, da aber für jedes der umgesetzten Verfahren\footnote{siehe \chpref{chp:umfeld_termide}, \chpref{chp:umfeld_icedg} und \chpref{chp:umfeld_dyonisys}.} individuelle Konfigurationsparameter angegeben werden müssen, muss die Konfiguration von allen Optimierern beerbt und angepasst werden. \\
+\\
+Die Datenbasis sowie die Konfiguration werden als statische Variablen in der Klasse \textsf{MainThread} verwaltet und stehen somit jeder Instanz von \textsf{MainThread} zur Verfügung, auch den Instanzen erbender Klassen. Die Verwaltung als statische Variable hat zur Folge, dass Datenbasis und Konfiguration selbst dann bestehen bleiben, wenn es keine Instanz von \textsf{MainThread} mehr gibt, dies ist der Arbeitsweise der \textsf{JVM}\index{JVM} zu verdanken. Erst bei Terminierung der \textsf{JVM} oder bei Neueingabe von Datenbasis und Konfiguration gehen diese verloren.
+
+
+\section{Dyonisys}
+\textsc{Dyonisys} baut auf den in \chpref{chp:basis} beschriebenen Strukturen auf und erweitert sie teilweise. So ist z.B. die Erweiterung des Parsers aufgrund weiterer Konfigurationsparameter für das Ameisen-System unbedingt notwendig. Ebenso müssen die Strukturen zur Datenverwaltung angepasst werden, da \textsc{Dyonisys} auf dynamische Veränderungen reagieren soll und somit eine feste Anzahl von Fahrzeugen oder Aufträgen in Widerspruch hierzu stünde. \\
+\\
+Bereitgestellt wird \textsc{Dyonisys} als Webservice\index{Webservice}, der auf einem \textsf{Tomcat}\footnote{Für Informationen über \textsf{Tomcat} sei auf \cite{tomcat} verwiesen.}\index{Tomcat} Webserver\index{Webserver} gehostet wird \cite{tomcat}. Ein Servlet\footnote{Bei einem Servlet handelt es sich um eine Java-Klasse, die durch einen Webserver zur Verfügung gestellt wird und seine Funktionalität erweitert. Servlets ermöglichen, wie auch z.B. \textsf{PHP} und \textsf{Ruby}, die Umsetzung dynamischer Webseiten. Das Wort \emph{Servlet} ist zusammengesetzt aus den Wörtern \underline{Ser}ver und App\underline{let}. \emph{Applet} wiederum setzt sich zusammen aus \underline{Appl}ication und Snipp\underline{et}. Ein \emph{Servlet} ist also ein serverseitig ausgeführter Anwendungsschnipsel.} nimmt Anfragen entgegen, die über \textsc{ATOS} gemacht werden und erzeugt die zur Verarbeitung benötigten Objekte, veranlasst die Berechnung der Lösung und gibt das Ergebnis über \textsc{ATOS} wieder zurück. \\
+\\
+Sobald eine Anfrage eintrifft, wird dabei ein \textsf{OptimizerThread} erzeugt, der die weitere Verarbeitung vornimmt. Da der \textsf{OptimizerThread} von \textsf{MainThread} erbt, ist hier Zugriff auf Datenbasis und Konfiguration gegeben. Es wird ein Parser erzeugt, der die eingegebenen Daten verarbeitet und die Konfiguration und Datenbasis initialisiert. Danach wird ein \textsf{Optimizer} instanziiert, der als $Proxy^\star$\index{Proxy} implementiert ist und die Erzeugung des Ameisen-Systems\index{Ameisen-System} übernimmt. Das Ameisen-System erzeugt die Ameisen\index{Ameise} und die Ausführungsthreads (\textsf{AntRunner}) und berechnet eine Lösung zum gegebenen Problem. Zum Schluss wird die Lösung über den \textsf{Optimizer} an den \textsf{OptimizerThread} geliefert und über \textsc{ATOS} zurückgegeben. \\
+\\
+In den folgenden Unterkapiteln werden wir die eben kurz umrissenen Abläufe, die \textsc{Dyonisys} während der Lösungsberechnung durchführt, im Detail betrachten. Dabei werden wir auch die verwendeten Algorithmen näher beleuchten und erklären. Unsere Erklärungen werden wir dabei auf \figref{fig:uml_dyonisys} beziehen.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\textwidth]{img/uml_dyonisys.png}
+  \caption{UML-Diagramm zur Klassenübersicht von \textsc{Dyonisys}}
+  \label{fig:uml_dyonisys}
+\end{figure}
+
+
+\subsection{Kommunikation\index{Kommunikation}}
+Um einen Überblick über die stattfindende Kommunikation zu geben, die im Rahmen der Optimierung abläuft, abstrahieren wir von den tatsächlich implementierten Klassen und konzentrieren uns auf den logischen Ablauf. \\
+
+\begin{wrapfigure}{r}{0.52\textwidth}
+  \vspace{-30pt}
+  \begin{center}
+    \includegraphics[width=0.5\textwidth]{img/Dyonisys.pdf}
+  \end{center}
+  \vspace{-20pt}
+  \caption{Bestandteile von \textsc{Dyonisys} und Kommunikation über \textsc{ATOS}}
+  \label{fig:dyonisys}
+ \vspace{-10pt}
+\end{wrapfigure}
+
+\noindent
+Im Wesentlichen besteht \textsc{Dyonisys} aus den in \figref{fig:dyonisys} gezeigten Komponenten, zwischen denen Informationen übertragen werden. Auf jede stattgefundene Datenübertragung folgt eine kontextbezogene Reaktion durch den Empfänger. \\
+
+\begin{enumerate}
+  \item Der Parser erhält seine Eingabe vom SAP-System über \textsc{ATOS} in \textsc{JSON}-Notation. Er erzeugt die notwendigen Datenstrukturen und füllt sie mit den erhaltenen Daten. Hierzu zählen die Konfiguration, die Datenbasis, das Ameisen-System sowie der Eingabegraph für das Ameisen-System.
+  \item Das Ameisen-System erhält vom Parser die Eingabedaten und bereitet die Optimierung vor. Dabei werden die Ameisen erzeugt und der Status des Ameisen-Systems initialisiert. Zum Status zählen die Lösung, die initial leer ist, sowie der Problemgraph mit den zugehörigen Pheromonkonzentrationen.
+  \item Der Optimierungslauf wird gestartet und jede der Ameisen bestimmt einen Lösungskandidaten.
+  \item Das Ameisen-System fragt die Lösungskandidaten von den Ameisen ab und bestimmt daraus die beste gefundene Lösung. Sie wird in den Status des Ameisen-Systems übernommen. Der Ablauf von 3. und 4. wird solange wiederholt, bis die maximale Anzahl der Zyklen erreicht ist, Stagnation\index{Stagnation} eintritt oder ein anderes Abbruchkriterium zutrifft.
+  \item Das Ergebnis wird in \textsc{JSON} codiert und über \textsc{ATOS} an das SAP-System geliefert.
+\end{enumerate}
+
+
+\subsection{Optimierungs-Thread\index{Optimierungs-Thread}}
+Ein Optimierungs-Thread (\textsf{OptimizerThread}) wird immer dann erzeugt, wenn das Servlet\index{Servlet}, das die Funktionalität von \textsc{Dyonisys} zur Verfügung stellt, über \textsc{ATOS} angesprochen wird. Dem Optimierungs-Thread werden als Eingabe die Daten übergeben, die über das Servlet getätigt wurden. Da \textsf{OptimizerThread} die Klasse \textsf{MainThread} beerbt, besteht von hier Zugriff auf die globale Konfiguration und Datenbasis. \\
+\\
+Im Optimierungs-Thread wird ein Parser erzeugt, der die Eingabe interpretiert. Je nach übermittelter Information werden
+\begin{itemize}
+  \item Datenbasis und Konfiguration initialisiert,
+  \item Ein Optimierungslauf gestartet,
+  \item Die gefundene Lösung abgefragt,
+  \item Aufträge zur Datenbasis hinzugefügt,
+  \item Fahrzeuge aus der Datenbasis gelöscht,
+  \item Veränderungen an der Distanzmatrix vorgenommen. \\
+\end{itemize}
+
+\noindent
+Der Parser informiert den Optimierungs-Thread durch das Setzen von \textsf{antSystemAction} darüber, was das Ameisen-System tun soll, nämlich entweder Nichts, einen Optimierungslauf durchführen oder den Status ausgeben. \\
+\\
+Neben der Datenbasis und der Konfiguration wird auch der Status des Ameisen-Systems, \textsf{antSystemStatus}, als statische Variable in der Klasse \textsf{OptimizerThread} verwaltet. Dadurch wird sichergestellt, dass diese drei Objekte selbst dann nicht verloren gehen, wenn es keine Instanz von \textsf{OptimizerThread} mehr gibt, sondern erst dann, wenn die \textsf{JVM} terminiert wird. \\
+\\
+Der Optimierungs-Thread erzeugt zur Optimierung einen \textsf{Optimizer}, der wiederum die Erzeugung des Ameisen-Systems veranlasst, und es startet. Da der \textsf{Optimizer} und das Ameisen-System im Thread des \textsf{OptimizerThread} laufen, haben auch sie Zugriff auf die Konfiguration und die Datenbasis, also alle für die Optimierung notwendigen Informationen.
+
+
+\subsection{Ameisen-System\index{Ameisen-System}, Ameisen\index{Ameise} und Ausführungs-Thread\index{Ausführungs-Thread}}
+Dem Ameisen-System werden bei seiner Erzeugung alle für die Optimierung notwendigen Parameter übergeben. Es wird die vorgesehene Anzahl an Ameisen erzeugt und diesen dabei die notwendigen Parameter weitergereicht. Außerdem werden Ausführungs-Threads (\textsf{AntRunner}) erzeugt, an die Teile der Optimierungsarbeit delegiert werden. \\
+\\
+Die Ameisen werden in zwei Listen organisiert. Zum einen die Liste der Ameisen, die bereit sind, einen Lösungskandidaten zu konstruieren und zum anderen die Liste der Ameisen, die mit der Konstruktion eines Lösungskandidaten\index{Lösungskandidat} bereits fertig sind. \\
+\\
+Jedem Ausführungs-Thread wird bei seiner Erzeugung eine Referenz auf das Ameisen-System mitgegeben. Wenn der Thread seine Arbeit aufnimmt, holt er sich vom Amei\-sen-System eine Ameise, die bereit ist, einen Lösungskandidaten zu bestimmen und startet den Berechnungslauf. Ist die Lösung bestimmt, so wird die Ameise an das Ameisen-System zurückgegeben und für die nächste wartende Ameise derselbe Ablauf durchgeführt. Dies wird solange wiederholt, bis der Ausführungs-Thread gestoppt wird, also ein Interrupt-Signal erhält. Der Zugriff auf die wartenden und fertigen Ameisen ist durch die Verwendung von \emph{Monitoren}\footnote{Monitore sind ein Sprachkonzept, bei dem für Objekte eine Warteschlange erzeugt wird. Findet ein synchronisierter Zugriff auf ein Objekt statt, müssen sich die Threads in diese Warteschlange einreihen und warten, bis ihnen der Zugriff auf das synchronisierte Objekt zugeteilt wird. Die Funktionalität der Monitore wird durch den Compiler sichergestellt.} synchronisiert, sodass die Arbeit mit mehreren Threads möglich ist. Auf diese Weise kann der Parallelisierungsgrad\index{Parallelisierungsgrad} des Ameisen-Systems sehr einfach gesteigert und die verfügbare Rechenleistung optimal genutzt werden. \\
+\\
+Die Lösungskonstruktion durch eine Ameise läuft so ab, dass zunächst eines der Fahrzeuge aus der Datenbasis ausgewählt wird und für dieses dann eine Tour bestimmt wird. Die Ameise beginnt damit, einen Trip zu erzeugen und ihm so lange Stops hinzuzufügen, bis er bezüglich der Ladekapazität des Fahrzeugs voll ist oder keine Zeit mehr übrig ist. Ist noch Zeit, weitere Trips durchzuführen, so werden diese auch mit so vielen Stops gefüllt wie möglich. Zum Schluss kehrt das Fahrzeug zu seinem Heimatdepot zurück. Sofern es noch unverplante Aufträge \emph{und} Fahrzeuge gibt, wählt die Ameise ein weiteres Fahrzeug aus und erstellt für dieses eine Tour. Da Fahrzeuge immer nur dann benutzt werden, wenn es für sie tatsächlich etwas zu tun gibt, wird die Anzahl der für den Plan benötigten Fahrzeuge minimiert. \\
+\\
+Die Ameisen können dabei durch ihren Status, der vom Typ \textsf{AntStatus} ist, verschiedene Signale geben:
+\begin{itemize}
+  \item \textsf{STATUS\_OK} \\
+    Alles ist in Ordnung, es können weitere Stops hinzugefügt werden.
+  \item \textsf{STATUS\_TOUR\_FULL} \\
+    Die aktuelle Tour ist fertig berechnet worden. Sofern es noch sowohl unverplante Fahrzeuge als auch Aufträge gibt, ist ein neues Fahrzeug auszuwählen und zu verplanen.
+  \item \textsf{STATUS\_TRIP\_FULL} \\
+    Der aktuelle Trip ist voll, da das Fahrzeug voll beladen ist oder keine Zeit mehr bleibt, um weitere Aufträge zu erledigen. Bleibt noch Zeit nach, so muss ein neuer Trip eingefügt werden, damit weitere Aufträge verplant werden können.
+  \item \textsf{STATUS\_PLAN\_FINISHED} \\
+    Der gesamte Plan ist fertig berechnet worden und steht als Lösungskandidat zur Verfügung. \\
+\end{itemize}
+
+\noindent
+Die Auswahl des jeweils nächsten Stops verläuft in abgewandelter Form nach dem in \chpref{chp:ant_detail} aufgezeigten Verfahren und basiert auf der Bewertung aller möglichen Nachfolge-Stops mit einer Besuchswahrscheinlichkeit\index{Besuchswahrscheinlichkeit}. Es findet jedoch keine Normierung der Wahrscheinlichkeiten statt, sodass sie in der Summe verschieden von $1$ sein können. Befindet sich die Ameise bzw. das Fahrzeug am Stop $i$, so wird jedem möglichen Folgestop $j$ nach der Formel
+\begin{equation}\label{eqn:probability_adapted}
+p_j = \tau_{(i,j)}^\alpha \cdot \eta_{(i,j)}^\beta
+\end{equation}
+
+\noindent
+eine Wahrscheinlichkeit $p_j$ zugewiesen. Außerdem wird die Summe aller Wahrscheinlichkeiten gespeichert. Es wird dann ein \emph{gleichverteilter} Zufallswert $x$ zwischen $0$ und der Summe der Wahrscheinlichkeiten bestimmt, über den der nächste Stop ausgewählt wird. Die Auswahl des Folgestops läuft so ab, dass die möglichen Folgestops zunächst nach ihrer Identifikationsnummer sortiert werden. Dann werden die ihnen zugewiesenen Besuchswahrscheinlichkeiten solange kumuliert, bis der zuvor generierte Zufallswert $x$ erreicht oder überschritten wird. Der Stop, dessen Besuchswahrscheinlichkeit zuletzt addiert wurde, wird dann als Folgestop ausgewählt. Dieses Verfahren wird auch von \textsc{Dorigo} und \textsc{Stützle} vorgeschlagen \cite{Dorigo}. \\
+\\
+Sind alle Ameisen mit der Lösungskonstruktion fertig, wird die beste Lösung bestimmt und in den Status des \textsf{OptimizerThread} übernommen. Es schließen sich die Evaporation\index{Evaporation} und das Neulegen der Pheromone\index{Pheromon} an. Für jede Ameise werden entlang ihres Weges auf jeder benutzten Kante neue Pheromone ausgeschüttet. Die Berechnung der Konzentration findet ebenfalls nach einer leicht modifizierten Formel statt. Die in \chpref{chp:ant_detail} beschriebene Formel wird dahingehend verändert, dass die Kosten der bisher besten bekannten Lösung mit einbezogen werden. Hat eine Ameise die Kante $(i,j)$ verwendet, so ergibt sich die neue Pheromonkonzentration aus
+\begin{equation}
+\tau_{(i,j)} \leftarrow \tau_{(i,j)} + \frac{c_{best}}{c_{ant}}.
+\end{equation}
+\nomenclature{$c$}{Kosten einer Lösung}
+\nomenclature{$c_{best}$}{Kosten der besten bekannten Lösung}
+\nomenclature{$c_{ant}$}{Kosten der Lösung einer bestimmten Ameise}
+
+\noindent
+Dabei bezeichnet $c_{best}$ die Kosten der bisher besten bekannten Lösung und $c_{ant}$ die Kosten der Lösung, die durch die aktuelle Ameise bestimmt wurde. Diese Modifikation kommt zur Anwendung, da die Konzentration der neu gelegten Pheromone umgekehrt proportional zu den Kosten der gefundenen Lösung ist und sich bei hohen Kostenwerten ansonsten sehr geringe Pheromonmengen ergäben. Sind für alle Ameisen neue Pheromone gelegt worden, so werden alle Ameisen zurück in die Liste der wartenden Ameisen verschoben und die Ausführungs-Threads darüber informiert, dass wieder Arbeit zu erledigen ist. \\
+\\
+Der Zyklus der Lösungsberechnung wird so lange wiederholt bis die in der Konfiguration festgelegte Maximalzahl an Durchläufen erreicht ist. Falls Stagnation\index{Stagnation} auftritt oder ein anderes Abbruchkriterium\index{Abbruchkriterium} erfüllt ist, kommt es evtl. schon vorher zum Ende der Berechnung. \\
+\\
+Die meisten der in \chpref{chp:ameisen_erweiterung} vorgestellten Erweiterungen kommen hier nicht zum Einsatz, sollten sie sich als notwendig erweisen, können sie später ergänzt werden. Als einzige Ergänzung ist eine untere Grenze für die Pheromone auf den Kanten implementiert, die standardmäßig auf $1$ gesetzt wird.
+
+
+\subsection{Pheromone\index{Pheromon}}
+Die Pheromone auf den Kanten werden in Form eines Graphen\index{Graph} im Status des Ameisen-Systems abgebildet. \\
+\\
+Die Knoten des Graphen entsprechen den Orten, also den Fahrzeug- und Ladedepots und den Aufträgen, die Kanten den Verbindungen zwischen den Orten. Die Bewertung der Kanten gibt die Pheromonkonzentration auf ihr an. Da die Kanten im vorliegenden Problem gerichtet sind, also die Länge sich für beide Richtungen unterscheiden kann, werden auch die Pheromone pro Richtung gespeichert. \\
+
+\begin{wrapfigure}{r}{0.55\textwidth}
+  \vspace{-20pt}
+  \begin{center}
+    \includegraphics[width=0.50\textwidth]{img/uml_pheromone.png}
+  \end{center}
+  \vspace{-20pt}
+  \caption{UML-Diagramm zu den Pheromonen.}
+  \label{fig:uml_pheromone}
+ \vspace{-10pt}
+\end{wrapfigure}
+
+\noindent
+Über die Methoden \textsf{getDistance} und \textsf{setDistance} lässt sich die Länge der Kante bzw. die Pheromonkonzentration auslesen und verändern. Die restlichen Methoden sind für die Verwaltung von Pheromonen eher uninteressant, aber bieten ein gutes Werkzeug zur Arbeit mit allgemeinen Graphen und können für die Umsetzung von Nachbarschaftslisten\index{Nachbarschaftsliste} herangezogen werden. \\
+\\
+Über den Typparameter $N$ wird angegeben, von welchem Typ die Pheromonwerte sein sollen, wir verwenden hier Fließkommawerte (\textsf{Double}), da allein schon aufgrund der Evaporation Ganzzahlen (\textsf{Integer}) ausgeschlossen sind.
+
+
+\subsection{Abbildung der Dynamik\index{Dynamik}}
+Die Abbildung der dynamischen Ereignisse erfolgt indirekt, sodass das Ameisen-System davon im Prinzip nichts mitbekommt. Tritt ein Ereignis ein, so erhält \textsc{Dyonisys} diese Information stets vom SAP\index{SAP}-System über \textsc{ATOS}\index{ATOS}, wie in \figref{fig:dyonisys} dargestellt. Der Parser\footnote{siehe \chpref{chp:parser}.}\index{Parser} interpretiert die Eingabe und nimmt derart Veränderungen am Szenario vor, dass die neue Situation abgebildet wird. Dazu muss solange gewartet werden, bis das Ameisen-System die Verwaltungsphase\index{Verwaltungsphase} durchlaufen hat. Vor dem erneuten Eintritt in die Konstruktionsphase\index{Konstruktionsphase} wird es dann angehalten, um die Veränderungen vornehmen zu können. Das Ameisen-System selbst muss dabei nichts tun, es muss nur hinterher auf die neue Situation reagieren. \\
+\\
+Abhängig vom Typ der aufgetretenen Ereignisse müssen dabei unterschiedliche Aktionen durchgeführt werden. Da es dabei in der Regel der Fall sein wird, dass es nur lokale Veränderungen gibt, die Gesamtsituation also im Wesentlichen bestehen bleibt, können die bereits vorhandenen Pheromonwerte in die neue Situation übernommen werden. Somit kann die gemeinsame, verteilte Information, das Gedächtnis der Ameisen, weiter genutzt werden. \\
+\\
+In den folgenden Beschreibungen der Behandlung der Ereignisse gehen wir davon aus, dass sich das Ameisen-System in angehaltenem Zustand befindet. Nach der Durchführung der Änderung wird die Berechnung fortgesetzt und das Ameisen-System tritt wieder in die Konstruktionsphase\index{Konstruktionsphase} ein.
+
+
+\subsubsection{Ausfall eines Fahrzeugs\index{Fahrzeugausfall}}
+Fällt ein Fahrzeug aus, so wird es aus der Datenbasis gelöscht. Alle Aufträge, die durch dieses Fahrzeug beliefert werden sollen, werden im aktuellen Plan als unverplant markiert. In der nächsten Konstruktionsphase versuchen die Ameisen, die nun unverplanten Aufträge auf die verbleibenden Fahrzeuge aufzuteilen. Bereits nach einem Zyklus\index{Zyklus} können dabei alle betroffenen Aufträge wieder verplant sein, es ist jedoch ebenso denkbar, dass die Belieferung aller ursprünglich geplanten Aufträge in der neuen Situation nicht möglich ist.
+
+
+\subsubsection{Hinzukommen von Aufträgen}
+Kommen neue Aufträge hinzu, so werden diese zunächst in der Datenbasis in die Menge aller Aufträge eingefügt. Im aktuellen Plan werden sie als unverplant vermerkt. \\
+\\
+Durch die neuen Aufträge gibt es im Problemgraphen nun auch neue Knoten und somit neue Kanten, auf denen noch keine Pheromone vorhanden sind. Für die Konstruktion der Lösung sind diese aber erforderlich, sonst würden die Ameisen den betroffenen Knoten aufgrund der Berechnungsvorschrift \eqnref{eqn:probability_adapted} immer eine Besuchswahrscheinlichkeit von $0$ zuweisen, obwohl sie noch nicht besucht wurden. \\
+\\
+Für die Pheromonkonzentration\index{Pheromonkonzentration} auf den neuen Kanten kommen zwei sinnvolle Mög\-lich\-kei\-ten in Betracht. Zum einen der Durchschnitt der Konzentrationen auf den bisherigen Kanten und zum anderen eine Konzentration in Höhe der Initialkonzentration $\tau_0$. Aus Gründen der Performance wurde die zweite Option, also das Legen von Pheromonen der Konzentration $\tau_0$ gewählt.
+
+
+\subsubsection{Veränderung von Wegkosten}
+Die Veränderung von Wegkosten tritt z.B. ein, wenn sich ein Stau bildet oder eine Straßensperrung besteht. Es gibt zum einen die Möglichkeit, diese Veränderung direkt in der Distanzmatrix zu speichern und zum anderen, eine neue, aktualisierte Distanzmatrix vom xServer\index{xServer} abzurufen. Die Ameisen verwenden dann beim nächsten Durchlauf der Konstruktionsphase\index{Konstruktionsphase} die aktualisierten Distanzinformationen und beziehen sie direkt in die Berechnung der Besuchswahrscheinlichkeiten ein. Eine denkbare Erweiterung des Verhaltens ist die Veränderung der Konzentration der Pheromone auf den betroffenen Kanten proportional zur Veränderung der Wegkosten. \\
+\\
+Durch die Veränderung der Wegkosten kann die bisherige beste Lösung stark verschlechtert werden, da Kunden ggf. nicht mehr fristgerecht erreicht werden können. Alle Aufträge, die durch dieses Problem betroffen sind, werden als unverplant markiert und der dadurch entstehende Plan als aktuell bester gespeichert.

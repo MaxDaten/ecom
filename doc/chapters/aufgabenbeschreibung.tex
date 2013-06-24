@@ -1,0 +1,34 @@
+\chapter{\index{Einführung}Einführung}
+In dieser Arbeit geht es um die dynamische Optimierung von \index{Liefertour}\emph{Liefertouren}. Auch wenn wir es speziell mit den Anforderungen der Öl- und Gas-Branche zu tun haben, wollen wir unsere Untersuchungen möglichst branchenunabhängig führen. \\
+\\
+Im Einführungskapitel wird zunächst ein informeller Überblick über die Problematik gegeben, dabei wird auf mathematische Korrektheit verzichtet, da der leichte Einstieg in die Thematik im Vordergrund stehen soll.
+
+\section{\index{Motivation}Motivation}
+Versetzen wir uns einmal in die Lage eines Öl-Konzerns. \\
+\\
+Wir haben eine Reihe von Kunden, die Bestellungen bei uns aufgeben. Diese Bestellungen müssen unter Verwendung unseres Fuhrparks ausgeliefert werden. Jedes Fahrzeug verfügt über Ausrüstung und Eigenschaften, die den Transport einer Ware ermöglichen oder verbieten können. Die Fahrzeuge starten an einem Fahrzeugdepot und müssen zunächst an einem Warenlager betankt werden, danach folgt die Belieferung der Kunden. \\
+\\
+Bei der Planung achten wir darauf, dass unsere Liefertouren ressourcenschonend, also kostengünstig sind und dem Unternehmen somit den höchstmöglichen \index{Gewinn}Gewinn bescheren. Was jedoch nicht berücksichtigt werden kann, sind Ereignisse, die in der realen Welt unvorhersehbar auftreten. Der Ausfall eines Fahrzeugs oder ein Notfall-Auftrag sind Beispiele, die den gesamten Plan unbrauchbar machen können. \\
+\\
+Für diesen Anwendungsfall soll ein Verfahren entworfen und umgesetzt werden, welches imstande ist, die Tourenpläne \emph{just-in-time} an neue, unerwartete Situationen anzupassen. Dieses Verfahren soll langfristig in die von der \emph{implico GmbH} entwickelte Software zur Distributionsplanung integriert werden.
+
+\clearpage
+\section{\index{Problembeschreibung}Problembeschreibung und \index{Abgrenzung}Abgrenzung}
+Wir beschreiben nun das zu untersuchende Problem genauer und nehmen dabei auch einige abgrenzende Vereinfachungen vor. Dadurch wollen wir Sonderfälle ausschließen, um uns auf den Kern des Problems konzentrieren zu können, die Einbeziehung zu einem späteren Zeitpunkt schließen wir damit jedoch nicht aus. \\
+\\
+Wie bereits erwähnt, haben wir eine Reihe von Kunden, die Bestellungen bei uns aufgeben und von Fahrzeugen aus unserem Fuhrpark beliefert werden sollen. Die Kunden haben gewisse Anforderungen an die Lieferfahrzeuge, wie z.B. eine Mindestschlauchlänge oder ein Firmenlogo, das auf dem Fahrzeug prangen soll. Somit verfügt jeder Kunde über eine Menge von Anforderungen, jedes Fahrzeug über eine Menge von Eigenschaften. Damit ein Fahrzeug für die Lieferung zu einem bestimmten Kunden eingesetzt werden kann, müssen die Anforderungen des Kunden durch das Fahrzeug erfüllt werden. Die Anforderungen lassen sich in die Kategorien \emph{hart} und \emph{weich} unterteilen. Die Verletzung einer harten Bedingung hat zur Folge, dass der Tourenplan ungültig wird, die Verletzung einer weichen Bedingung hingegen verursacht lediglich (fiktive) Strafkosten. \\
+\\
+Die Liefertour eines jeden Fahrzeugs beginnt und endet an einem Fahrzeugdepot, dabei kehrt das Fahrzeug immer zu dem Depot zurück, von dem es auch gestartet ist. Zum Startzeitpunkt kann das Fahrzeug entweder voll betankt oder komplett leer sein. Im Laufe des Tages kann es erforderlich sein, mehrmals ein Tanklager anzufahren, um den Fahrzeugtank für weitere Auslieferungen zu befüllen. An den Tanklagern wird von einer mittleren Wartezeit ausgegangen, bevor mit dem Tankvorgang begonnen werden kann. Art und Menge der verfügbaren Waren können sich ebenso wie ihr Preis von Lager zu Lager unterscheiden. Getankt werden kann nur innerhalb der Öffnungszeiten des Lagers. \\
+\\
+Jedem Kunden ist ein Zeitplan\index{Zeitplan} zugeordnet, dessen \index{Zeitfenster}Zeitfenster angeben, wann die Zustellung seiner Bestellung erfolgen soll. Die Zeitfenster werden dabei derart interpretiert, dass sie angeben, wann mit der Belieferung frühestens bzw. spätestens begonnen werden darf. Wir gehen davon aus, dass die Bestellmengen jeweils in ein einziges Fahrzeug passen und eine Aufteilung auf mehrere Fahrzeuge nicht erforderlich ist. \\
+\\
+Bei bestimmten Waren kann es vorkommen, dass ein Fahrzeug sie aufgrund technischer Gegebenheiten nicht befördern kann. Ebenso besteht die Möglichkeit, dass es Waren gibt, die nicht in Kombination transportiert werden dürfen (bestimmte Stoffe können z.B. chemisch reagieren oder den Verderb einer anderen Ware verursachen). \\
+\\
+Wir stellen bei der Tourenplanung sicher, dass die gesetzlich vorgeschriebenen Arbeits- und Pausenzeiten eingehalten werden und setzen voraus, dass die Fahrer ihren Arbeitstag in ausgeruhtem Zustand beginnen.
+
+\section{\index{Zielsetzung}Zielsetzung}\label{chp:zielsetzung}
+Im Rahmen dieser Arbeit wird es unser Ziel sein, ein praxistaugliches Lösungsverfahren für die Tourenplanung zu entwickeln, wobei vor allem der Aspekt der dynamischen Veränderung der Probleminstanzen berücksichtigt werden soll. Die zu behandelnden Ereignisse sind das Ausfallen von Fahrzeugen, das Hinzukommen von Aufträgen und das Verändern von Wegkosten. Unsere Ziele werden die Qualität der berechneten Lösungen sowie eine niedrige Laufzeit sein, damit das Verfahren einen praktischen Nutzen bietet. \\
+\\
+Wir werden zu Beginn einen Überblick über die notwendige Theorie geben und dabei sehen, dass das Problem der Tourenplanung schwer zu lösen ist. Danach werden wir betrachten, worum es sich bei einem \index{Ameisen-Systemen} Ameisen-System handelt, und prüfen, ob es den Anforderungen, die im Zusammenhang mit der Tourenplanung enstehen, gerecht werden kann. Auf der Grundlage eines Ameisen-Systems werden wir dann ein Lösungsverfahren entwerfen und implementieren.  \\
+\\
+Zum Schluss werden wir einige Tests durchführen und das erarbeitete Lösungsverfahren mit einem vergleichen, das bereits in der Praxis zum Einsatz kommt und auf der Tabu-Suche basiert.
