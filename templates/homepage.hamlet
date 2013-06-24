@@ -1,13 +1,2 @@
 $newline never
 <h1>_{MsgShopWellcome}
-
-$if null allProducts
-    <p>_{MsgNoProducts}
-$else
-    <div .row>
-        $forall product <- allProducts
-            <div .span4 .product-box .tile>
-                <a href="@{ProductR (productId product)}">
-                    <span .product-box-content>
-                        <h5>#{getProductTitle product}
-                        ^{pageBody prodImg}
