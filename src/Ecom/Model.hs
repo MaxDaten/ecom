@@ -14,9 +14,9 @@ import           Control.Monad              (mzero)
 import           Control.Monad.Reader       (ask)
 import           Control.Monad.State        (get, put)
 ----------------------------------------------------------------------------------------------------
-import           Data.IxSet                 (Indexable (..), IxSet, (@=), (@+), Proxy (..), getOne, ixFun, ixSet)
+import           Data.IxSet                 (Indexable (..), IxSet, (@=), (@+), (@<=), Proxy (..), getOne, ixFun, ixSet)
 import qualified Data.IxSet                 as IxSet
-import           Data.List                  ((\\), sort)
+import           Data.List                  (sort)
 import           Data.Set                   (Set, intersection)
 import qualified Data.Set                   as Set
 import           Data.Maybe                 (listToMaybe)
@@ -43,12 +43,41 @@ import           Yesod.Core
 data Product = Product
     { productId             :: ProductId
     , productTitle          :: ProductTitle
+    , productSlot           :: ProductSlot
     , productCategories     :: Set ProductCategory
     , productSizes          :: Set ProductSize
     , productColors         :: Set ProductColor
+    , productRequirements   :: Attributes
+    , productAttributes     :: Attributes
     , productDescription    :: ProductDescription
     }
     deriving (Eq, Ord, Data, Typeable, Show, Generic)
+
+data Attributes = Attributes
+    { str :: Strength
+    , int :: Intelligence
+    , dex :: Dexterity
+    , sta :: Stamina
+    }
+    deriving (Eq, Data, Typeable, Show, Generic)
+
+instance Ord Attributes where
+  a1 < a2 = and $ zipWith (<) (map ($ a1) attribs) (map ($ a2) attribs)
+
+attribs :: [Attributes -> Int]
+attribs = [unStr . str, unInt . int, unDex . dex, unSta . sta]
+
+unStr :: Strength -> Int
+unStr (Strength     s) = s
+
+unInt :: Intelligence -> Int
+unInt (Intelligence i) = i
+
+unDex :: Dexterity -> Int
+unDex (Dexterity    d) = d
+
+unSta :: Stamina -> Int
+unSta (Stamina      s) = s
 
 data Association = Association
     { assocCategory         :: ProductCategory
@@ -56,10 +85,10 @@ data Association = Association
     }
     deriving (Eq, Ord, Data, Typeable, Show, Generic)
 
-
 data User = User
     { username              :: Text
     , history               :: [Product]
+    , attributes            :: Attributes
     }
     deriving (Eq, Ord, Data, Typeable, Show, Generic)
 
@@ -67,7 +96,7 @@ newtype ProductId = ProductId { unProductId :: UUID }
     deriving (Eq, Ord, Data, Typeable, Read, Show, Generic)
 
 instance PathPiece ProductId where
-    fromPathPiece x             = ProductId <$> fromPathPiece x
+    fromPathPiece x              = ProductId <$> fromPathPiece x
     toPathPiece (ProductId pid)  = toPathPiece pid
 
 instance PathPiece UUID where
@@ -80,6 +109,11 @@ newtype ProductSize         = ProductSize        Int             deriving (Eq, O
 newtype ProductTitle        = ProductTitle       Text            deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 newtype ProductCategory     = ProductCategory    Text            deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 newtype ProductDescription  = ProductDescription Text            deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
+newtype ProductSlot         = ProductSlot        Text            deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
+newtype Strength            = Strength           Int             deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
+newtype Intelligence        = Intelligence       Int             deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
+newtype Dexterity           = Dexterity          Int             deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
+newtype Stamina             = Stamina            Int             deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
 
 deriving instance Data a => Data (RGB a)
 deriving instance Typeable1 RGB
@@ -88,6 +122,7 @@ deriving instance Ord a => Ord (RGB a)
 
 -- TH magic
 deriveSafeCopy 0 'base ''Product
+deriveSafeCopy 0 'base ''Attributes
 deriveSafeCopy 0 'base ''ProductColor
 deriveSafeCopy 0 'base ''RGB
 deriveSafeCopy 0 'base ''ProductId
@@ -98,11 +133,16 @@ deriveSafeCopy 0 'base ''User
 ----------------------------------------------------------------------------------------------------
 instance Indexable Product where
     empty = ixSet
-        [ ixFun $ \p -> [ productId          p ]
-        , ixFun $ \p -> [ productTitle       p ]
+        [ ixFun $ \p -> [ productId         p ]
+        , ixFun $ \p -> [ productTitle      p ]
+        , ixFun $ \p -> [ productSlot       p ]
         , ixFun $ \p -> Set.toList $ productCategories p
         , ixFun $ \p -> Set.toList $ productSizes  p
         , ixFun $ \p -> Set.toList $ productColors p
+        , ixFun $ \p -> [ str . productRequirements $ p ]
+        , ixFun $ \p -> [ int . productRequirements $ p ]
+        , ixFun $ \p -> [ dex . productRequirements $ p ]
+        , ixFun $ \p -> [ sta . productRequirements $ p ]
         ]
 
 instance Indexable Association where
@@ -120,6 +160,9 @@ instance Indexable User where
 
 instance FromJSON Product
 instance ToJSON Product
+
+instance FromJSON Attributes
+instance ToJSON Attributes
 
 instance FromJSON Association
 instance ToJSON Association
@@ -154,9 +197,12 @@ mkProduct :: ProductId -> Product
 mkProduct pid =
     Product { productId             = pid
             , productTitle          = ""
+            , productSlot           = ""
             , productCategories     = Set.singleton (ProductCategory "")
             , productColors         = Set.singleton (ProductColor $ RGB 0 0 0)
             , productSizes          = Set.singleton (ProductSize 0)
+            , productRequirements   = Attributes { str = Strength 0, int = Intelligence 0, dex = Dexterity 0, sta = Stamina 0 }
+            , productAttributes     = Attributes { str = Strength 0, int = Intelligence 0, dex = Dexterity 0, sta = Stamina 0 }
             , productDescription    = ""
             }
 
@@ -169,7 +215,7 @@ genUUIDFromProduct :: Product -> UUID
 genUUIDFromProduct p = generateNamed namespaceOID $ BS.unpack (Aeson.encode p)
 
 mkUser :: Text -> User
-mkUser name = User name []
+mkUser name = User name [] (Attributes { str = Strength 0, int = Intelligence 0, dex = Dexterity 0, sta = Stamina 0 })
 
 ----------------------------------------------------------------------------------------------------
 
@@ -265,26 +311,25 @@ associatedProducts p = do
     EcomState{..} <- ask
     let categories = concatMap (Set.toList . assocedCategories) $ IxSet.toList $ assocs @+ (Set.toList $ productCategories p)
         products   = concatMap (\pc -> IxSet.toList $ catalog @= pc) categories
-    return products
+    return $ filter (\p' -> (productId p') /= (productId p)) products
 
 
-similarProducts :: [Product] -> Double -> Query EcomState [Product]
-similarProducts ps t = do
+similarProducts :: [Product] -> Attributes -> Double -> Query EcomState [Product]
+similarProducts ps a t = do
     EcomState{..} <- ask
-    let otherProducts = (\\ ps) . IxSet.toList $ catalog
-        similarities  = [(p1 -? p2, p2) | p1 <- ps, p2 <- otherProducts, p1 `matchHard` p2]
+    let otherProducts = IxSet.toList $ catalog @<= str a @<= int a @<= dex a @<= sta a @+ (concatMap (Set.toList . productSizes) ps)
+        withoutBought = filter (\p -> (productId p) `notElem` (map productId ps)) otherProducts
+        similarities  = [(p1 -? p2, p2) | p1 <- ps, p2 <- withoutBought]
     return $ map snd . filter ((<=t) . fst) . sort $ similarities
 
-matchHard :: Product -> Product -> Bool
-matchHard p1 p2 = not . Set.null $ (productSizes p1) `intersection` (productSizes p2)
 
 -- calculate similarity between products
 (-?) :: Product -> Product -> Double
-p1 -? p2 = minimum [dist c1 c2 | c1 <- colors p1, c2 <- colors p2]
+p1 -? p2 = (map (fromIntegral . ($ productAttributes p1)) attribs) `dist` (map (fromIntegral . ($ productAttributes p2)) attribs)
              where
-               dist c1 c2      = foldr (+) 0 . map (^2) $ zipWith (-) c1 c2
-               colors          = map c2l . Set.toList . productColors
-               c2l (ProductColor (RGB r g b)) = [r, g, b]
+               dist x y        = sqrt . foldr (+) 0 . map (**2.0) $ zipWith (-) x y
+               --colors          = map c2l . Set.toList . productColors
+               --c2l (ProductColor (RGB r g b)) = [r, g, b]
 
 
 allUsers :: Query EcomState [User]

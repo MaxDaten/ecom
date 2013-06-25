@@ -3,7 +3,7 @@ LATEX  = pdflatex
 INDEX  = makeindex
 
 # filename ant extensions
-FILE = thesis
+FILE = ecom
 TEXEXT = .tex
 PDFEXT = .pdf
 IDXEXT = .idx

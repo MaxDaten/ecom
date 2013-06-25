@@ -1,8 +1,11 @@
 {
     "productId"             : "00000000-0000-0000-0000-000000000000",
-    "productTitle"          : "Gestreiftes Hemd",
-    "productCategories"     : ["Abendmode"],
-    "productSizes"          : [37, 40, 55],
-    "productColors"         : ["#888888", "#335566"],
-    "productDescription"    : "Hemd mit Sterling-Silber Streifen\n+3 kritische Treffer"
+    "productTitle"          : "Lederrüstung",
+    "productSlot"           : "Torso",
+    "productCategories"     : ["Lederrüstung"],
+    "productSizes"          : [12, 14, 16],
+    "productColors"         : ["#87421F", "#000000"],
+    "productRequirements"   : { "str" : 15, "int" : 0, "dex" : 0, "sta" : 0 },
+    "productAttributes"     : { "str" : 10, "int" : 0, "dex" : 5, "sta" : 5 },
+    "productDescription"    : "Eine Lederrüstung, perfekt geeignet für Schurken und Jäger"
 }

@@ -63,9 +63,12 @@ productBuyAForm baseProduct = specificVariant
         specificVariant size color = Product
             (productId baseProduct) 
             (productTitle baseProduct)
+            (productSlot baseProduct)
             (productCategories baseProduct)
             (Set.singleton size)
             (Set.singleton color)
+            (productRequirements baseProduct)
+            (productAttributes baseProduct)
             (productDescription baseProduct)
 
 

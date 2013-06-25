@@ -1,8 +1,11 @@
 {
     "productId"             : "00000000-0000-0000-0000-000000000000",
-    "productTitle"          : "Dulci & Gibbon Pumps",
-    "productCategories"     : ["Schuhe"],
-    "productSizes"          : [30, 31, 32, 33, 34, 35],
-    "productColors"         : ["#000000", "#ffffff"],
-    "productDescription"    : "Sündhaftteure Pumps mit Schleifchen"
+    "productTitle"          : "Stoffhandschuhe",
+    "productSlot"           : "Hand",
+    "productCategories"     : ["Leichte Rüstung"],
+    "productSizes"          : [12, 13],
+    "productColors"         : ["#FF0000", "#00FF00"],
+    "productRequirements"   : { "str" : 0, "int" : 0, "dex" : 0, "sta" : 0 },
+    "productAttributes"     : { "str" : 3, "int" : 0, "dex" : 5, "sta" : 0 },
+    "productDescription"    : "Leichte Handschuhe, besonders geeignet für Magier"
 }

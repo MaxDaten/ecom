@@ -1,8 +1,11 @@
 {
     "productId"             : "00000000-0000-0000-0000-000000000000",
-    "productTitle"          : "Lederhandschuhe",
-    "productCategories"     : ["Winter"],
-    "productSizes"          : [12, 13, 14],
-    "productColors"         : ["#ffffff"],
-    "productDescription"    : "Wollhandschuhe mit Wärmkissen-Einlage"
+    "productTitle"          : "Zaubererhut",
+    "productSlot"           : "Kopf",
+    "productCategories"     : ["Leichte Rüstung"],
+    "productSizes"          : [12, 14, 16],
+    "productColors"         : ["#00FF00", "#FF00FF"],
+    "productRequirements"   : { "str" : 0, "int" : 0, "dex" : 0, "sta" : 0 },
+    "productAttributes"     : { "str" : 0, "int" : 5, "dex" : 0, "sta" : 5 },
+    "productDescription"    : "Ein modischer Zaubererhut"
 }

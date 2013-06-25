@@ -12,8 +12,8 @@ getHomeR = do
     prodImg <- widgetToPageContent $ placeholditWidget 250 210
 
     mUser <- fuser =<< lookupSession "name"
-    let userHistory = join . maybeToList $ history <$> mUser
-    recommendedProducts <- acidQuery (SimilarProducts userHistory 5.0)
+    let userHistory    = join . maybeToList $ history <$> mUser
+    recommendedProducts <- maybe (return []) (\user -> acidQuery (SimilarProducts userHistory (attributes user) 5.0)) mUser
 
     defaultLayout $ do
         aDomId <- newIdent

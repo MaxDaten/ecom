@@ -1,8 +1,11 @@
 {
     "productId"             : "00000000-0000-0000-0000-000000000000",
-    "productTitle"          : "Perl Badeshorts",
-    "productCategories"     : ["Bademoden"],
-    "productSizes"          : [32, 34, 37, 56],
-    "productColors"         : ["#000000", "#5500ee"],
-    "productDescription"    : "Sexy Badeshorts für Sie und Ihn, Wasserabweisend"
+    "productTitle"          : "Lederhandschuhe",
+    "productSlot"           : "Hand",
+    "productCategories"     : ["Lederrüstung"],
+    "productSizes"          : [12, 14],
+    "productColors"         : ["#87421F", "#000000"],
+    "productRequirements"   : { "str" : 5, "int" : 0, "dex" : 5, "sta" : 0 },
+    "productAttributes"     : { "str" : 0, "int" : 0, "dex" : 5, "sta" : 0 },
+    "productDescription"    : "Lederhandschuhe für Schurken und Jäger"
 }

@@ -1,8 +1,11 @@
 {
     "productId"             : "00000000-0000-0000-0000-000000000000",
-    "productTitle"          : "Spagetti Krawatte",
-    "productCategories"     : ["Abendmode"],
-    "productSizes"          : [0],
-    "productColors"         : ["#992222"],
-    "productDescription"    : "Schmale Krawatte vom Modehaus Spagetti"
+    "productTitle"          : "Lederhose",
+    "productSlot"           : "Beine",
+    "productCategories"     : ["Lederrüstung"],
+    "productSizes"          : [12, 14, 16],
+    "productColors"         : ["#87421F", "#000000"],
+    "productRequirements"   : { "str" : 10, "int" : 0, "dex" : 0, "sta" : 0 },
+    "productAttributes"     : { "str" :  5, "int" : 0, "dex" : 5, "sta" : 5 },
+    "productDescription"    : "Eine schicke Lederhose für Schurken und Jäger"
 }
