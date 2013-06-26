@@ -8,6 +8,6 @@ $else
             <div .span4 .product-box .tile>
                 <div .product-box-content>
                     <a href="@{ProductR (productId product)}">
-                        <span>
+                        <span .tile>
                             <h5>#{getProductTitle product}
                             ^{pageBody prodImg}
