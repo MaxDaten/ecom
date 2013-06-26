@@ -2,16 +2,16 @@
 {-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
 module Ecom.Handler.Admin where
 
-import Ecom.Import
-import Ecom.Utils
-import Data.UUID (nil)
-import           Data.Colour                ()
-import           Data.Colour.SRGB
+import             Ecom.Import
+import             Ecom.Utils
+import             Data.UUID                (nil)
+import             Data.Colour              ()
+import             Data.Colour.SRGB
 
-import Data.Set (Set)
-import qualified Data.Set as Set
-import Data.List.Split
-import Data.Text (unpack, pack)
+import             Data.Set                 (Set)
+import qualified   Data.Set                 as Set
+import             Data.List.Split
+import             Data.Text                (unpack, pack)
 
 
 getAdminAllUsersR :: Handler RepHtml
@@ -134,15 +134,18 @@ productAForm = Product
     <$> (ProductTitle            <$> areq textField (i18nFieldSettings MsgProductTitle) Nothing)
     <*> (ProductSlot             <$> areq textField (i18nFieldSettings MsgProductSlot) Nothing) -- enum radio
     <*> (fromCVS ProductCategory <$> areq textField (i18nFieldSettings MsgProductCategories) Nothing)
-    <*> (fromCVS (ProductSize . read . unpack) <$> areq textField (i18nFieldSettings MsgProductSizes) Nothing)
-    <*> (fromCVS (ProductColor . toSRGB . sRGB24read . unpack) <$> areq textField (i18nFieldSettings MsgProductColors) Nothing)
+    <*> (fromCVS mkPSizes        <$> areq textField (i18nFieldSettings MsgProductSizes) Nothing)
+    <*> (fromCVS mkPColors       <$> areq textField (i18nFieldSettings MsgProductColors) Nothing)
     <*> attributesAForm
     <*> attributesAForm
-    <*> (ProductDescription . unTextarea <$> areq textareaField (i18nFieldSettings MsgProductDescription) Nothing)
+    <*> (mkPDescription          <$> areq textareaField (i18nFieldSettings MsgProductDescription) Nothing)
 
     where
         fromCVS :: (Ord a) => (Text -> a) -> Text -> Set a
-        fromCVS ctor = Set.fromList . map (ctor . pack) . splitOn "," . unpack 
+        fromCVS ctor    = Set.fromList . map (ctor . pack) . splitOn "," . unpack
+        mkPSizes        = ProductSize . read . unpack
+        mkPColors       = ProductColor . toSRGB . sRGB24read . unpack
+        mkPDescription  = ProductDescription . unTextarea 
 
 attributesAForm :: AForm Handler Attributes
 attributesAForm = Attributes
