@@ -132,7 +132,7 @@ productAForm :: AForm Handler Product
 productAForm = Product 
     (ProductId nil) 
     <$> (ProductTitle            <$> areq textField (i18nFieldSettings MsgProductTitle) Nothing)
-    <*> (mkPSlot                 <$> areq intField (i18nFieldSettings MsgProductSlot) (Just (fromEnum (maxBound :: ProductSlot) ))) -- enum radio
+    <*> areq (selectFieldList slotOptions) (i18nFieldSettings MsgProductSlot) (Just (maxBound :: ProductSlot))
     <*> (fromCVS ProductCategory <$> areq textField (i18nFieldSettings MsgProductCategories) Nothing)
     <*> (fromCVS mkPSizes        <$> areq textField (i18nFieldSettings MsgProductSizes) Nothing)
     <*> (fromCVS mkPColors       <$> areq textField (i18nFieldSettings MsgProductColors) Nothing)
@@ -148,6 +148,8 @@ productAForm = Product
         mkPDescription  = ProductDescription . unTextarea
         mkPSlot :: Int -> ProductSlot
         mkPSlot         = toEnum
+        slotOptions :: [(Text, ProductSlot)]
+        slotOptions     = let enum = [minBound..maxBound] :: [ProductSlot] in zip (map (pack . show) enum) (enum)
 
 attributesAForm :: AForm Handler Attributes
 attributesAForm = Attributes

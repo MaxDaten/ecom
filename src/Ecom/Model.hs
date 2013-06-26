@@ -116,7 +116,7 @@ newtype Stamina             = Stamina            Int             deriving (Eq, O
 data    ProductSlot         = Head               -- 0
                             | Torso              -- 1
                             | Legs               -- 2
-                            | Feets              -- 3
+                            | Feet               -- 3
                             | Hands              -- 4
                             | LWeapon | RWeapon  -- 5, 6
                             | LRing | RRing      -- 7, 8
