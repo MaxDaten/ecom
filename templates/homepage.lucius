@@ -4,8 +4,8 @@ h1, h2 {
 h2##{aDomId} {
     color: #990
 }
-
+/*
 .tile{
     margin-top: 20px;
     height: 300px;
-}
+}*/

@@ -1,8 +1,11 @@
 {
     "productId"             : "00000000-0000-0000-0000-000000000000",
     "productTitle"          : "",
-    "productCategory"       : "",
+    "productSlot"           : "",
+    "productCategories"     : [],
     "productSizes"          : [0],
     "productColors"         : ["#000000"],
+    "productRequirements"   : { "str" : 0, "int" : 0, "dex" : 0, "sta" : 0 },
+    "productAttributes"     : { "str" : 0, "int" : 0, "dex" : 0, "sta" : 0 },
     "productDescription"    : ""
 }

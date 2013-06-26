@@ -1,9 +1,15 @@
 <h1>#{getProductTitle product }
-<div .product-box>
-    <div .product-box-content .clearfix>
-        <div .span8 .product-image-container>
-            ^{pageBody mainImg}
-            <p>#{getProductDescription product}
-        <div .span3 .buy-form-container .pull-right>
-                ^{basicBuyForm (productId product) formWidget enc}
+<div .product-box .row>
+    <div .span12 .product-box-content .clearfix>
+        <div .row>
+            <div .span7 .product-image-container>
+                ^{pageBody mainImg}
+                <p>#{getProductDescription product}
+            <div .product-info-container .span5>
+                <div .product-attribs .product-boni>
+                    ^{productAttribWidget MsgProductBoni (productAttributes product)}
+                <div .product-attribs .product-requirements>
+                    ^{productAttribWidget MsgProductRequirements (productRequirements product)}
+                <div .buy-form-container .pull-right>
+                    ^{basicBuyForm (productId product) formWidget enc}
 

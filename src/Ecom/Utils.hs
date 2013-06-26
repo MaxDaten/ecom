@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, RecordWildCards #-}
 module Ecom.Utils where
 
 import           Data.Colour
@@ -32,6 +32,28 @@ shortenDescription n = (flip T.append $ "...") . T.strip . (T.take n)
 colorHex :: (RealFrac b, Floating b) => Colour b -> String
 colorHex = sRGB24show
 
+
+productAttribWidget :: (RenderMessage Ecom msg)
+                 => msg -> Attributes -> WidgetT Ecom IO ()
+productAttribWidget msg attributes@Attributes{..} = do
+    -- mr <- getMessageRender
+    toWidget [whamlet|
+    <table>
+        <caption>
+            _{msg}
+        <tr .attr-str>
+            <td .attr-label>_{MsgAttribStrength}:
+            <td .attr-value>#{unStr str}
+        <tr .attr-int>
+            <td .attr-label>_{MsgAttribIntelligence}:
+            <td .attr-value>#{unInt int}
+        <tr .attr-dex>
+            <td .attr-label>_{MsgAttribDextery}:
+            <td .attr-value>#{unDex dex}
+        <tr .attr-sta>
+            <td .attr-label>_{MsgAttribStamina}:
+            <td .attr-value>#{unSta sta}
+    |]
 
 -- copied from :/
 -- http://hackage.haskell.org/packages/archive/yesod-form/1.3.0/doc/html/src/Yesod-Form-Fields.html#selectFieldHelper

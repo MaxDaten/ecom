@@ -1,12 +1,12 @@
-.product-box {
-    background-color: #eee;
+.product-box-content {
+	background-color: #eee;
     border-radius: 3px;
 
-    .product-box-content {
-        padding: 20px;
-        display: block;
-        height: 100%;
-    }
+    /*padding-bottom: 20px;*/
+}
+
+.product-box {
+    padding-bottom: 20px;
 }
 
 .color-preview {

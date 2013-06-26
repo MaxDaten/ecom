@@ -1,4 +1,4 @@
-ShopWellcome         		: Willkommen in unserem Shop
+ShopWellcome         		: Willkommen bei Axt und Degen
 RecommendedProducts			: Empfohlene Produkte
 ProductCatalog				: Produkt Katalog
 NoProducts           		: keine Produkte gefunden
@@ -36,5 +36,13 @@ InvalidUser					: Ungültiger Nutzer
 UserHistoryCleared			: Kauf-Verlauf gelöscht
 UserHistoryEntryDeleted		: Kauf-Eintrag gelöscht
 
+
 ProductSizeAttribName		: Größe
 ProductColorAttribName		: Farbe
+
+ProductRequirements			: Anforderungen
+ProductBoni					: Boni
+AttribStrength				: Stärke
+AttribIntelligence			: Intelligenz
+AttribDextery				: Geschicklichkeit
+AttribStamina				: Ausdauer
