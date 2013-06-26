@@ -24,5 +24,5 @@ $newline never
                 <a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.de">
                     <img alt="Creative Commons Lizenzvertrag" style="border-width:0" src="http://i.creativecommons.org/l/by/3.0/80x15.png" />
                 <br />Dieses Werk bzw. Inhalt steht unter einer <a rel="license" href="http://creativecommons.org/licenses/by/3.0/deed.de">Creative Commons Namensnennung 3.0 Unported Lizenz</a>
-                <br />Handmade with <a href="http://www.haskell.org/">Haskell</a>, <a href="http://www.yesodweb.com/">Yesod</a>, <a href="http://acid-state.seize.it/">acid-query</a> and <a href="http://twitter.github.io/bootstrap/">Bootstrap</a>
+                <br />Handmade with <a href="http://www.haskell.org/">Haskell</a>, <a href="http://www.yesodweb.com/">Yesod</a>, <a href="http://acid-state.seize.it/">acid-query</a> and <a href="http://twitter.github.io/bootstrap/">Bootstrap</a> | Code on <a href="https://github.com/MaxDaten/ecom">Github</a>
 
