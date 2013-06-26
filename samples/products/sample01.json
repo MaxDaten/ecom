@@ -1,7 +1,7 @@
 {
     "productId"             : "00000000-0000-0000-0000-000000000000",
     "productTitle"          : "Leichte Robe",
-    "productSlot"           : "Torso",
+    "productSlot"           : "Head",
     "productCategories"     : ["Leichte Rüstung"],
     "productSizes"          : [12, 14, 15, 16],
     "productColors"         : ["#FF0000", "#0000FF"],

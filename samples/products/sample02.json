@@ -1,7 +1,7 @@
 {
     "productId"             : "00000000-0000-0000-0000-000000000000",
     "productTitle"          : "Stoffhandschuhe",
-    "productSlot"           : "Hand",
+    "productSlot"           : "Hands",
     "productCategories"     : ["Leichte Rüstung"],
     "productSizes"          : [12, 13],
     "productColors"         : ["#FF0000", "#00FF00"],

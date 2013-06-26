@@ -1,4 +1,5 @@
 {
 	"username"		: "TestUser",
-	"history"		: []
+	"history"		: [],
+	"attributes"	: { "str" : 0, "int" : 0, "dex" : 0, "sta" : 0 }
 }

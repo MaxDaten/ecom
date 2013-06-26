@@ -1,7 +1,7 @@
 {
     "productId"             : "00000000-0000-0000-0000-000000000000",
     "productTitle"          : "Zaubererhut",
-    "productSlot"           : "Kopf",
+    "productSlot"           : "Head",
     "productCategories"     : ["Leichte Rüstung"],
     "productSizes"          : [12, 14, 16],
     "productColors"         : ["#00FF00", "#FF00FF"],

@@ -1,8 +1,11 @@
 {
     "productId"             : "00000000-0000-0000-0000-000000000000",
-    "productTitle"          : "",
-    "productCategory"       : "",
-    "productSizes"          : [0],
-    "productColors"         : ["#000000"],
-    "productDescription"    : ""
+    "productTitle"          : "Leichte Robe",
+    "productSlot"           : "Head",
+    "productCategories"     : ["Leichte Rüstung"],
+    "productSizes"          : [12, 14, 15, 16],
+    "productColors"         : ["#FF0000", "#0000FF"],
+    "productRequirements"   : { "str" : 0, "int" : 0, "dex" : 0, "sta" : 0 },
+    "productAttributes"     : { "str" : 0, "int" : 5, "dex" : 0, "sta" : 5 },
+    "productDescription"    : "Eine schicke Robe für den modebewussten Magier"
 }

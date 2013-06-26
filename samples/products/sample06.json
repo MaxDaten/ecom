@@ -1,7 +1,7 @@
 {
     "productId"             : "00000000-0000-0000-0000-000000000000",
     "productTitle"          : "Lederhandschuhe",
-    "productSlot"           : "Hand",
+    "productSlot"           : "Hands",
     "productCategories"     : ["Lederrüstung"],
     "productSizes"          : [12, 14],
     "productColors"         : ["#87421F", "#000000"],

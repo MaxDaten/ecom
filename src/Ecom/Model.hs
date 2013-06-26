@@ -109,11 +109,21 @@ newtype ProductSize         = ProductSize        Int             deriving (Eq, O
 newtype ProductTitle        = ProductTitle       Text            deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 newtype ProductCategory     = ProductCategory    Text            deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 newtype ProductDescription  = ProductDescription Text            deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
-newtype ProductSlot         = ProductSlot        Text            deriving (Eq, Ord, Data, Typeable, SafeCopy, IsString, Show, Generic, ToJSON, FromJSON)
 newtype Strength            = Strength           Int             deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
 newtype Intelligence        = Intelligence       Int             deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
 newtype Dexterity           = Dexterity          Int             deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
 newtype Stamina             = Stamina            Int             deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
+data    ProductSlot         = Head               -- 0
+                            | Torso              -- 1
+                            | Legs               -- 2
+                            | Feets              -- 3
+                            | Hands              -- 4
+                            | LWeapon | RWeapon  -- 5, 6
+                            | LRing | RRing      -- 7, 8
+                            | Necklace           -- 9
+                            | Artifact           -- 10
+                            | Misc               -- 11
+    deriving (Eq, Ord, Enum, Bounded, Read, Data, Typeable, Show, Generic)
 
 deriving instance Data a => Data (RGB a)
 deriving instance Typeable1 RGB
@@ -129,6 +139,7 @@ deriveSafeCopy 0 'base ''ProductId
 deriveSafeCopy 0 'base ''UUID
 deriveSafeCopy 0 'base ''Association
 deriveSafeCopy 0 'base ''User
+deriveSafeCopy 0 'base ''ProductSlot
 
 ----------------------------------------------------------------------------------------------------
 instance Indexable Product where
@@ -191,13 +202,21 @@ instance FromJSON (RGB Double) where
 instance ToJSON (RGB Double) where
     toJSON (RGB r g b) = Aeson.String . pack . sRGB24show $ sRGB r g b
 
+
+instance FromJSON ProductSlot where
+    parseJSON (Aeson.String slot) = return . read . unpack $ slot
+    parseJSON _ = mzero
+
+instance ToJSON ProductSlot where
+    toJSON slot = Aeson.String . pack $ show slot
+
 ----------------------------------------------------------------------------------------------------
 
 mkProduct :: ProductId -> Product
 mkProduct pid =
     Product { productId             = pid
             , productTitle          = ""
-            , productSlot           = ""
+            , productSlot           = Misc
             , productCategories     = Set.singleton (ProductCategory "")
             , productColors         = Set.singleton (ProductColor $ RGB 0 0 0)
             , productSizes          = Set.singleton (ProductSize 0)

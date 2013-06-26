@@ -1,7 +1,7 @@
 {
     "productId"             : "00000000-0000-0000-0000-000000000000",
     "productTitle"          : "Lederhose",
-    "productSlot"           : "Beine",
+    "productSlot"           : "Legs",
     "productCategories"     : ["Lederrüstung"],
     "productSizes"          : [12, 14, 16],
     "productColors"         : ["#87421F", "#000000"],
