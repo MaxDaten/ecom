@@ -22,7 +22,7 @@
                         <b .carret>
                     <ul .dropdown-menu>
                         <li>
-                            <a href="@{AdminProductsR}"><i class="icon-tag"></i> _{MsgAdminProducts}
+                            <a href="@{AdminAllProductsR}"><i class="icon-tag"></i> _{MsgAdminProducts}
                         <li>
                             <a href="@{AdminAssocsR}"><i class="icon-random"></i> _{MsgAdminAssocs}
                         <li>

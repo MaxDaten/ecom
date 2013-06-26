@@ -11,6 +11,6 @@ $newline never
             <ul>
                 <li>
                     $forall color <- getProductColors product
-                        _{MsgProductColorAttribName}: ^{colorPreview color 15 15}
+                        _{MsgProductColor}: ^{colorPreview color 15 15}
                 <li>
-                    _{MsgProductSizeAttribName}: #{show $ getProductSizes product}
+                    _{MsgProductSize}: #{show $ getProductSizes product}

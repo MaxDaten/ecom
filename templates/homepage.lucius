@@ -5,7 +5,3 @@ h2##{aDomId} {
     color: #990
 }
 
-.tile{
-    display: block;
-    /*height: 300px;*/
-}

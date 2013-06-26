@@ -84,6 +84,7 @@ library
                  , ixset                         == 1.0.*
                  , containers
                  , vector                        == 0.10.*
+                 , split                         == 0.2.*
 
                  , conduit                       >= 1.0
                  , monad-logger                  >= 0.3

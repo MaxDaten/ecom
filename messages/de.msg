@@ -20,6 +20,7 @@ BuyProduct           		: Kaufen
 BoughtProducts	 	 		: Gekaufte Produkte
 ProductBought p@Product     : Produkt gekauft #{show $ getProductTitle p}
 ProductNotFound				: Produkt nicht gefunden
+ProductAdded 				: Produkt hinzugefügt
 Username			 		: Nutzername
 Actions				 		: Aktionen
 
@@ -37,12 +38,18 @@ UserHistoryCleared			: Kauf-Verlauf gelöscht
 UserHistoryEntryDeleted		: Kauf-Eintrag gelöscht
 
 
-ProductSizeAttribName		: Größe
-ProductColorAttribName		: Farbe
+ProductSize 				: Größe
+ProductSizes				: Größen
+ProductColor				: Farbe
+ProductColors 				: Farben
+ProductTitle				: Titel
+ProductSlot			 		: Ausrüstungsplatz
+ProductCategories			: Kategorien
+ProductDescription 			: Beschreibung
 
 ProductRequirements			: Anforderungen
 ProductBoni					: Boni
 AttribStrength				: Stärke
 AttribIntelligence			: Intelligenz
-AttribDextery				: Geschicklichkeit
+AttribDexterity				: Geschicklichkeit
 AttribStamina				: Ausdauer

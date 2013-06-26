@@ -9,11 +9,13 @@
 
 /assoc/#ProductId                   ProductAssocR           GET
 
-/admin/products                     AdminProductsR          GET
+/admin/products                     AdminAllProductsR       GET
 /admin/users                        AdminAllUsersR          GET POST
 /admin/assocs                       AdminAssocsR            GET
 
 /admin/create/user                  AdminCreateUserR        GET
+/admin/create/product               AdminCreateProductR     GET POST
+
 /admin/delete/user/#Text            AdminDeleteUserR        GET
 /admin/users/#Text                  AdminUserR              GET
 /admin/delete/history/#Text         AdminClearHistoryR      POST

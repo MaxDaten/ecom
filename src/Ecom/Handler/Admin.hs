@@ -4,6 +4,14 @@ module Ecom.Handler.Admin where
 
 import Ecom.Import
 import Ecom.Utils
+import Data.UUID (nil)
+import           Data.Colour                ()
+import           Data.Colour.SRGB
+
+import Data.Set (Set)
+import qualified Data.Set as Set
+import Data.List.Split
+import Data.Text (unpack, pack)
 
 
 getAdminAllUsersR :: Handler RepHtml
@@ -62,6 +70,25 @@ getAdminCreateUserR = do
     <a .btn href=@{AdminAllUsersR}>« _{MsgBack}|]
 
 
+getAdminCreateProductR :: Handler RepHtml
+getAdminCreateProductR = do
+    (widget, enctype) <- generateFormPost productForm
+    defaultLayout [whamlet|
+    ^{basicProductForm widget enctype}
+    <a .btn href=@{AdminAllUsersR}>« _{MsgBack}|]
+
+postAdminCreateProductR :: Handler RepHtml
+postAdminCreateProductR = do
+    ((result, _), _) <- runFormPost productForm
+    case result of
+        FormSuccess product -> do
+            lift $ print (show product)
+            acidUpdate (InsertProduct product)
+            setInfoMessageI MsgProductAdded
+        _ -> setErrorMessageI MsgInvalidInput
+    redirect AdminAllProductsR
+
+
 getAdminDeleteUserR :: Text -> Handler RepHtml
 getAdminDeleteUserR name = do
     acidUpdate (DeleteUserByName name)
@@ -82,6 +109,7 @@ getUserR name = do
             $(widgetFile "user")
     where idxList = zip ([0..])
 
+---------------------------------------------------------------------------------------------------
 
 userAForm :: AForm Handler User
 userAForm = mkUser <$> areq textField "Name" Nothing
@@ -100,8 +128,44 @@ basicUserForm widget enctype = toWidget $
 
 ---------------------------------------------------------------------------------------------------
 
-getAdminProductsR :: Handler RepHtml
-getAdminProductsR = do
+productAForm :: AForm Handler Product
+productAForm = Product 
+    (ProductId nil) 
+    <$> (ProductTitle            <$> areq textField (i18nFieldSettings MsgProductTitle) Nothing)
+    <*> (ProductSlot             <$> areq textField (i18nFieldSettings MsgProductSlot) Nothing) -- enum radio
+    <*> (fromCVS ProductCategory <$> areq textField (i18nFieldSettings MsgProductCategories) Nothing)
+    <*> (fromCVS (ProductSize . read . unpack) <$> areq textField (i18nFieldSettings MsgProductSizes) Nothing)
+    <*> (fromCVS (ProductColor . toSRGB . sRGB24read . unpack) <$> areq textField (i18nFieldSettings MsgProductColors) Nothing)
+    <*> attributesAForm
+    <*> attributesAForm
+    <*> (ProductDescription . unTextarea <$> areq textareaField (i18nFieldSettings MsgProductDescription) Nothing)
+
+    where
+        fromCVS :: (Ord a) => (Text -> a) -> Text -> Set a
+        fromCVS ctor = Set.fromList . map (ctor . pack) . splitOn "," . unpack 
+
+attributesAForm :: AForm Handler Attributes
+attributesAForm = Attributes
+    <$> (Strength     <$> areq intField (i18nFieldSettings MsgAttribStrength) (Just 0))
+    <*> (Intelligence <$> areq intField (i18nFieldSettings MsgAttribIntelligence) (Just 0))
+    <*> (Dexterity    <$> areq intField (i18nFieldSettings MsgAttribDexterity) (Just 0))
+    <*> (Stamina      <$> areq intField (i18nFieldSettings MsgAttribStamina) (Just 0))
+
+productForm :: Html -> MForm Handler (FormResult Product, Widget)
+productForm = renderDivs productAForm
+
+basicProductForm :: Widget -> Enctype -> WidgetT Ecom IO ()
+basicProductForm widget enctype = toWidget $ 
+    [whamlet|
+    <form method=post action=@{AdminCreateProductR} enctype=#{enctype}>
+        ^{widget}
+        <button .btn-primary .btn>_{MsgSubmit}
+   |]
+
+---------------------------------------------------------------------------------------------------
+
+getAdminAllProductsR :: Handler RepHtml
+getAdminAllProductsR = do
     allProducts <- acidQuery (AllProducts)
     defaultLayout $ do
         setTitle "Admin Products"

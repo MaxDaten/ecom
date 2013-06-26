@@ -26,3 +26,9 @@ footer {
 	border-top: 1px solid #ccc;
 	margin-top: 10px;
 }
+
+
+.tile{
+    display: block;
+    /*height: 300px;*/
+}

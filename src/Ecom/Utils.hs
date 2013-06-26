@@ -48,7 +48,7 @@ productAttribWidget msg attributes@Attributes{..} = do
             <td .attr-label>_{MsgAttribIntelligence}:
             <td .attr-value>#{unInt int}
         <tr .attr-dex>
-            <td .attr-label>_{MsgAttribDextery}:
+            <td .attr-label>_{MsgAttribDexterity}:
             <td .attr-value>#{unDex dex}
         <tr .attr-sta>
             <td .attr-label>_{MsgAttribStamina}:
@@ -93,3 +93,6 @@ selectFieldHelper outside onOpt inside opts' = Field
             x -> case olReadExternal opts x of
                     Nothing -> Left $ SomeMessage $ MsgInvalidEntry x
                     Just y -> Right $ Just y
+
+i18nFieldSettings :: (RenderMessage Ecom msg) => msg -> FieldSettings Ecom
+i18nFieldSettings msg = FieldSettings (SomeMessage msg) Nothing Nothing Nothing []
