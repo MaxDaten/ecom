@@ -113,16 +113,16 @@ newtype Strength            = Strength           Int             deriving (Eq, O
 newtype Intelligence        = Intelligence       Int             deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
 newtype Dexterity           = Dexterity          Int             deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
 newtype Stamina             = Stamina            Int             deriving (Eq, Ord, Data, Typeable, SafeCopy, Show, Generic, ToJSON, FromJSON)
-data    ProductSlot         = Head               -- 0
-                            | Torso              -- 1
-                            | Legs               -- 2
-                            | Feet               -- 3
-                            | Hands              -- 4
-                            | LWeapon | RWeapon  -- 5, 6
-                            | LRing | RRing      -- 7, 8
-                            | Necklace           -- 9
-                            | Artifact           -- 10
-                            | Misc               -- 11
+data    ProductSlot         = Head          
+                            | Torso         
+                            | Legs          
+                            | Feet          
+                            | Hands         
+                            | LWeapon | RWeapon
+                            | LRing | RRing    
+                            | Necklace      
+                            | Artifact       
+                            | Misc           
     deriving (Eq, Ord, Enum, Bounded, Read, Data, Typeable, Show, Generic)
 
 deriving instance Data a => Data (RGB a)

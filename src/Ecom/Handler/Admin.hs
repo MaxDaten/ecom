@@ -146,10 +146,8 @@ productAForm = Product
         mkPSizes        = ProductSize . read . unpack
         mkPColors       = ProductColor . toSRGB . sRGB24read . unpack
         mkPDescription  = ProductDescription . unTextarea
-        mkPSlot :: Int -> ProductSlot
-        mkPSlot         = toEnum
-        slotOptions :: [(Text, ProductSlot)]
-        slotOptions     = let enum = [minBound..maxBound] :: [ProductSlot] in zip (map (pack . show) enum) (enum)
+        slotOptions    :: [(EcomMessage, ProductSlot)]
+        slotOptions     = let enum = [minBound..maxBound] :: [ProductSlot] in zip (map (slotMsg) enum) enum
 
 attributesAForm :: AForm Handler Attributes
 attributesAForm = Attributes

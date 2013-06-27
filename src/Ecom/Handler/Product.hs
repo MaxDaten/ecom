@@ -57,8 +57,8 @@ postBuyProductR baseProductId = do
 
 productBuyAForm :: Product -> AForm Handler Product
 productBuyAForm baseProduct = specificVariant 
-    <$> areq (sizesField baseProduct) "MsgProductSizeAttribName" Nothing
-    <*> areq (colorField baseProduct) "MsgProductColorAttribName" Nothing
+    <$> areq (sizesField baseProduct) (i18nFieldSettings MsgProductSize) Nothing
+    <*> areq (colorField baseProduct) (i18nFieldSettings MsgProductColor) Nothing
     where
         specificVariant size color = Product
             (productId baseProduct) 
@@ -81,9 +81,8 @@ colorField = colorRadioField . return . mkOptionList . (map mkColorOption) . Set
 
 
 productBuyForm :: Product -> Html -> MForm Handler (FormResult Product, Widget)
-productBuyForm = renderDivs . productBuyAForm
+productBuyForm = renderTable . productBuyAForm
 
--- ^{colorPreview color 50 50}
 basicBuyForm :: ProductId -> Widget -> Enctype -> WidgetT Ecom IO ()
 basicBuyForm pid widget enctype = toWidget $
     [whamlet|

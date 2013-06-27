@@ -8,7 +8,7 @@
             <div .product-info-container .span5>
                 <div .product-attribs .product-boni>
                     ^{productAttribWidget MsgProductBoni (productAttributes product)}
-                    #{show (productSlot product) }
+                    _{slotMsg (productSlot product) }
                 <div .product-attribs .product-requirements>
                     ^{productAttribWidget MsgProductRequirements (productRequirements product)}
                 <div .buy-form-container .pull-right>

@@ -53,3 +53,16 @@ AttribStrength				: Stärke
 AttribIntelligence			: Intelligenz
 AttribDexterity				: Geschicklichkeit
 AttribStamina				: Ausdauer
+
+SlotHead					: Kopf
+SlotTorso					: Torso
+SlotLegs					: Beine
+SlotFeet					: Füße
+SlotHands					: Hände
+SlotRWeapon					: Rechte Waffe
+SlotLWeapon					: Linke Waffe
+SlotRRing					: Rechter Ring
+SlotLRing					: Linker Ring
+SlotNecklace				: Halskette
+SlotArtifact				: Artifakt
+SlotMisc					: Sonstiges

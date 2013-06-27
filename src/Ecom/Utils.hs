@@ -33,6 +33,22 @@ colorHex :: (RealFrac b, Floating b) => Colour b -> String
 colorHex = sRGB24show
 
 
+slotMsg :: ProductSlot -> EcomMessage
+slotMsg Head     = MsgSlotHead
+slotMsg Torso    = MsgSlotTorso
+slotMsg Legs     = MsgSlotLegs
+slotMsg Feet     = MsgSlotFeet
+slotMsg Hands    = MsgSlotHands
+slotMsg LWeapon  = MsgSlotLWeapon
+slotMsg RWeapon  = MsgSlotRWeapon
+slotMsg LRing    = MsgSlotLRing
+slotMsg RRing    = MsgSlotRRing
+slotMsg Necklace = MsgSlotNecklace
+slotMsg Artifact = MsgSlotArtifact
+slotMsg Misc     = MsgSlotMisc
+--slotMsg _        = undefined -- we want a warning
+
+
 productAttribWidget :: (RenderMessage Ecom msg)
                  => msg -> Attributes -> WidgetT Ecom IO ()
 productAttribWidget msg attributes@Attributes{..} = do
