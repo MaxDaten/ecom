@@ -24,6 +24,7 @@ library
                      Ecom.Model
     other-modules:   Ecom.Utils
                      Ecom.Handler.Home
+                     Ecom.Handler.Catalog
                      Ecom.Handler.Product
                      Ecom.Handler.ProductAssoc
                      Ecom.Handler.Admin

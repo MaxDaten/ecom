@@ -4,6 +4,8 @@
 /robots.txt                         RobotsR                 GET
 
 /                                   HomeR                   GET
+/catalog 							CatalogR 				GET
+/catalog/th/#Int 					CatalogThresholdR 		GET
 /prod/#ProductId                    ProductR                GET
 /buy/prod/#ProductId                BuyProductR             POST
 

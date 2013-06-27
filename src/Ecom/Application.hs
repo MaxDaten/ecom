@@ -21,6 +21,7 @@ import Data.Acid (openLocalState)
 -- Import all relevant handler modules here.
 -- Don't forget to add new modules to your cabal file!
 import Ecom.Handler.Home
+import Ecom.Handler.Catalog
 import Ecom.Handler.Product
 import Ecom.Handler.ProductAssoc
 import Ecom.Handler.Admin

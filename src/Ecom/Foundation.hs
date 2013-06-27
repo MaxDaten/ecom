@@ -90,14 +90,16 @@ instance Yesod Ecom where
         -- value passed to hamletToRepHtml cannot be a widget, this allows
         -- you to use normal widget features in default-layout.
         header <- widgetToPageContent $ do
-            addScriptRemote "http://code.jquery.com/jquery-1.10.1.min.js"
-            addScript $ StaticR js_bootstrap_js
+            addScript $ StaticR js_jquery_1_10_1_js
+            addScript $ StaticR js_jquery_ui_1_10_3_js
+            addScript $ StaticR js_bootstrap_min_js
             $(widgetFile "header")
 
         pc <- widgetToPageContent $ do
             $(combineStylesheets 'StaticR
                 [ css_normalize_css
-                , css_bootstrap_css
+                , css_bootstrap_min_css
+                , css_jquery_ui_1_10_0_css
                 ])
             $(widgetFile "default-layout")
         hamletToRepHtml $(hamletFile "templates/default-layout-wrapper.hamlet")

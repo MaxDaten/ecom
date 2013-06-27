@@ -1,0 +1,13 @@
+// Vertical slider
+$("#recom-slider").slider({
+    orientation: "horizontal",
+    range: "min",
+    min: #{rawJS (show $ fst thresholdDim)},
+    max: #{rawJS (show $ snd thresholdDim)},
+    value: #{rawJS (show startValue)},
+    slide: function (event, ui) {
+        $("#recom-reload").attr("href", "/catalog/th/"+ ui.value);
+    }
+});
+$("#recom-slider").val(#{rawJS (show startValue)});
+//$("#amount").val($("#recom-slider").slider("value"));

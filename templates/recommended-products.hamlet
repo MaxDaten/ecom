@@ -1,5 +1,8 @@
 $newline never
 <h2>_{MsgRecommendedProducts}
+<div .slider-form .row>
+    <div #recom-slider .span12>
+    <a #recom-reload href=@{CatalogThresholdR startValue} .span12 .btn .btn-primary .btn-mini>Reload
 <ul>
     $forall rProduct <- recommendedProducts
         <li>#{getProductTitle rProduct}
