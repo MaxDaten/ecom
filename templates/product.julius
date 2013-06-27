@@ -1,0 +1,8 @@
+function RecommendedProductListCtrl($scope, $http) {
+  $http.get('catalog/th/5/products.json').success(function(data) {
+    $scope.rcomProducts = data;
+  });
+ 
+}
+ 
+PhoneListCtrl.$inject = ['$scope', '$http'];

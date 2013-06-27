@@ -40,7 +40,7 @@ getCatalogR = do
         $(widgetFile "homepage")
         unless (null recommendedProducts) 
             $(widgetFile "recommended-products")
-        $(widgetFile "product-catalog")
+        $(widgetFile "catalog")
     where
         fuser :: Maybe Text -> Handler (Maybe User) 
         fuser Nothing = return Nothing
@@ -66,7 +66,6 @@ getProductPidR pid = do
 
 getProductRecR :: Int -> Handler RepHtml
 getProductRecR threshold = undefined
-
 
 ---------------------------------------------------------------------------------------------------
 

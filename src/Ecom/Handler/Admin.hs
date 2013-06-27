@@ -19,7 +19,7 @@ getAdminAllUsersR = do
         allUsers <- acidQuery AllUsers
         defaultLayout $ do
             setTitle "Admin Users"
-            $(widgetFile "admin-users")
+            $(widgetFile "admin/users")
             $(widgetFile "table")
 
 
@@ -174,11 +174,11 @@ getAdminAllProductsR = do
     allProducts <- acidQuery (AllProducts)
     defaultLayout $ do
         setTitle "Admin Products"
-        $(widgetFile "admin-products")
+        $(widgetFile "admin/products")
         $(widgetFile "table")
 
 
 getAdminAssocsR :: Handler RepHtml
 getAdminAssocsR = defaultLayout $ do
     setTitle "Admin Assocs"
-    $(widgetFile "admin-assocs")
+    $(widgetFile "admin/assocs")
