@@ -1,7 +1,7 @@
 {-# LANGUAGE TemplateHaskell, QuasiQuotes, DeriveDataTypeable
 , GeneralizedNewtypeDeriving, TypeFamilies, OverloadedStrings, RecordWildCards, FlexibleInstances,
 TypeSynonymInstances, DeriveGeneric, DefaultSignatures, StandaloneDeriving #-}
-{-# OPTIONS_GHC -fno-warn-orphans -fwarn-name-shadowing -fwarn-hi-shadowing #-}
+{-# OPTIONS_GHC -fno-warn-orphans -fno-warn-name-shadowing -fno-warn-hi-shadowing #-}
 -- mainly inspired by
 -- https://github.com/HalfWayMan/meadowstalk.com/blob/a386797b7b1e470d841dbc9c2cc83b77de63fcab/src/Meadowstalk/Model.hs
 -- Model.hs
@@ -17,7 +17,7 @@ import           Control.Monad.State        (get, put)
 import           Data.IxSet                 (Indexable (..), IxSet, (@=), (@+), (@<=), Proxy (..), getOne, ixFun, ixSet)
 import qualified Data.IxSet                 as IxSet
 import           Data.List                  (sort)
-import           Data.Set                   (Set, intersection)
+import           Data.Set                   (Set)
 import qualified Data.Set                   as Set
 import           Data.Maybe                 (listToMaybe)
 import           Data.Data

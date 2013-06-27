@@ -1,5 +1,5 @@
 {-# LANGUAGE TupleSections, OverloadedStrings, RecordWildCards #-}
-{-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
+{-# OPTIONS_GHC -fno-warn-unused-do-bind -fno-warn-warnings-deprecations -fno-warn-name-shadowing -fno-warn-hi-shadowing #-}
 module Ecom.Handler.Admin where
 
 import             Ecom.Import

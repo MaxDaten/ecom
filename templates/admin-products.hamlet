@@ -13,7 +13,7 @@ $newline never
     <tbody>
         $forall p <- allProducts
             <tr>
-                <td><a href="@{ProductR (productId p)}">#{shortenUUID 5 $ getProductId p}
+                <td><a href="@{ProductPidR (productId p)}">#{shortenUUID 5 $ getProductId p}
                 <td>#{getProductTitle p}
                 <td>#{show $ getProductCategories p}
                 <td>#{show $ getProductSizes p}
