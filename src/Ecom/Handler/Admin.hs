@@ -4,14 +4,7 @@ module Ecom.Handler.Admin where
 
 import             Ecom.Import
 import             Ecom.Utils
-import             Data.UUID                (nil)
-import             Data.Colour              ()
-import             Data.Colour.SRGB
-
-import             Data.Set                 (Set)
-import qualified   Data.Set                 as Set
-import             Data.List.Split
-import             Data.Text                (unpack, pack)
+import             Ecom.Forms
 
 
 getAdminAllUsersR :: Handler RepHtml
@@ -108,64 +101,6 @@ getUserR name = do
             setTitle $ toHtml $ "User: " ++ show (username user)
             $(widgetFile "user")
     where idxList = zip ([0..])
-
----------------------------------------------------------------------------------------------------
-
-userAForm :: AForm Handler User
-userAForm = mkUser <$> areq textField "Name" Nothing
-
-
-userForm :: Html -> MForm Handler (FormResult User, Widget)
-userForm = renderDivs userAForm
-
-basicUserForm :: Widget -> Enctype -> WidgetT Ecom IO ()
-basicUserForm widget enctype = toWidget $ 
-    [whamlet|
-    <form method=post action=@{AdminAllUsersR} enctype=#{enctype}>
-        ^{widget}
-        <button .btn-primary .btn>_{MsgSubmit}
-   |]
-
----------------------------------------------------------------------------------------------------
-
-productAForm :: AForm Handler Product
-productAForm = Product 
-    (ProductId nil) 
-    <$> (ProductTitle            <$> areq textField (i18nFieldSettings MsgProductTitle) Nothing)
-    <*> areq (selectFieldList slotOptions) (i18nFieldSettings MsgProductSlot) (Just (maxBound :: ProductSlot))
-    <*> (fromCVS ProductCategory <$> areq textField (i18nFieldSettings MsgProductCategories) Nothing)
-    <*> (fromCVS mkPSizes        <$> areq textField (i18nFieldSettings MsgProductSizes) Nothing)
-    <*> (fromCVS mkPColors       <$> areq textField (i18nFieldSettings MsgProductColors) Nothing)
-    <*> attributesAForm
-    <*> attributesAForm
-    <*> (mkPDescription          <$> areq textareaField (i18nFieldSettings MsgProductDescription) Nothing)
-
-    where
-        fromCVS :: (Ord a) => (Text -> a) -> Text -> Set a
-        fromCVS ctor    = Set.fromList . map (ctor . pack) . splitOn "," . unpack
-        mkPSizes        = ProductSize . read . unpack
-        mkPColors       = ProductColor . toSRGB . sRGB24read . unpack
-        mkPDescription  = ProductDescription . unTextarea
-        slotOptions    :: [(EcomMessage, ProductSlot)]
-        slotOptions     = let enum = [minBound..maxBound] :: [ProductSlot] in zip (map (slotMsg) enum) enum
-
-attributesAForm :: AForm Handler Attributes
-attributesAForm = Attributes
-    <$> (Strength     <$> areq intField (i18nFieldSettings MsgAttribStrength) (Just 0))
-    <*> (Intelligence <$> areq intField (i18nFieldSettings MsgAttribIntelligence) (Just 0))
-    <*> (Dexterity    <$> areq intField (i18nFieldSettings MsgAttribDexterity) (Just 0))
-    <*> (Stamina      <$> areq intField (i18nFieldSettings MsgAttribStamina) (Just 0))
-
-productForm :: Html -> MForm Handler (FormResult Product, Widget)
-productForm = renderDivs productAForm
-
-basicProductForm :: Widget -> Enctype -> WidgetT Ecom IO ()
-basicProductForm widget enctype = toWidget $ 
-    [whamlet|
-    <form method=post action=@{AdminCreateProductR} enctype=#{enctype}>
-        ^{widget}
-        <button .btn-primary .btn>_{MsgSubmit}
-   |]
 
 ---------------------------------------------------------------------------------------------------
 

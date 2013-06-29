@@ -23,6 +23,7 @@ library
                      Ecom.Settings.Development
                      Ecom.Model
     other-modules:   Ecom.Utils
+                     Ecom.Forms
                      Ecom.Handler.Home
                      Ecom.Handler.Catalog
                      Ecom.Handler.ProductAssoc
