@@ -16,10 +16,10 @@ import Data.Colour.SRGB (sRGB24show)
 
 
 handleProductRecsRootR :: Handler RepHtml
-handleProductRecsRootR = redirect (HomeR) --- bad: default value hardcoded
+handleProductRecsRootR = redirect (CatalogR)
 
 handleProductPidRootR :: Handler RepHtml
-handleProductPidRootR = redirect (HomeR)
+handleProductPidRootR = redirect (CatalogR)
 
 getCatalogR :: Handler RepHtml
 getCatalogR = do
