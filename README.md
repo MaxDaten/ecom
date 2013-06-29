@@ -5,9 +5,9 @@
 + install yesod with `cabal install yesod-platform yesod-bin`
 + clone this repository with `git clone git@github.com:MaxDaten/ecom.git ecom`
 + `cd ecom`
-+ `cabal install --onyl-dependencies`
++ `cabal install --only-dependencies`
 + `yesod devel`
-+ visit http://localhost:3000
++ visit `http://localhost:3000`
 
 ## Intro
 
