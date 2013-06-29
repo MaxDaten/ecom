@@ -3,7 +3,7 @@ $newline never
 $if null recommendedProducts
     <p>_{MsgNoRecommendations}
 $else
-    <div .recommendation ng-app="recommendations" ng-controller="RecsListCtrl" loadfrom=#{productRecsR}>
+    <div .recommendation ng-app="recommendations" ng-controller="RecsListCtrl" loadfrom=@{ProductRecsRootR}>
         {{sliderValue}}
         <div .slider-form .row>
             <div .recom-slider-container .span12>
@@ -11,4 +11,4 @@ $else
             <!-- <div .recom-relaod-container .span12>
                 <button ng-click="loadData()" #recom-reload .btn .btn-primary .btn-mini .btn-block>Reload -->
         <ul>
-            <li ng-repeat="product in recProducts"><a href=#{productPidR}{{product.productId}}>{{product.productTitle}}</a></li>
+            <li ng-repeat="product in recProducts"><a href=@{ProductPidRootR}/{{product.productId}}>{{product.productTitle}}</a></li>

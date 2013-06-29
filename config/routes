@@ -6,6 +6,8 @@
 /                                       HomeR                           GET
 /catalog/products                       CatalogR                        GET
 /catalog/products/by-pid/#ProductId     ProductPidR                     GET
+/catalog/products/by-pid 			    ProductPidRootR
+/catalog/products/by-rec	            ProductRecsRootR
 /catalog/products/by-rec/#Int           ProductRecsR                    GET
 /buy/prod/#ProductId                    BuyProductR                     POST
 

@@ -11,14 +11,19 @@ import Text.Julius (rawJS)
 
 import qualified Data.Set as Set
 
-import Data.Text (pack)
+import Data.Text (pack, intercalate)
 
 import Data.Colour.SRGB (sRGB24show)
+import Yesod.Routes.Class (Route, renderRoute)
+import Data.List (inits)
+import Yesod.Core (RenderRoute)
 
 
--- TODO : some better deriving
-productRecsR = "/catalog/products/by-rec/" :: Text
-productPidR = "/catalog/products/by-pid/" :: Text
+handleProductRecsRootR :: Handler RepHtml
+handleProductRecsRootR = redirect (HomeR) --- bad: default value hardcoded
+
+handleProductPidRootR :: Handler RepHtml
+handleProductPidRootR = redirect (HomeR)
 
 getCatalogR :: Handler RepHtml
 getCatalogR = do

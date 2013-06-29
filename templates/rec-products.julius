@@ -13,6 +13,7 @@ recommendations.controller('RecsListCtrl', ['$scope', '$http', '$attrs', '$locat
         range           : "min"
     };
     var loadfrom = $attrs.loadfrom || '';
+    loadfrom = loadfrom.replace(/\/?$/, '/');
     console.log('loadroute: ' + loadfrom);
 
     $scope.loadData = function(value) {
