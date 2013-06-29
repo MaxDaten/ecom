@@ -7,10 +7,10 @@
                 <p>#{getProductDescription product}
             <div .product-info-container .span5>
                 <div .product-attribs .product-boni>
-                    ^{productAttribWidget MsgProductBoni (productAttributes product)}
+                    ^{attribWidget MsgProductBoni (productAttributes product)}
                     _{slotMsg (productSlot product) }
                 <div .product-attribs .product-requirements>
-                    ^{productAttribWidget MsgProductRequirements (productRequirements product)}
+                    ^{attribWidget MsgProductRequirements (productRequirements product)}
                 <div .buy-form-container .pull-right>
                     ^{basicBuyForm (productId product) formWidget enc}
 

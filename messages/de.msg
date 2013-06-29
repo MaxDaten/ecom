@@ -37,6 +37,7 @@ PleaseLogin 				: Bitte einloggen!
 InvalidUser					: Ungültiger Nutzer
 UserHistoryCleared			: Kauf-Verlauf gelöscht
 UserHistoryEntryDeleted		: Kauf-Eintrag gelöscht
+UserAttrib					: Nutzerattribute
 
 
 ProductSize 				: Größe

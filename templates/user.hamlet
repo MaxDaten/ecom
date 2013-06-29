@@ -1,5 +1,6 @@
 $newline never
 <h1>#{username user}
+^{attribWidget MsgUserAttrib (attributes user)}
 <hr>
 <h2>_{MsgBoughtProducts}
 <ul>

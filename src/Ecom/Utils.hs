@@ -49,9 +49,9 @@ slotMsg Misc     = MsgSlotMisc
 --slotMsg _        = undefined -- we want a warning
 
 
-productAttribWidget :: (RenderMessage Ecom msg)
+attribWidget :: (RenderMessage Ecom msg)
                  => msg -> Attributes -> WidgetT Ecom IO ()
-productAttribWidget msg attributes@Attributes{..} = do
+attribWidget msg attributes@Attributes{..} = do
     -- mr <- getMessageRender
     toWidget [whamlet|
     <table>
