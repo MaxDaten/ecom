@@ -21,7 +21,7 @@ getCatalogR = do
     allProducts <- acidQuery (AllProducts)
     prodImg <- widgetToPageContent $ placeholditWidget 250 210
 
-    mUser <- fuser =<< lookupSession "name"
+    mUser <- getUser =<< lookupSession "name"
     let userHistory    = join . maybeToList $ history <$> mUser
 
     let th = 30 :: Int-- !!!
@@ -29,6 +29,7 @@ getCatalogR = do
 
     r <- getCurrentRoute
     rf <- getUrlRender
+    rps <- getUrlRenderParams
     let currentR = maybe ("" :: Text) rf r
 
     let thresholdDim = (5, 400) :: (Double, Double)
@@ -38,13 +39,10 @@ getCatalogR = do
         aDomId <- newIdent
         setTitle "Willkommen!"
         $(widgetFile "homepage")
-        unless (null recommendedProducts) 
+        unless (null recommendedProducts) $ do
+            addScript $ StaticR js_lib_recommendations_js
             $(widgetFile "rec-products")
         $(widgetFile "catalog")
-    where
-        fuser :: Maybe Text -> Handler (Maybe User) 
-        fuser Nothing = return Nothing
-        fuser (Just u) = acidQuery (UserByName u)
 
 
 getProductPidR :: ProductId -> Handler RepHtml
@@ -64,8 +62,27 @@ getProductPidR pid = do
                 $(widgetFile "productAssoc")
 
 
-getProductRecsR :: Int -> Handler RepHtml
-getProductRecsR threshold = undefined
+getProductRecsR :: Int -> Handler TypedContent
+getProductRecsR threshold = do
+    mUser <- getUser =<< lookupSession "name"
+    let userHistory = join . maybeToList $ history <$> mUser
+
+    r <- getCurrentRoute
+    rf <- getUrlRender
+    rps <- getUrlRenderParams
+    let currentR = maybe ("" :: Text) rf r
+
+    recommendedProducts <- maybe (return []) (\user -> acidQuery (SimilarProducts userHistory (attributes user) (realToFrac threshold))) mUser
+    let thresholdDim = (5, 400) :: (Double, Double)
+    let startValue = threshold
+    let widget = do
+        $(widgetFile "rec-products")
+        addScript $ StaticR js_lib_recommendations_js
+    defaultLayoutJson widget (return recommendedProducts)
+
+
+getUser :: Maybe Text -> Handler (Maybe User) 
+getUser = maybe (return Nothing) (\u -> acidQuery (UserByName u))
 
 ---------------------------------------------------------------------------------------------------
 

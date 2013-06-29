@@ -30,6 +30,7 @@ UserCreated	name@Text	 	: Benutzer erstellt: #{name}
 LoginAs	name@Text	 		: Eingeloggt als: #{name}
 LoggedOut					: Abgemeldet
 NotLoggedIn			 		: Nicht eingeloggt
+NoRecommendations			: Keine Empfehlungen vorhanden
 Logout					 	: Abmelden
 Login					 	: Anmelden
 PleaseLogin 				: Bitte einloggen!

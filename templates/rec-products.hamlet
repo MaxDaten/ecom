@@ -1,10 +1,14 @@
 $newline never
 <h2>_{MsgRecommendedProducts}
-<div .slider-form .row>
-    <div .recom-slider-container .span12>
-        <div #recom-slider>
-    <div .recom-relaod-container .span12>
-        <button #recom-reload href=@{CatalogR}?th=#{startValue} .btn .btn-primary .btn-mini .btn-block>Reload
-<ul>
-    $forall rProduct <- recommendedProducts
-        <li>#{getProductTitle rProduct}
+$if null recommendedProducts
+    <p>_{MsgNoRecommendations}
+$else
+    <div .recommendation ng-app="recommendations" ng-controller="RecsListCtrl" blunt="xyzabc">
+        {{sliderValue}}
+        <div .slider-form .row>
+            <div .recom-slider-container .span12>
+                <div #recom-slider ui-slider min=#{show $ fst thresholdDim} range="min" max=#{show $ snd thresholdDim} value=#{show startValue}>
+            <div .recom-relaod-container .span12>
+                <button ng-click="loadData()" #recom-reload .btn .btn-primary .btn-mini .btn-block>Reload
+        <ul>
+            <li ng-repeat="product in recProducts">{{product.productTitle}}</li>

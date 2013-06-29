@@ -1,15 +1,66 @@
-// Vertical slider
-var currentRoute = #{rawJS (show currentR)}
-$("#recom-slider").slider({
-    orientation: "horizontal",
-    range: "min",
-    min: #{rawJS (show $ fst thresholdDim)},
-    max: #{rawJS (show $ snd thresholdDim)},
-    value: #{rawJS (show startValue)},
-    step: 1,
-    slide: function (event, ui) {
-        $("#recom-reload").attr("href", currentRoute + ui.value);
-    }
-});
-//$("#recom-slider").val(#{rawJS (show startValue)});
-//$("#amount").val($("#recom-slider").slider("value"));
+// angular.module('recommendations.service', []);
+
+// // Vertical slider
+// var recomRecsR = '@{ProductRecsR startValue}';
+
+// var recommendations = angular.module('recommendations',[]);
+
+// recommendations.directive('uiSlider', function () {
+//     return function(scope, element, attrs) {
+//         element.slider({
+//             orientation: "horizontal",
+//             range: "min",
+//             min: #{rawJS (show $ fst thresholdDim)},
+//             max: #{rawJS (show $ snd thresholdDim)},
+//             value: #{rawJS (show startValue)},
+//             step: 1,
+//             create: function (event, ui) {
+//                 var curValue = #{rawJS (show startValue)};
+//                 var tooltip = '<a class="tooltip" id="slider-tooltip" href="#"></a>';
+
+//                 //$('.ui-slider-handle').html(tooltip);
+//                 // $('.ui-slider-handle').tooltip( "option", "content", curValue );
+//                 $('.ui-slider-handle').attr('title', curValue);    
+//                 $('.ui-slider-handle').tooltip({
+//                     container: '.ui-slider-handle',
+//                     position: {
+//                         my: "center bottom-15",
+//                         at: "center top",
+//                         using: function( position, feedback ) {
+//                             $( this ).css( position );
+//                             $( "<div>" )
+//                             .addClass( "arrow bottom" )
+//                             .addClass( feedback.vertical )
+//                             .addClass( feedback.horizontal )
+//                             .appendTo( this );
+//                         }
+//                     }
+//                 });
+//                 scope.sliderValue = curValue;  
+//             },
+//             //slide: sliderTooltip,
+//             slide: function (event, ui) {
+//                 //$("#recom-reload").attr("href", currentRoute + ui.value);
+//                 $('.ui-slider-handle').attr('title', ui.value);
+//                 $('.ui-slider-handle').tooltip('open');
+
+//                 scope.$apply(function() {
+//                     scope.sliderValue = ui.value;
+//                 });
+//             }
+//         });
+//     }
+// });
+
+// recommendations.controller('RecsListCtrl', ['$scope', '$http', function($scope, $http) {
+
+//     $scope.loadData = function() {
+//         $http.get(recomRecsR + $scope.sliderValue).success(function(data) {
+//            $scope.recProducts = data;
+//         });
+//     }
+
+//     $scope.loadData();
+// }]);
+
+
