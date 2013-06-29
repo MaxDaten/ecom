@@ -16,6 +16,10 @@ import Data.Text (pack)
 import Data.Colour.SRGB (sRGB24show)
 
 
+-- TODO : some better deriving
+productRecsR = "/catalog/products/by-rec/" :: Text
+productPidR = "/catalog/products/by-pid/" :: Text
+
 getCatalogR :: Handler RepHtml
 getCatalogR = do
     allProducts <- acidQuery (AllProducts)
@@ -27,11 +31,6 @@ getCatalogR = do
     let th = 30 :: Int-- !!!
     recommendedProducts <- maybe (return []) (\user -> acidQuery (SimilarProducts userHistory (attributes user) (realToFrac th))) mUser
 
-    r <- getCurrentRoute
-    rf <- getUrlRender
-    rps <- getUrlRenderParams
-    let currentR = maybe ("" :: Text) rf r
-
     let thresholdDim = (5, 400) :: (Double, Double)
     let startValue = th
 
@@ -40,7 +39,6 @@ getCatalogR = do
         setTitle "Willkommen!"
         $(widgetFile "homepage")
         unless (null recommendedProducts) $ do
-            addScript $ StaticR js_lib_recommendations_js
             $(widgetFile "rec-products")
         $(widgetFile "catalog")
 
@@ -67,17 +65,10 @@ getProductRecsR threshold = do
     mUser <- getUser =<< lookupSession "name"
     let userHistory = join . maybeToList $ history <$> mUser
 
-    r <- getCurrentRoute
-    rf <- getUrlRender
-    rps <- getUrlRenderParams
-    let currentR = maybe ("" :: Text) rf r
-
     recommendedProducts <- maybe (return []) (\user -> acidQuery (SimilarProducts userHistory (attributes user) (realToFrac threshold))) mUser
     let thresholdDim = (5, 400) :: (Double, Double)
     let startValue = threshold
-    let widget = do
-        $(widgetFile "rec-products")
-        addScript $ StaticR js_lib_recommendations_js
+    let widget = $(widgetFile "rec-products")
     defaultLayoutJson widget (return recommendedProducts)
 
 
