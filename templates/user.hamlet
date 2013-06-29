@@ -3,15 +3,29 @@ $newline never
 ^{attribWidget MsgUserAttrib (attributes user)}
 <hr>
 <h2>_{MsgBoughtProducts}
-<ul>
-    $forall (i, product) <- idxList (history user) 
-        <li><a href=@{ProductPidR (productId product)}>#{getProductTitle product}</a> 
-            <form method=post action=@{AdminDeleteHistoryEntry (username user) i}>
-                <button .btn .btn-mini .btn-danger" type=submit>
-                    <i class="icon-remove-circle">
-            <ul>
-                <li>
-                    $forall color <- getProductColors product
-                        _{MsgProductColor}: ^{colorPreview color 15 15}
-                <li>
-                    _{MsgProductSize}: #{show $ getProductSizes product}
+<!-- currently just copied from products.hamlet -->
+<table .table .table-striped .table-hover>
+    <thead>
+        <tr>
+            <th>##
+            <th>id
+            <th>Title
+            <th>Category
+            <th>Sizes
+            <th>Colors
+            <th>Actions
+    <tbody>
+         $forall (i, p) <- idxList (history user) 
+            <tr>
+                <td>#{i}
+                <td><a href="@{ProductPidR (productId p)}">#{shortenUUID 5 $ getProductId p}
+                <td>#{getProductTitle p}
+                <td>#{intersperse "," $ map toHtml $ getProductCategories p}
+                <td>#{show $ getProductSizes p}
+                <td>
+                    $forall color <- getProductColors p
+                        ^{colorPreview color 25 25}
+                <td>
+                    <form method=post action=@{AdminDeleteHistoryEntry (username user) i}>
+                        <button .btn .btn-mini .btn-danger" type=submit>
+                            <i class="icon-remove-circle">
