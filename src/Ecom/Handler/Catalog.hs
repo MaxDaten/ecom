@@ -7,16 +7,12 @@ import Ecom.Import
 import Ecom.Utils
 import Control.Monad (join, unless)
 import Data.Maybe (maybeToList)
-import Text.Julius (rawJS)
 
 import qualified Data.Set as Set
 
-import Data.Text (pack, intercalate)
+import Data.Text (pack)
 
 import Data.Colour.SRGB (sRGB24show)
-import Yesod.Routes.Class (Route, renderRoute)
-import Data.List (inits)
-import Yesod.Core (RenderRoute)
 
 
 handleProductRecsRootR :: Handler RepHtml
@@ -69,6 +65,8 @@ getProductRecsR :: Int -> Handler TypedContent
 getProductRecsR threshold = do
     mUser <- getUser =<< lookupSession "name"
     let userHistory = join . maybeToList $ history <$> mUser
+
+    prodImg <- widgetToPageContent $ placeholditWidget 250 210
 
     recommendedProducts <- maybe (return []) (\user -> acidQuery (SimilarProducts userHistory (attributes user) (realToFrac threshold))) mUser
     let thresholdDim = (5, 400) :: (Double, Double)

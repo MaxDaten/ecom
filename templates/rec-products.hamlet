@@ -10,5 +10,13 @@ $else
                 <div #recom-slider ui-slider min=#{show $ fst thresholdDim} range="min" max=#{show $ snd thresholdDim} value=#{show startValue}>
             <!-- <div .recom-relaod-container .span12>
                 <button ng-click="loadData()" #recom-reload .btn .btn-primary .btn-mini .btn-block>Reload -->
-        <ul>
-            <li ng-repeat="product in recProducts"><a href=@{ProductPidRootR}/{{product.productId}}>{{product.productTitle}}</a></li>
+       <!--  <ul>
+            <li ng-repeat="product in recProducts"><a href=@{ProductPidRootR}/{{product.productId}}>{{product.productTitle}}</a></li> -->
+
+        <div .row>
+            <div ng-repeat="product in recProducts" .span4 .product-box .tile>
+                    <div .product-box-content>
+                        <a href=@{ProductPidRootR}/{{product.productId}}>
+                            <span .tile>
+                                <h5>{{product.productTitle}}
+                                ^{pageBody prodImg}
