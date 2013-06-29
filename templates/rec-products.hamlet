@@ -3,7 +3,7 @@ $newline never
 $if null recommendedProducts
     <p>_{MsgNoRecommendations}
 $else
-    <div .recommendation ng-app="recommendations" ng-controller="RecsListCtrl" blunt="xyzabc">
+    <div .recommendation ng-app="recommendations" ng-controller="RecsListCtrl" loadfrom="/catalog/products/by-rec/">
         {{sliderValue}}
         <div .slider-form .row>
             <div .recom-slider-container .span12>

@@ -90,7 +90,7 @@ instance Yesod Ecom where
         -- value passed to hamletToRepHtml cannot be a widget, this allows
         -- you to use normal widget features in default-layout.
         header <- widgetToPageContent $ do
-            addScript $ StaticR js_jquery_1_10_1_js
+            addScript $ StaticR js_jquery_1_10_1_min_js
             addScript $ StaticR js_angular_min_js
             addScript $ StaticR js_jquery_ui_1_10_3_js
             addScript $ StaticR js_bootstrap_min_js

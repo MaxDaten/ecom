@@ -3,7 +3,7 @@ angular.module('recommendations.service', []);
 var recommendations = angular.module('recommendations',[]);
 
 
-recommendations.controller('RecsListCtrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
+recommendations.controller('RecsListCtrl', ['$scope', '$http', '$attrs', '$location', function($scope, $http, $attrs, $location) {
     $scope.recSliderInits = {
         value           : 50,
         min             : 0,
@@ -12,11 +12,12 @@ recommendations.controller('RecsListCtrl', ['$scope', '$http', '$location', func
         orientation     : "horizontal",
         range           : "min"
     };
+    var loadfrom = $attrs.loadfrom || '';
+    console.log('loadroute: ' + loadfrom);
 
     $scope.loadData = function(value) {
         $scope.sliderValue = value || $scope.sliderValue || $scope.recSliderInits.value;
-        // var loadRoute = $scope.loadRoute | $location.absUrl();
-        var getReqUrl = $scope.sliderValue.toString();
+        var getReqUrl = loadfrom + $scope.sliderValue.toString();
 
         console.log('getUrl: ' + getReqUrl);
         $http.get(getReqUrl).success(function(data) {
@@ -28,6 +29,8 @@ recommendations.controller('RecsListCtrl', ['$scope', '$http', '$location', func
 
     $scope.loadData();
 }]);
+
+
 
 recommendations.directive('uiSlider', function () {
     return function(scope, element, attrs) {
