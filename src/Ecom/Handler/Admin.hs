@@ -6,6 +6,8 @@ import             Ecom.Import
 import             Ecom.Utils
 import             Ecom.Forms
 
+import             Data.List (intersperse)
+
 
 getAdminAllUsersR :: Handler RepHtml
 getAdminAllUsersR = do

@@ -15,7 +15,7 @@ $newline never
             <tr>
                 <td><a href="@{ProductPidR (productId p)}">#{shortenUUID 5 $ getProductId p}
                 <td>#{getProductTitle p}
-                <td>#{show $ getProductCategories p}
+                <td>#{intersperse "," $ map toHtml $ getProductCategories p}
                 <td>#{show $ getProductSizes p}
                 <td>
                     $forall color <- getProductColors p
