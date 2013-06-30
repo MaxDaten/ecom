@@ -99,11 +99,39 @@ getUserR name = do
     mU <- acidQuery (UserByName name)
     case mU of
         Nothing -> notFound
-        (Just user) -> defaultLayout $ do
+        Just user -> defaultLayout $ do
             setTitle $ toHtml $ "User: " ++ show (username user)
             $(widgetFile "user")
     where idxList = zip ([0..])
 
+
+getAdminEditUserR :: Text -> Handler RepHtml
+getAdminEditUserR name = do
+    mU <- acidQuery (UserByName name)
+    case mU of
+        Nothing -> notFound
+        Just user -> do
+            (widget, enctype) <- generateFormPost $ renderTable $ attributesAFormWithDefault (attributes user)
+            defaultLayout [whamlet|
+                <form method=post action=@{AdminEditUserR name} enctype=#{enctype}>
+                    ^{widget}
+                    <button .btn-primary .btn>_{MsgSubmit}
+            |]
+
+
+postAdminEditUserR :: Text -> Handler RepHtml
+postAdminEditUserR name = do
+    mU <- acidQuery (UserByName name)
+    case mU of
+        Nothing -> notFound
+        Just user -> do
+            ((result, _), _ ) <- runFormPost $ renderTable attributesAForm
+            case result of
+                FormSuccess attrs -> do
+                    _ <- acidUpdate (SetUserAttributes user attrs)
+                    setInfoMessageI MsgUserUpdated
+                _ -> setErrorMessageI MsgInvalidInput
+    redirect (UserR name)
 ---------------------------------------------------------------------------------------------------
 
 getAdminAllProductsR :: Handler RepHtml

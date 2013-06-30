@@ -154,11 +154,15 @@ $newline never
 
 ---------------------------------------------------------------------------------------------------
 
+attributesAFormWithDefault :: Attributes -> AForm Handler Attributes
+attributesAFormWithDefault attrs = Attributes
+    <$> (Strength     <$> areq intField (i18nFieldSettings MsgAttribStrength) (Just . unStr $ str attrs))
+    <*> (Intelligence <$> areq intField (i18nFieldSettings MsgAttribIntelligence) (Just . unInt $ int attrs))
+    <*> (Dexterity    <$> areq intField (i18nFieldSettings MsgAttribDexterity) (Just . unDex $ dex attrs))
+    <*> (Stamina      <$> areq intField (i18nFieldSettings MsgAttribStamina) (Just . unSta $ sta attrs))
+
 attributesAForm :: AForm Handler Attributes
-attributesAForm = Attributes
-    <$> (Strength     <$> areq intField (i18nFieldSettings MsgAttribStrength) (Just 0))
-    <*> (Intelligence <$> areq intField (i18nFieldSettings MsgAttribIntelligence) (Just 0))
-    <*> (Dexterity    <$> areq intField (i18nFieldSettings MsgAttribDexterity) (Just 0))
-    <*> (Stamina      <$> areq intField (i18nFieldSettings MsgAttribStamina) (Just 0))
+attributesAForm = attributesAFormWithDefault mkAttributes
+
 
 ---------------------------------------------------------------------------------------------------

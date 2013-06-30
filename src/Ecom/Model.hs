@@ -234,7 +234,10 @@ genUUIDFromProduct :: Product -> UUID
 genUUIDFromProduct p = generateNamed namespaceOID $ BS.unpack (Aeson.encode p)
 
 mkUser :: Text -> User
-mkUser name = User name [] (Attributes { str = Strength 0, int = Intelligence 0, dex = Dexterity 0, sta = Stamina 0 })
+mkUser name = User name [] mkAttributes
+
+mkAttributes :: Attributes
+mkAttributes = Attributes { str = Strength 0, int = Intelligence 0, dex = Dexterity 0, sta = Stamina 0 }
 
 ----------------------------------------------------------------------------------------------------
 
@@ -401,6 +404,12 @@ deleteHistoryEntry user i = do
     where
         (h1, h2) = splitAt i $ history user
 
+
+setUserAttributes :: User -> Attributes -> Update EcomState (Maybe User)
+setUserAttributes user attrs =
+    let modUser = user { attributes = attrs } 
+    in insertUser modUser >> (return . Just $ modUser)
+
 {-- 
 withUsernameUpdate :: Text -> (User -> Update EcomState a) -> Update EcomState (Maybe a)
 withUsernameUpdate username f = do
@@ -468,6 +477,7 @@ makeAcidic ''EcomState [ 'fetchState, 'putState
                        , 'addProductToUserHistory
                        , 'clearUserHistory
                        , 'deleteHistoryEntry
+                       , 'setUserAttributes
                        --, 'withUsernameUpdate
                        ]
 

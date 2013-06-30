@@ -1,5 +1,7 @@
 $newline never
 <h1>#{username user}
+<a .btn .btn-small href=@{AdminEditUserR (username user)}>
+    <i class="icon-edit"></i>
 ^{attribWidget MsgUserAttrib (attributes user)}
 <hr>
 <h2>_{MsgBoughtProducts}
