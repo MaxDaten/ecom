@@ -7,14 +7,12 @@ import 				Ecom.Import
 import 				Ecom.Utils
 
 import             	Data.Set                 (Set)
-import qualified 	Data.Set as Set
+import qualified 	Data.Set                  as Set
 import             	Data.List.Split
-
-
-import 				Data.Text (pack, unpack)
-
+import              Control.Arrow            ((&&&))
+import 				Data.Text                (pack, unpack)
 import             	Data.UUID                (nil)
-import 				Data.Colour.SRGB (sRGB24show, toSRGB, sRGB24read)
+import 				Data.Colour.SRGB         (sRGB24show, toSRGB, sRGB24read)
 
 ---------------------------------------------------------------------------------------------------
 
@@ -57,10 +55,96 @@ productAForm = Product
         mkPColors       = ProductColor . toSRGB . sRGB24read . unpack
         mkPDescription  = ProductDescription . unTextarea
         slotOptions    :: [(EcomMessage, ProductSlot)]
-        slotOptions     = let enum = [minBound..maxBound] :: [ProductSlot] in zip (map (slotMsg) enum) enum
+        slotOptions     = map (slotMsg &&& id) [minBound..maxBound]
+
+productMForm :: Html -> MForm Handler (FormResult Product, Widget)
+productMForm extra = do  
+    (titleRes, titleView)    <- mreq textField (i18nFieldSettings MsgProductTitle) Nothing
+    (slotRes,  slotView)     <- mreq (selectFieldList slotOptions) (i18nFieldSettings MsgProductSlot) (Just (maxBound :: ProductSlot))
+    (catRes,   catView)      <- mreq textField (i18nFieldSettings MsgProductCategories) Nothing
+    (sizeRes,  sizeView)     <- mreq textField (i18nFieldSettings MsgProductSizes) Nothing
+    (colRes,   colView)      <- mreq textField (i18nFieldSettings MsgProductColors) Nothing
+    (reqRes,   reqViews')    <- aFormToForm $ attributesAForm
+    (boniRes,  boniViews')   <- aFormToForm $ attributesAForm
+    (descRes,  descView)     <- mreq textareaField (i18nFieldSettings MsgProductDescription) Nothing
+    let reqViews    = reqViews' []
+        boniViews   = boniViews' []
+        productRes  = Product (ProductId nil)
+                    <$> (ProductTitle <$> titleRes)
+                    <*> slotRes
+                    <*> (fromCVS ProductCategory <$> catRes)
+                    <*> (fromCVS mkPSizes <$> sizeRes)
+                    <*> (fromCVS mkPColors <$> colRes)
+                    <*> reqRes
+                    <*> boniRes
+                    <*> (mkPDescription <$> descRes)
+        baseViews = [titleView, slotView, catView, sizeView, colView, descView]
+    let widget = do
+        baseFormId <- newIdent
+        reqFormId  <- newIdent
+        boniFormId <- newIdent
+        toWidget [lucius|
+        ##{baseFormId} {
+
+        }
+        ##{reqFormId}, ##{boniFormId} {
+            border: 1px red solid;
+            border-radius: 3px;
+            background-color: lightgrey;
+
+            input {
+                width: 3.5em;
+            }
+        }
+        ##{reqFormId} {
+            border-color: red;
+        }
+        ##{boniFormId} {
+            border-color: green;
+        }
+        |]
+        toWidget [whamlet|
+        #{extra}
+        <div .row>
+            <div ##{baseFormId} .span4>
+                <table>
+                    $forall v <- baseViews
+                        <tr>
+                            <td>
+                                ^{fvLabel v}
+                            <td>
+                                ^{fvInput v}
+            <div ##{reqFormId} .span2>
+                <table>
+                    <caption>_{MsgProductRequirements}
+                    $forall reqView <- reqViews
+                        <tr>
+                            <td>
+                                ^{fvLabel reqView}
+                            <td>
+                                ^{fvInput reqView}
+            <div ##{boniFormId} .span2>
+                <table>
+                    <caption>_{MsgProductBoni}
+                    $forall boniView <- boniViews
+                        <tr>
+                            <td>
+                                ^{fvLabel boniView}
+                            <td>
+                                ^{fvInput boniView}
+        |]
+    return (productRes, widget)
+    where
+        fromCVS :: (Ord a) => (Text -> a) -> Text -> Set a
+        fromCVS ctor    = Set.fromList . map (ctor . pack) . splitOn "," . unpack
+        mkPSizes        = ProductSize . read . unpack
+        mkPColors       = ProductColor . toSRGB . sRGB24read . unpack
+        mkPDescription  = ProductDescription . unTextarea
+        slotOptions    :: [(EcomMessage, ProductSlot)]
+        slotOptions     = map (slotMsg &&& id) [minBound..maxBound]
 
 productForm :: Html -> MForm Handler (FormResult Product, Widget)
-productForm = renderDivs productAForm
+productForm = productMForm
 
 basicProductForm :: Widget -> Enctype -> WidgetT Ecom IO ()
 basicProductForm widget enctype = toWidget $ 
