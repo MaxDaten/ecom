@@ -33,10 +33,6 @@ footer {
     /*height: 300px;*/
 }
 
-i.icon-signin {
-	color: Chartreuse;
-}
-
-i.icon-signout {
-	color: red;
+#not-logged, #logged-user {
+	color: white;
 }

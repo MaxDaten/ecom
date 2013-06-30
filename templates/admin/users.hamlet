@@ -18,8 +18,8 @@ $newline never
                             <i class="icon-signin"></i>
                     <form method=post action=@{AdminClearHistoryR (username u)}>
                         <button .btn .btn-small .btn-danger type=submit>
-                            <i class="icon-trash"></i>
+                            <i class="icon-eraser"></i>
                     <form method=get action=@{AdminDeleteUserR (username u)}>
                         <button .btn .btn-small .btn-danger type=submit>
-                            <i class="icon-remove-circle">
+                            <i class="icon-remove">
 
