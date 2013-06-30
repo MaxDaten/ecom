@@ -1,6 +1,6 @@
 $newline never
 <h1>_{MsgAdminUsers}
-<a .btn href=@{AdminCreateUserR}><i class=icon-plus-sign></i> _{MsgAddNewUser}
+<a .btn href=@{AdminCreateUserR}><i class=icon-plus></i> _{MsgAddNewUser}
 <table .table .table-striped .table-hover>
     <thead>
         <tr>
