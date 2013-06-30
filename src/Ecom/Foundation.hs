@@ -101,6 +101,7 @@ instance Yesod Ecom where
             $(combineStylesheets 'StaticR
                 [ css_normalize_css
                 , css_bootstrap_min_css
+                , css_font_awesome_min_css
                 , css_jquery_ui_1_10_0_css
                 ])
             $(widgetFile "default-layout")
