@@ -32,3 +32,11 @@ footer {
     display: block;
     /*height: 300px;*/
 }
+
+i.icon-signin {
+	color: Chartreuse;
+}
+
+i.icon-signout {
+	color: red;
+}

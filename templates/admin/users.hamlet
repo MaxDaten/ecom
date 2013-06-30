@@ -14,8 +14,8 @@ $newline never
                 <td><span class="badge badge-success">#{show $ length $ history u}
                 <td>
                     <form method=get action=@{LoginUserR (username u)}>
-                        <button .btn .btn-small type=submit>
-                            <i class="icon-eye-open"></i>
+                        <button .btn .btn-small .btn-success type=submit>
+                            <i class="icon-signin"></i>
                     <form method=post action=@{AdminClearHistoryR (username u)}>
                         <button .btn .btn-small .btn-danger type=submit>
                             <i class="icon-trash"></i>
