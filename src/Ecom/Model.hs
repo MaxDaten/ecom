@@ -308,6 +308,15 @@ insertAssoc a = do
     put $ ecom { assocs = IxSet.updateIx (assocCategory a) a assocs }
 
 
+deleteAssoc :: Association -> Update EcomState ()
+deleteAssoc = deleteAssocByName . unProductCategory . assocCategory
+
+deleteAssocByName :: Text -> Update EcomState ()
+deleteAssocByName aName = do
+    ecom@EcomState{..} <- get
+    put $ ecom { assocs = IxSet.deleteIx (ProductCategory aName) assocs }
+
+
 combineAssoc :: Association -> Update EcomState ()
 combineAssoc a = do
     EcomState{..} <- get
@@ -462,6 +471,8 @@ makeAcidic ''EcomState [ 'fetchState, 'putState
                        , 'productById
                        
                        , 'insertAssoc
+                       , 'deleteAssoc
+                       , 'deleteAssocByName
                        , 'combineAssoc
                        , 'allAssocs
                        , 'assocByCategory

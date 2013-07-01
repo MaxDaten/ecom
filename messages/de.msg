@@ -21,8 +21,12 @@ BoughtProducts	 	 		: Gekaufte Produkte
 ProductBought p@Product     : Produkt gekauft #{show $ getProductTitle p}
 ProductNotFound				: Produkt nicht gefunden
 ProductAdded 				: Produkt hinzugefügt
+AssocCreated 				: Assoziation hinzugefügt
 Username			 		: Nutzername
 Actions				 		: Aktionen
+
+FromAssoc					: Von
+ToAssocs					: Zu
 
 UserAlreadyExisting  		: Nutzer existiert bereits
 InvalidInput		 		: Falsche Eingabe

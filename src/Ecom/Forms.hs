@@ -49,8 +49,6 @@ productAForm = Product
     <*> (mkPDescription          <$> areq textareaField (i18nFieldSettings MsgProductDescription) Nothing)
 
     where
-        fromCVS :: (Ord a) => (Text -> a) -> Text -> Set a
-        fromCVS ctor    = Set.fromList . map (ctor . pack) . splitOn "," . unpack
         mkPSizes        = ProductSize . read . unpack
         mkPColors       = ProductColor . toSRGB . sRGB24read . unpack
         mkPDescription  = ProductDescription . unTextarea
@@ -250,3 +248,26 @@ attributesAForm = attributesAFormWithDefault mkAttributes
 
 
 ---------------------------------------------------------------------------------------------------
+
+assocAForm :: AForm Handler Association
+assocAForm = Association
+    <$> (ProductCategory <$> areq textField (i18nFieldSettings MsgFromAssoc) Nothing)
+    <*> (fromCVS ProductCategory <$> areq textField (i18nFieldSettings MsgToAssocs) Nothing)
+
+
+assocForm :: Html -> MForm Handler (FormResult Association, Widget)
+assocForm = renderTable assocAForm
+
+
+basicAssocForm :: Widget -> Enctype -> WidgetT Ecom IO ()
+basicAssocForm widget enctype = toWidget $ 
+    [whamlet|
+    <form method=post action=@{AdminCreateAssocR} enctype=#{enctype}>
+        ^{widget}
+        <button .btn-primary .btn>_{MsgSubmit}
+   |]
+
+---------------------------------------------------------------------------------------------------
+
+fromCVS :: (Ord a) => (Text -> a) -> Text -> Set a
+fromCVS ctor    = Set.fromList . map (ctor . pack) . splitOn "," . unpack

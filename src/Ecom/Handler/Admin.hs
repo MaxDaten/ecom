@@ -7,6 +7,8 @@ import             Ecom.Utils
 import             Ecom.Forms
 
 import             Data.List (intersperse)
+import             Data.Set (toList)
+import             Control.Arrow ((&&&))
 
 
 getAdminAllUsersR :: Handler RepHtml
@@ -64,25 +66,7 @@ getAdminCreateUserR = do
     ^{basicUserForm widget enctype}
     <a .btn href=@{AdminAllUsersR}>« _{MsgBack}|]
 
-
-getAdminCreateProductR :: Handler RepHtml
-getAdminCreateProductR = do
-    (widget, enctype) <- generateFormPost productForm
-    defaultLayout [whamlet|
-    ^{basicProductForm widget enctype}
-    <a .btn href=@{AdminAllUsersR}>« _{MsgBack}|]
-
-postAdminCreateProductR :: Handler RepHtml
-postAdminCreateProductR = do
-    ((result, _), _) <- runFormPost productForm
-    case result of
-        FormSuccess product -> do
-            lift $ print (show product)
-            acidUpdate (InsertProduct product)
-            setInfoMessageI MsgProductAdded
-        _ -> setErrorMessageI MsgInvalidInput
-    redirect AdminAllProductsR
-
+---------------------------------------------------------------------------------------------------
 
 getAdminDeleteUserR :: Text -> Handler RepHtml
 getAdminDeleteUserR name = do
@@ -134,6 +118,25 @@ postAdminEditUserR name = do
     redirect (UserR name)
 ---------------------------------------------------------------------------------------------------
 
+getAdminCreateProductR :: Handler RepHtml
+getAdminCreateProductR = do
+    (widget, enctype) <- generateFormPost productForm
+    defaultLayout [whamlet|
+    ^{basicProductForm widget enctype}
+    <a .btn href=@{AdminAllUsersR}>« _{MsgBack}|]
+
+
+postAdminCreateProductR :: Handler RepHtml
+postAdminCreateProductR = do
+    ((result, _), _) <- runFormPost productForm
+    case result of
+        FormSuccess product -> do
+            acidUpdate (InsertProduct product)
+            setInfoMessageI MsgProductAdded
+        _ -> setErrorMessageI MsgInvalidInput
+    redirect AdminAllProductsR
+
+
 getAdminAllProductsR :: Handler RepHtml
 getAdminAllProductsR = do
     allProducts <- acidQuery (AllProducts)
@@ -143,7 +146,39 @@ getAdminAllProductsR = do
         $(widgetFile "table")
 
 
+---------------------------------------------------------------------------------------------------
+
+getAdminCreateAssocR :: Handler RepHtml
+getAdminCreateAssocR = do
+    (widget, enctype) <- generateFormPost assocForm
+    defaultLayout [whamlet|
+    ^{basicAssocForm widget enctype}
+    <a .btn href=@{AdminAssocsR}>« _{MsgBack}
+    |]
+
+postAdminCreateAssocR :: Handler RepHtml
+postAdminCreateAssocR = do
+    ((result, _), _) <- runFormPost assocForm
+    case result of
+        FormSuccess assoc -> do
+            acidUpdate (InsertAssoc assoc)
+            setInfoMessageI MsgAssocCreated
+        _ -> setErrorMessageI MsgInvalidInput
+    redirect AdminAssocsR
+
+
 getAdminAssocsR :: Handler RepHtml
-getAdminAssocsR = defaultLayout $ do
-    setTitle "Admin Assocs"
-    $(widgetFile "admin/assocs")
+getAdminAssocsR = do
+    allA <- acidQuery (AllAssocs)
+    let allAssocs = map toText allA
+    defaultLayout $ do
+        setTitle "Admin Assocs"
+        $(widgetFile "admin/assocs")
+    where
+        toText :: Association -> (Text, [Text])
+        toText = (unProductCategory . assocCategory) &&& ((map unProductCategory) . toList . assocedCategories)
+
+getAdminDeleteAssocR :: Text -> Handler RepHtml
+getAdminDeleteAssocR name = do
+    acidUpdate (DeleteAssocByName name)
+    redirect AdminAssocsR
