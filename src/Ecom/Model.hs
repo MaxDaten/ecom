@@ -17,7 +17,7 @@ import           Control.Monad.State        (get, put)
 import           Data.IxSet                 (Indexable (..), IxSet, (@=), (@+), (@<=), Proxy (..), getOne, ixFun, ixSet)
 import qualified Data.IxSet                 as IxSet
 import           Data.List                  (sort, nub)
-import           Data.Set                   (Set, intersection)
+import           Data.Set                   (Set)
 import qualified Data.Set                   as Set
 import           Data.Maybe                 (listToMaybe)
 import           Data.Data
@@ -356,9 +356,10 @@ similarProducts ps a t = do
 
 -- calculate similarity between products
 (-?) :: Product -> Product -> Double
-p1 -? p2 = (map (fromIntegral . ($ productAttributes p1)) attribs) `dist` (map (fromIntegral . ($ productAttributes p2)) attribs)
-             where
-               dist x y        = sqrt . foldr (+) 0 . map (**2.0) $ zipWith (-) x y
+p1 -? p2 = (attr p1) `dist` (attr p2)
+  where
+    dist x y = sqrt . foldr (+) 0 . map (**2.0) $ zipWith (-) x y
+    attr     = \p -> map ($ productAttributes p) (map (fromIntegral .) attribs)
                --colors          = map c2l . Set.toList . productColors
                --c2l (ProductColor (RGB r g b)) = [r, g, b]
 

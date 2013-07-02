@@ -2,7 +2,45 @@
 Produktempfehlungen können einem Benutzer auf Grundlage verschiedener Informationen gemacht werden. feature-basierte Emfpehlungen werden anhand der Ähnlichkeit von Produkten gemacht, association-basierte Empfehlungen anhand von als zusammengehörig definierten Produktkategorien.
 
 \section{Feature-based}
-Feature-basierte Produktempfehlungen werden auf der Grundlage dessen ausgesprochen, was ein Benutzer bisher gekauft hat. Dabei wird berücksichtigt, dass einem Benutzer nur die Produkte empfohlen werden, die er auch tragen kann.
+Feature-basierte Produktempfehlungen werden auf der Grundlage dessen aus\-ge\-spro\-chen, was ein Benutzer bisher gekauft hat, was sich also in seiner \textsf{history} (Code \ref{User}, Z.2) befindet. Dabei wird berücksichtigt, dass einem Benutzer nur die Produkte empfohlen werden, die er auch tragen kann. \\
+\\
+Ein Benutzer kann ein Produkt tragen, wenn es in einer Größe verfügbar ist, in der er bereits ein anderes Produkt gekauft hat und wenn er die Anforderungen des Produktes erfüllt. Die ist der Fall, wenn die Anforderungen des Produktes bezüglich Stärke, Intelligenz, Geschicklichkeit und Ausdauer alle kleiner sind als die Attribute des Benutzers bezogen auf das jeweilige Merkmal. Sei \textsf{u} ein Benutzer und \textsf{ps} der Katalog an verfügbaren Produkten, dann können die Produkte, die von \textsf{u} getragen werden können, wie in Code \ref{wearable} gezeigt, bestimmt werden.
+
+\begin{lstlisting}[label=wearable,caption={Algorithmus zur Bestimmung von Produkten, die ein Benutzer tragen kann}]
+wearable :: User -> [Product] -> [Product]
+wearable u ps = attrOk u . sizeOk u $ ps
+  where
+    userSizes = foldr union empty . map productSizes . history
+    sizeOk u  = filter (\p -> not . null . toList 
+                       $ (productSizes p) `intersection` (userSizes u))
+    attrOk u  = filter (\p -> (attributes u) < (productRequirements p))
+\end{lstlisting}
+\textsf{userSizes} berechnet zu einem gegebenen Benutzer die Menge der Größen, in denen er Produkte erworben hat. \\
+\textsf{sizeOk} wählt aus einer Menge von Produkten diejenigen aus, die in einer Größe verfügbar sind, die zu einem gegebenen Benutzer passen.\\
+\textsf{attrOk} schränkt die verfügbaren Produkte auf diejenigen ein, die der Benutzer aufgrund seiner und der Produktattribute tragen kann.
+\\
+Der in Code \ref{wearable} beschriebene Algorithmus weicht von der tatsächlichen Implementierung ab, da im produktiven Einsatz aufgrund des Kontext monadisch gearbeitet werden muss. Das hier gezeigte Verfahren ist unabhängig davon korrekt und dient der Verdeutlichung der Idee für feature-basierte Produktempfehlungen\\
+\\
+Sind die von einem Benutzer tragbaren Produkte ausgewählt, so wird zwischen diesen und den vom Benutzer bereits gekauften Produkten paarweise die Ähnlichkeit berechnet, um Empfehlungen zu generieren. Somit ist es im folgenden hinreichend, zu be\-schrei\-ben, wie die Ähnlichkeit zwischen zwei Produkten bestimmt werden kann.\\
+\\
+Um die Ähnlichkeit zwischen zwei Produkten zu bestimmen, findet zunächst eine Projektion auf ihre Boni \textsf{productAttributes} statt, welche als Vektoren im $\mathbb{R}^4$ interpretiert werden. Zwischen diesen 
+
+\begin{lstlisting}[label=wearable,caption={Algorithmus zur Bestimmung von Produkten, die ein Benutzer tragen kann}]
+attribs :: [Attributes -> Double]
+attribs = map (fromIntegral .)
+              [unStr . str, unInt . int, unDex . dex, unSta . sta]
+
+(-?) :: Product -> Product -> Double
+p1 -? p2 = (attr p1) `dist` (attr p2)
+  where
+    dist x y = sqrt . foldr (+) 0 . map (**2.0) $ zipWith (-) x y
+    attr     = \p -> map ($ productAttributes p) attribs
+\end{lstlisting}
+Da die Ähnlichkeit zwischen Produkten symmetrisch ist, gilt 
+\begin{equation}
+  \bigwedge_{p_1, p_2 \in P} \delta\left(p_1, p_2\right) = \delta\left(p_2, p_1\right)
+\end{equation}
+mit Produkten $p_1, p_2$ und der Menge aller Produkte $P$.
 
 \section{Association-based}
-\lipsum[2]
+\lipsum[1-4]

@@ -26,13 +26,32 @@ data Product = Product { productId           :: ProductId
 \end{lstlisting}
 Attribute enthalten Informationen über Stärke, Intelligenz, Geschicklichkeit und Ausdauer. Im Bezug auf Produkte werden Attribute einerseits verwendet, um zu be\-schrei\-ben, welche Anforderungen sie an ihren Träger stellen und andererseits, welche Boni sie bie\-ten.
 
-\begin{lstlisting}[label=Attributes,caption=Struktur von \textsf{Attributes}]
+\begin{lstlisting}[label=Attributes,caption=Struktur von \textsf{Attributes} und zugehörige Zugriffsfunktionen]
 data Attributes = Attributes { str :: Strength
                              , int :: Intelligence
                              , dex :: Dexterity
                              , sta :: Stamina
                              }
+
+newtype Strength     = Strength     Int
+newtype Intelligence = Intelligence Int
+newtype Dexterity    = Dexterity    Int
+newtype Stamina      = Stamina      Int
+
+unStr :: Strength -> Int
+unStr (Strength     s) = s
+
+unInt :: Intelligence -> Int
+unInt (Intelligence i) = i
+
+unDex :: Dexterity -> Int
+unDex (Dexterity    d) = d
+
+unSta :: Stamina -> Int
+unSta (Stamina      s) = s
 \end{lstlisting}
+Die in Code \ref{Attributes} gezeigte Struktur wurde gewählt um Haskells Möglichkeiten der Typsicherheit zu nutzen und eine Unterscheidung zwischen den Typen von Stärke, Intelligenz, Geschicklichkeit und Ausdauer zu machen, sodass diese nicht kompatibel sind. Dennoch können die eingewickelten Daten mit Hilfe der Funktionen \textsf{unStr}, \textsf{unInt}, \textsf{unDex} und \textsf{unSta} ausgewickelt werden, um auf dieser Grundlage Berechnungen durchzuführen.
+
 
 \section{Kategorieverknüpfung}
 Zur Umsetzung von Assoziationsbasierten Produktempfehlungen sollen die Kategorien verwendet werden, denen Produkte zugeordnet sind. Für jede Kategorie \textsf{assocCategory} kann eine Menge von Kategorien \textsf{assocedCategories} definiert werden, die mit dieser Kategorie assoziiert sind.
