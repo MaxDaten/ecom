@@ -1,6 +1,6 @@
 $newline never
 <h1>_{MsgAdminUsers}
-<a .btn href=@{AdminCreateUserR}><i class=icon-plus-sign></i> _{MsgAddNewUser}
+<a .btn href=@{AdminCreateUserR}><i class=icon-plus></i> _{MsgAddNewUser}
 <table .table .table-striped .table-hover>
     <thead>
         <tr>
@@ -13,13 +13,13 @@ $newline never
                 <td><a href=@{AdminUserR (username u)}>#{username u}
                 <td><span class="badge badge-success">#{show $ length $ history u}
                 <td>
-                    <form method=get action=@{AdminDeleteUserR (username u)}>
-                        <button .btn .btn-small type=submit>
-                            <i class="icon-remove-circle">
                     <form method=get action=@{LoginUserR (username u)}>
-                        <button .btn .btn-small type=submit>
-                            <i class="icon-eye-open"></i>
+                        <button .btn .btn-small .btn-success type=submit>
+                            <i class="icon-signin"></i>
                     <form method=post action=@{AdminClearHistoryR (username u)}>
-                        <button .btn .btn-small type=submit>
-                            <i class="icon-trash"></i>
+                        <button .btn .btn-small .btn-danger type=submit>
+                            <i class="icon-eraser"></i>
+                    <form method=get action=@{AdminDeleteUserR (username u)}>
+                        <button .btn .btn-small .btn-danger type=submit>
+                            <i class="icon-remove">
 

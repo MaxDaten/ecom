@@ -24,6 +24,6 @@
                         <li>
                             <a href="@{AdminAllProductsR}"><i class="icon-tag"></i> _{MsgAdminProducts}
                         <li>
-                            <a href="@{AdminAssocsR}"><i class="icon-random"></i> _{MsgAdminAssocs}
-                        <li>
                             <a href="@{AdminAllUsersR}"><i class="icon-user"></i> _{MsgAdminUsers}
+                        <li>
+                            <a href="@{AdminAssocsR}"><i class="icon-random"></i> _{MsgAdminAssocs}

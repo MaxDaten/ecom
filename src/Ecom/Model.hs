@@ -1,7 +1,7 @@
 {-# LANGUAGE TemplateHaskell, QuasiQuotes, DeriveDataTypeable
 , GeneralizedNewtypeDeriving, TypeFamilies, OverloadedStrings, RecordWildCards, FlexibleInstances,
 TypeSynonymInstances, DeriveGeneric, DefaultSignatures, StandaloneDeriving #-}
-{-# OPTIONS_GHC -fno-warn-orphans -fwarn-name-shadowing -fwarn-hi-shadowing #-}
+{-# OPTIONS_GHC -fno-warn-orphans -fno-warn-name-shadowing -fno-warn-hi-shadowing #-}
 -- mainly inspired by
 -- https://github.com/HalfWayMan/meadowstalk.com/blob/a386797b7b1e470d841dbc9c2cc83b77de63fcab/src/Meadowstalk/Model.hs
 -- Model.hs
@@ -234,7 +234,10 @@ genUUIDFromProduct :: Product -> UUID
 genUUIDFromProduct p = generateNamed namespaceOID $ BS.unpack (Aeson.encode p)
 
 mkUser :: Text -> User
-mkUser name = User name [] (Attributes { str = Strength 0, int = Intelligence 0, dex = Dexterity 0, sta = Stamina 0 })
+mkUser name = User name [] mkAttributes
+
+mkAttributes :: Attributes
+mkAttributes = Attributes { str = Strength 0, int = Intelligence 0, dex = Dexterity 0, sta = Stamina 0 }
 
 ----------------------------------------------------------------------------------------------------
 
@@ -303,6 +306,15 @@ insertAssoc :: Association -> Update EcomState ()
 insertAssoc a = do
     ecom@EcomState{..} <- get
     put $ ecom { assocs = IxSet.updateIx (assocCategory a) a assocs }
+
+
+deleteAssoc :: Association -> Update EcomState ()
+deleteAssoc = deleteAssocByName . unProductCategory . assocCategory
+
+deleteAssocByName :: Text -> Update EcomState ()
+deleteAssocByName aName = do
+    ecom@EcomState{..} <- get
+    put $ ecom { assocs = IxSet.deleteIx (ProductCategory aName) assocs }
 
 
 combineAssoc :: Association -> Update EcomState ()
@@ -401,6 +413,12 @@ deleteHistoryEntry user i = do
     where
         (h1, h2) = splitAt i $ history user
 
+
+setUserAttributes :: User -> Attributes -> Update EcomState (Maybe User)
+setUserAttributes user attrs =
+    let modUser = user { attributes = attrs } 
+    in insertUser modUser >> (return . Just $ modUser)
+
 {-- 
 withUsernameUpdate :: Text -> (User -> Update EcomState a) -> Update EcomState (Maybe a)
 withUsernameUpdate username f = do
@@ -453,6 +471,8 @@ makeAcidic ''EcomState [ 'fetchState, 'putState
                        , 'productById
                        
                        , 'insertAssoc
+                       , 'deleteAssoc
+                       , 'deleteAssocByName
                        , 'combineAssoc
                        , 'allAssocs
                        , 'assocByCategory
@@ -468,6 +488,7 @@ makeAcidic ''EcomState [ 'fetchState, 'putState
                        , 'addProductToUserHistory
                        , 'clearUserHistory
                        , 'deleteHistoryEntry
+                       , 'setUserAttributes
                        --, 'withUsernameUpdate
                        ]
 

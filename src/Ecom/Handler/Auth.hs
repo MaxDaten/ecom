@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -fno-warn-warnings-deprecations -fno-warn-name-shadowing #-}
 module Ecom.Handler.Auth where
 
 import Ecom.Import

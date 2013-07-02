@@ -1,29 +1,34 @@
-/static                             StaticR                 Static getStatic
+/static                                 StaticR                         Static getStatic
 
-/favicon.ico                        FaviconR                GET
-/robots.txt                         RobotsR                 GET
+/favicon.ico                            FaviconR                        GET
+/robots.txt                             RobotsR                         GET
 
-/                                   HomeR                   GET
-/catalog 							CatalogR 				GET
-/catalog/th/#Int 					CatalogThresholdR 		GET
-/prod/#ProductId                    ProductR                GET
-/buy/prod/#ProductId                BuyProductR             POST
+/                                       HomeR                           GET
+/catalog/products                       CatalogR                        GET
+/catalog/products/by-pid/#ProductId     ProductPidR                     GET
+/catalog/products/by-pid 			    ProductPidRootR
+/catalog/products/by-rec	            ProductRecsRootR
+/catalog/products/by-rec/#Int           ProductRecsR                    GET
+/buy/prod/#ProductId                    BuyProductR                     POST
 
-/assoc/#ProductId                   ProductAssocR           GET
+/catalog/assocs/#ProductId              ProductAssocR                   GET
 
-/admin/products                     AdminAllProductsR       GET
-/admin/users                        AdminAllUsersR          GET POST
-/admin/assocs                       AdminAssocsR            GET
+/admin/products                         AdminAllProductsR               GET
+/admin/users                            AdminAllUsersR                  GET POST
+/admin/assocs                           AdminAssocsR                    GET
 
-/admin/create/user                  AdminCreateUserR        GET
-/admin/create/product               AdminCreateProductR     GET POST
+/admin/create/user                      AdminCreateUserR                GET
+/admin/create/product                   AdminCreateProductR             GET POST
+/admin/create/assoc                     AdminCreateAssocR               GET POST
+/admin/edit/user/#Text 					AdminEditUserR					GET POST
 
-/admin/delete/user/#Text            AdminDeleteUserR        GET
-/admin/users/#Text                  AdminUserR              GET
-/admin/delete/history/#Text         AdminClearHistoryR      POST
-/admin/delete/history/#Text/#Int    AdminDeleteHistoryEntry POST
+/admin/delete/user/#Text                AdminDeleteUserR                GET
+/admin/delete/assoc/#Text               AdminDeleteAssocR               GET
+/admin/users/#Text                      AdminUserR                      GET
+/admin/delete/history/#Text             AdminClearHistoryR              POST
+/admin/delete/history/#Text/#Int        AdminDeleteHistoryEntry         POST
 
-/user/#Text                         UserR                   GET
+/users/#Text                            UserR                           GET
 
-/auth/login/#Text                   LoginUserR              GET
-/auth/logout                        LogoutR                 GET
+/auth/login/#Text                       LoginUserR                      GET
+/auth/logout                            LogoutR                         GET

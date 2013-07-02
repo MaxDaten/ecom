@@ -1,17 +1,14 @@
 {-# LANGUAGE TupleSections, OverloadedStrings, RecordWildCards #-}
-{-# OPTIONS_GHC -fno-warn-unused-do-bind #-}
+{-# OPTIONS_GHC -fno-warn-unused-do-bind -fno-warn-warnings-deprecations -fno-warn-name-shadowing -fno-warn-hi-shadowing #-}
 module Ecom.Handler.Admin where
 
 import             Ecom.Import
 import             Ecom.Utils
-import             Data.UUID                (nil)
-import             Data.Colour              ()
-import             Data.Colour.SRGB
+import             Ecom.Forms
 
-import             Data.Set                 (Set)
-import qualified   Data.Set                 as Set
-import             Data.List.Split
-import             Data.Text                (unpack, pack)
+import             Data.List (intersperse)
+import             Data.Set (toList)
+import             Control.Arrow ((&&&))
 
 
 getAdminAllUsersR :: Handler RepHtml
@@ -19,7 +16,7 @@ getAdminAllUsersR = do
         allUsers <- acidQuery AllUsers
         defaultLayout $ do
             setTitle "Admin Users"
-            $(widgetFile "admin-users")
+            $(widgetFile "admin/users")
             $(widgetFile "table")
 
 
@@ -69,25 +66,7 @@ getAdminCreateUserR = do
     ^{basicUserForm widget enctype}
     <a .btn href=@{AdminAllUsersR}>« _{MsgBack}|]
 
-
-getAdminCreateProductR :: Handler RepHtml
-getAdminCreateProductR = do
-    (widget, enctype) <- generateFormPost productForm
-    defaultLayout [whamlet|
-    ^{basicProductForm widget enctype}
-    <a .btn href=@{AdminAllUsersR}>« _{MsgBack}|]
-
-postAdminCreateProductR :: Handler RepHtml
-postAdminCreateProductR = do
-    ((result, _), _) <- runFormPost productForm
-    case result of
-        FormSuccess product -> do
-            lift $ print (show product)
-            acidUpdate (InsertProduct product)
-            setInfoMessageI MsgProductAdded
-        _ -> setErrorMessageI MsgInvalidInput
-    redirect AdminAllProductsR
-
+---------------------------------------------------------------------------------------------------
 
 getAdminDeleteUserR :: Text -> Handler RepHtml
 getAdminDeleteUserR name = do
@@ -104,81 +83,102 @@ getUserR name = do
     mU <- acidQuery (UserByName name)
     case mU of
         Nothing -> notFound
-        (Just user) -> defaultLayout $ do
+        Just user -> defaultLayout $ do
             setTitle $ toHtml $ "User: " ++ show (username user)
             $(widgetFile "user")
     where idxList = zip ([0..])
 
+
+getAdminEditUserR :: Text -> Handler RepHtml
+getAdminEditUserR name = do
+    mU <- acidQuery (UserByName name)
+    case mU of
+        Nothing -> notFound
+        Just user -> do
+            (widget, enctype) <- generateFormPost $ renderTable $ attributesAFormWithDefault (attributes user)
+            defaultLayout [whamlet|
+                <form method=post action=@{AdminEditUserR name} enctype=#{enctype}>
+                    ^{widget}
+                    <button .btn-primary .btn>_{MsgSubmit}
+            |]
+
+
+postAdminEditUserR :: Text -> Handler RepHtml
+postAdminEditUserR name = do
+    mU <- acidQuery (UserByName name)
+    case mU of
+        Nothing -> notFound
+        Just user -> do
+            ((result, _), _ ) <- runFormPost $ renderTable attributesAForm
+            case result of
+                FormSuccess attrs -> do
+                    _ <- acidUpdate (SetUserAttributes user attrs)
+                    setInfoMessageI MsgUserUpdated
+                _ -> setErrorMessageI MsgInvalidInput
+    redirect (UserR name)
 ---------------------------------------------------------------------------------------------------
 
-userAForm :: AForm Handler User
-userAForm = mkUser <$> areq textField "Name" Nothing
+getAdminCreateProductR :: Handler RepHtml
+getAdminCreateProductR = do
+    (widget, enctype) <- generateFormPost productForm
+    defaultLayout [whamlet|
+    ^{basicProductForm widget enctype}
+    <a .btn href=@{AdminAllUsersR}>« _{MsgBack}|]
 
 
-userForm :: Html -> MForm Handler (FormResult User, Widget)
-userForm = renderDivs userAForm
+postAdminCreateProductR :: Handler RepHtml
+postAdminCreateProductR = do
+    ((result, _), _) <- runFormPost productForm
+    case result of
+        FormSuccess product -> do
+            acidUpdate (InsertProduct product)
+            setInfoMessageI MsgProductAdded
+        _ -> setErrorMessageI MsgInvalidInput
+    redirect AdminAllProductsR
 
-basicUserForm :: Widget -> Enctype -> WidgetT Ecom IO ()
-basicUserForm widget enctype = toWidget $ 
-    [whamlet|
-    <form method=post action=@{AdminAllUsersR} enctype=#{enctype}>
-        ^{widget}
-        <button .btn-primary .btn>_{MsgSubmit}
-   |]
-
----------------------------------------------------------------------------------------------------
-
-productAForm :: AForm Handler Product
-productAForm = Product 
-    (ProductId nil) 
-    <$> (ProductTitle            <$> areq textField (i18nFieldSettings MsgProductTitle) Nothing)
-    <*> areq (selectFieldList slotOptions) (i18nFieldSettings MsgProductSlot) (Just (maxBound :: ProductSlot))
-    <*> (fromCVS ProductCategory <$> areq textField (i18nFieldSettings MsgProductCategories) Nothing)
-    <*> (fromCVS mkPSizes        <$> areq textField (i18nFieldSettings MsgProductSizes) Nothing)
-    <*> (fromCVS mkPColors       <$> areq textField (i18nFieldSettings MsgProductColors) Nothing)
-    <*> attributesAForm
-    <*> attributesAForm
-    <*> (mkPDescription          <$> areq textareaField (i18nFieldSettings MsgProductDescription) Nothing)
-
-    where
-        fromCVS :: (Ord a) => (Text -> a) -> Text -> Set a
-        fromCVS ctor    = Set.fromList . map (ctor . pack) . splitOn "," . unpack
-        mkPSizes        = ProductSize . read . unpack
-        mkPColors       = ProductColor . toSRGB . sRGB24read . unpack
-        mkPDescription  = ProductDescription . unTextarea
-        slotOptions    :: [(EcomMessage, ProductSlot)]
-        slotOptions     = let enum = [minBound..maxBound] :: [ProductSlot] in zip (map (slotMsg) enum) enum
-
-attributesAForm :: AForm Handler Attributes
-attributesAForm = Attributes
-    <$> (Strength     <$> areq intField (i18nFieldSettings MsgAttribStrength) (Just 0))
-    <*> (Intelligence <$> areq intField (i18nFieldSettings MsgAttribIntelligence) (Just 0))
-    <*> (Dexterity    <$> areq intField (i18nFieldSettings MsgAttribDexterity) (Just 0))
-    <*> (Stamina      <$> areq intField (i18nFieldSettings MsgAttribStamina) (Just 0))
-
-productForm :: Html -> MForm Handler (FormResult Product, Widget)
-productForm = renderDivs productAForm
-
-basicProductForm :: Widget -> Enctype -> WidgetT Ecom IO ()
-basicProductForm widget enctype = toWidget $ 
-    [whamlet|
-    <form method=post action=@{AdminCreateProductR} enctype=#{enctype}>
-        ^{widget}
-        <button .btn-primary .btn>_{MsgSubmit}
-   |]
-
----------------------------------------------------------------------------------------------------
 
 getAdminAllProductsR :: Handler RepHtml
 getAdminAllProductsR = do
     allProducts <- acidQuery (AllProducts)
     defaultLayout $ do
         setTitle "Admin Products"
-        $(widgetFile "admin-products")
+        $(widgetFile "admin/products")
         $(widgetFile "table")
 
 
+---------------------------------------------------------------------------------------------------
+
+getAdminCreateAssocR :: Handler RepHtml
+getAdminCreateAssocR = do
+    (widget, enctype) <- generateFormPost assocForm
+    defaultLayout [whamlet|
+    ^{basicAssocForm widget enctype}
+    <a .btn href=@{AdminAssocsR}>« _{MsgBack}
+    |]
+
+postAdminCreateAssocR :: Handler RepHtml
+postAdminCreateAssocR = do
+    ((result, _), _) <- runFormPost assocForm
+    case result of
+        FormSuccess assoc -> do
+            acidUpdate (InsertAssoc assoc)
+            setInfoMessageI MsgAssocCreated
+        _ -> setErrorMessageI MsgInvalidInput
+    redirect AdminAssocsR
+
+
 getAdminAssocsR :: Handler RepHtml
-getAdminAssocsR = defaultLayout $ do
-    setTitle "Admin Assocs"
-    $(widgetFile "admin-assocs")
+getAdminAssocsR = do
+    allA <- acidQuery (AllAssocs)
+    let allAssocs = map toText allA
+    defaultLayout $ do
+        setTitle "Admin Assocs"
+        $(widgetFile "admin/assocs")
+    where
+        toText :: Association -> (Text, [Text])
+        toText = (unProductCategory . assocCategory) &&& ((map unProductCategory) . toList . assocedCategories)
+
+getAdminDeleteAssocR :: Text -> Handler RepHtml
+getAdminDeleteAssocR name = do
+    acidUpdate (DeleteAssocByName name)
+    redirect AdminAssocsR

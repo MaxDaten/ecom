@@ -1,4 +1,5 @@
 {-# LANGUAGE TupleSections, OverloadedStrings, RecordWildCards #-}
+{-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
 module Ecom.Handler.ProductAssoc where
 
 import Ecom.Import

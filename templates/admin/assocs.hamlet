@@ -1,0 +1,19 @@
+$newline never
+<h1>_{MsgAdminAssocs}
+<a href=@{AdminCreateAssocR} .btn><i class=icon-plus></i> _{MsgAddNewAssoc}
+
+<table .table .table-striped .table-hover>
+    <thead>
+        <tr>
+            <th>_{MsgFromAssoc} <i class="icon-long-arrow-right"></i>
+            <th><i class="icon-long-arrow-right"></i> _{MsgToAssocs}
+            <th>_{MsgActions}
+    <tbody>
+        $forall (from, tos) <- allAssocs
+            <tr>
+                <td>#{toHtml from}
+                <td>#{intersperse "," $ map toHtml tos}
+                <td>
+                    <form method=get action=@{AdminDeleteAssocR from}>
+                        <button .btn .btn-small .btn-danger type=submit>
+                            <i class="icon-remove">

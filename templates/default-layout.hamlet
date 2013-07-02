@@ -1,9 +1,11 @@
 $maybe user <- loggedInUser
-    <div .alert .alert-success .alert-block #logged-user>_{MsgLoginAs user}
-        <a .pull-right href=@{LogoutR}>_{MsgLogout}</a>
+    <div .alert .alert-success .alert-block>_{MsgLoginAs user}
+        <a .btn .btn-small .btn-danger .pull-right #logged-user href=@{LogoutR}>
+            <i class="icon-signout"></i> _{MsgLogout}
 $nothing
     <div .alert .alert-block>_{MsgNotLoggedIn}
-        <a .pull-right href=@{AdminAllUsersR}>_{MsgLogin}</a>
+        <a .btn .btn-small .btn-success .pull-right #not-logged href=@{AdminAllUsersR}>
+            <i class="icon-signin"></i> _{MsgLogin}</a>
 $maybe msg <- emsg
     <div .alert .alert-error #error-msg>
         <button type="button" class="close" data-dismiss="alert">&times;</button>

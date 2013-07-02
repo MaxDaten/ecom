@@ -1,0 +1,17 @@
+$newline never
+<h2>_{MsgRecommendedProducts}
+$if null recommendedProducts
+    <p>_{MsgNoRecommendations}
+$else
+    <div .recommendation ng-app="recommendations" ng-controller="RecsListCtrl" loadfrom=@{ProductRecsRootR}>
+        {{sliderValue}}
+        <div .slider-form .row>
+            <div .recom-slider-container .span12>
+                <div #recom-slider ui-slider min=#{show $ fst thresholdDim} range="min" max=#{show $ snd thresholdDim} value=#{show startValue}>
+        <div .row>
+            <div ng-repeat="product in recProducts" .span4 .product-box .tile>
+                    <div .product-box-content>
+                        <a href=@{ProductPidRootR}/{{product.productId}}>
+                            <span .tile>
+                                <h5>{{product.productTitle}}
+                                ^{pageBody prodImg}
