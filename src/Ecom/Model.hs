@@ -16,7 +16,7 @@ import           Control.Monad.State        (get, put)
 ----------------------------------------------------------------------------------------------------
 import           Data.IxSet                 (Indexable (..), IxSet, (@=), (@+), (@<=), Proxy (..), getOne, ixFun, ixSet)
 import qualified Data.IxSet                 as IxSet
-import           Data.List                  (sort)
+import           Data.List                  (sort, nub)
 import           Data.Set                   (Set, intersection)
 import qualified Data.Set                   as Set
 import           Data.Maybe                 (listToMaybe)
@@ -339,7 +339,7 @@ similarProducts ps a t = do
     let otherProducts = IxSet.toList $ catalog @<= str a @<= int a @<= dex a @<= sta a @+ (concatMap (Set.toList . productSizes) ps)
         withoutBought = filter (\p -> (productId p) `notElem` (map productId ps)) otherProducts
         similarities  = [(p1 -? p2, p2) | p1 <- ps, p2 <- withoutBought]
-    return $ map snd . filter ((<=t) . fst) . sort $ similarities
+    return $ nub . map snd . filter ((<=t) . fst) . sort $ similarities
 
 
 -- calculate similarity between products

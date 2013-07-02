@@ -16,7 +16,25 @@
 \usepackage{scrpage2}
 
 % Zum setzen des Zeilenabstands
-\usepackage{setspace}
+\usepackage{setspace}\usepackage{listings}
+\lstloadlanguages{Haskell}
+\lstnewenvironment{code}
+    {\lstset{}%
+      \csname lst@SetFirstLabel\endcsname}
+    {\csname lst@SaveFirstLabel\endcsname}
+    \lstset{
+      basicstyle=\small\ttfamily,
+      flexiblecolumns=false,
+      basewidth={0.5em,0.45em},
+      literate={+}{{$+$}}1 {/}{{$/$}}1 {*}{{$*$}}1 {=}{{$=$}}1
+               {>}{{$>$}}1 {<}{{$<$}}1 {\\}{{$\lambda$}}1
+               {\\\\}{{\char`\\\char`\\}}1
+               {->}{{$\rightarrow$}}2 {>=}{{$\geq$}}2 {<-}{{$\leftarrow$}}2
+               {<=}{{$\leq$}}2 {=>}{{$\Rightarrow$}}2 
+               {\ .}{{$\circ$}}2 {\ .\ }{{$\circ$}}2
+               {>>}{{>>}}2 {>>=}{{>>=}}2
+               {|}{{$\mid$}}1               
+    }
 
 % Für Grafiken
 \usepackage{graphicx}
@@ -152,6 +170,7 @@
 % Deutsche Ausgabe
 \renewcommand{\listalgorithmname}{Algorithmenverzeichnis}
 \renewcommand{\nomname}{Abkürzungs- und Symbolverzeichnis}
+\renewcommand{\lstlistingname}{Code}
 \newcommand{\definitionname}{Definition}
 \newcommand{\guessname}{Vermutung}
 
@@ -171,12 +190,33 @@
 % ------------------------------------------------------------------------------
 %
 % ------------------------------------------------------------------------------
-\author{}
+\author{Christopher Blöcker, Jan-Philip Loos}
 \date{}
-\title{\textsc{DYONISYS} \\ Just-In-Time Optimierung des \\ Vehicle Routing Problem \\ \;}
-\subtitle{Bachelor-Thesis \\ von Christopher Blöcker \\ im Fachbereich Informatik \\ an der Fachhochschule Wedel}
+\title{E-Commerce Projekt}
+\subtitle{Onlineshop mit Produktempfehlungsfunktion}
 
 \makeindex
 \makenomenclature
 
 \usepackage{lipsum}
+\usepackage[babel]{csquotes}
+
+\usepackage{listings}
+\lstloadlanguages{Haskell}
+%\lstnewenvironment{code}
+%    {\lstset{}%
+%      \csname lst@SetFirstLabel\endcsname}
+%    {\csname lst@SaveFirstLabel\endcsname}
+%    \lstset{
+%      basicstyle=\small\ttfamily,
+%      flexiblecolumns=false,
+%      basewidth={0.5em,0.45em},
+%      literate={+}{{$+$}}1 {/}{{$/$}}1 {*}{{$*$}}1 {=}{{$=$}}1
+%               {>}{{$>$}}1 {<}{{$<$}}1 {\\}{{$\lambda$}}1
+%               {\\\\}{{\char`\\\char`\\}}1
+%               {->}{{$\rightarrow$}}2 {>=}{{$\geq$}}2 {<-}{{$\leftarrow$}}2
+%               {<=}{{$\leq$}}2 {=>}{{$\Rightarrow$}}2 
+%               {\ .}{{$\circ$}}2 {\ .\ }{{$\circ$}}2
+%               {>>}{{>>}}2 {>>=}{{>>=}}2
+%               {|}{{$\mid$}}1               
+%    }

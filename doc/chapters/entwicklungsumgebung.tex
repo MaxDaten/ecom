@@ -1,2 +1,14 @@
 \chapter{\index{Entwicklungsumgebung}Entwicklungsumgebung}
-\lipsum
+Als Programmiersprache wird Haskell verwendet, die verwendeten Frameworks bzw. Bibliotheken sind yesod, acid-state und Bootstrap.
+
+\section{\index{Haskell}Haskell}
+Haskell \cite{Has} ist eine streng typisierte, rein funktionale Programmiersprache, die das Prinzip der \index{lazy-evaluation} lazy-evaluation verwendet. Haskell bie\-tet durch die strenge \index{Typisierung}Typisierung und \index{Typinferenz}Typinferenz den Vorteil, dass der Großteil an Design- und Implementierungsfehlern bereits zur Übersetzungszeit aufgedeckt werden kann. Die Abwesenheit von Zuständen erleichtert die Entwicklung, da keine Seiteneffekte vorkommen und die funktionale Natur der Sprache unterstützt eine modulare Entwicklung. Für in Haskell entwickelte Software gilt: \enquote{If your program compiles it will be very close to what the programmer intended}.
+
+\section{\index{Yesod}Yesod}
+Yesod \cite{Yes} ist ein auf Haskell basierendes Web Framework, das die Entwicklung von typsicheren, RESTful Webanwendungen  \nomenclature{REST}{Representational state transfer} ermöglicht. Yesod verwendet Templates und den Glasgow Haskell Compiler \cite{ghc} zur Generierung von Quellcode, wodurch potenzielle Fehlerquellen minimiert und Typsicherheit selbst im Webumfeld erreicht werden. Außerdem wird die Entwicklung dadurch erleichtert, dass nicht mehr der konkrete Quellcode entwickelt, sondern dieser lediglich auf höherem Abstraktionsniveau be\-schrie\-ben wird. Da mit Yesod entwickelte Webseiten nicht (wie z.B. PHP) interpretiert, sondern kompiliert werden, kann eine C-ähnliche Performance erreicht werden.
+
+\section{\index{acid-state}acid-state}
+acid-state \cite{acid} \nomenclature{ACID}{Atomicity, Consistency, Isolation, Durability} ist eine Haskell Bibliothek, mit Hilfe derer sich Daten persistieren \index{Persistenz} lassen. acid-state verwendet keine SQL-Syntax, sondern wird mit Haskell-Syntax benutzt. Mittels acid-state persistierte Daten werden nicht in serialisierter Form abgelegt, sondern es wird die Folge von Funktionen, die auf dem Datenbestand ausgeführt werden, gespeichert. Nach Beenden und Neustarten einer Anwendung lässt sich somit der Zustand durch erneute Anwendung der Funktionen rekonstuieren. Aufgrund der Tatsache, dass Hakell \index{lazy-evaluation} lazy-evaluation verwendet, wird der Zustand nur bei Bedarf und effizient rekonstruiert. Zur Laufzeit hält acid-state die Daten im Hauptspeicher und erreicht dadurch hohe Performance.
+
+\section{\index{Bootstrap}Bootstrap}
+Bootstrap \cite{boot} ist ein Framework zur Entwicklung von Web-Frontends und stellt CSS-\nomenclature{CSS}{Cascading Style Sheets}Elemente sowies JS-\nomenclature{JS}{JavaScript}Plugins wie z.B. Buttons, Dropdown-Listen und Na\-vi\-ga\-tions\-menüs zur Verfügung.

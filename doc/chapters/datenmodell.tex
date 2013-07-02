@@ -1,10 +1,55 @@
 \chapter{\index{Datenmodell}Datenmodell}
+Das dem Empfehlungssystems zugrunde liegende Datenmodell \textsf{EcomState} besteht aus einem Produktkatalog, Assoziationen und Benutzern. Dabei beschreibt \textsf{IxSet a}, dass es sich um eine indexierte Menge des Datentyps \textsf{a} handelt.
 
-\section{Produktkatalog}
-\lipsum[1-4]
+\begin{lstlisting}[label=EcomState,caption=Struktur von \textsf{EcomState}]
+data EcomState = EcomState { catalog :: IxSet Product
+                           , assocs  :: IxSet Association
+                           , users   :: IxSet User
+                           }
+\end{lstlisting}
+
+
+\section{\index{Produkte}Produkte}
+Der Produktkatalog besteht aus einer Menge von Produkten. Ein Produkt ist eindeutig durch seine \textsf{ProcuctId} (Z. 1) gekennzeichnet. Jedes Produkt verfügt über einen Namen \textsf{ProductTitle} (Z. 2) und einen Slot \textsf{ProductSlot} (Z. 3), der beschreibt, an welcher Körperstelle das Produkt getragen wird. Produkte können mehreren Kategorien angehören sowie in verschiedenen Größen bzw. Farben verfügbar sein, die wird durch modelliert, dass jedes Produkt über eine Menge (\textsf{Set}) der jeweiligen Eigenschaften verfügt (Z. 4-6). Die Anforderungen eines Produktes an den Träger werden durch Attribute beschrieben (Z. 7), die Boni, die ein Produkt seinem Träger bringt, sind ebenfalls durch Attribute beschrieben (Z. 8). Zuletzt verfügen Produkte über eine Produktbeschreibung \textsf{ProductDecription} (Z. 9).
+
+\begin{lstlisting}[label=Product,caption=Struktur von \textsf{Product}]
+data Product = Product { productId           :: ProductId
+                       , productTitle        :: ProductTitle
+                       , productSlot         :: ProductSlot
+                       , productCategories   :: Set ProductCategory
+                       , productSizes        :: Set ProductSize
+                       , productColors       :: Set ProductColor
+                       , productRequirements :: Attributes
+                       , productAttributes   :: Attributes
+                       , productDescription  :: ProductDescription
+                       }
+\end{lstlisting}
+Attribute enthalten Informationen über Stärke, Intelligenz, Geschicklichkeit und Ausdauer. Im Bezug auf Produkte werden Attribute einerseits verwendet, um zu be\-schrei\-ben, welche Anforderungen sie an ihren Träger stellen und andererseits, welche Boni sie bie\-ten.
+
+\begin{lstlisting}[label=Attributes,caption=Struktur von \textsf{Attributes}]
+data Attributes = Attributes { str :: Strength
+                             , int :: Intelligence
+                             , dex :: Dexterity
+                             , sta :: Stamina
+                             }
+\end{lstlisting}
 
 \section{Kategorieverknüpfung}
-\lipsum[5-8]
+Zur Umsetzung von Assoziationsbasierten Produktempfehlungen sollen die Kategorien verwendet werden, denen Produkte zugeordnet sind. Für jede Kategorie \textsf{assocCategory} kann eine Menge von Kategorien \textsf{assocedCategories} definiert werden, die mit dieser Kategorie assoziiert sind.
 
-\section{Kundenverwaltung}
-\lipsum[9-12]
+\begin{lstlisting}[label=Association,caption=Struktur von \textsf{Association}]
+data Association = Association
+                 { assocCategory     :: ProductCategory
+                 , assocedCategories :: Set ProductCategory
+                 }
+\end{lstlisting}
+
+
+\section{Benutzer}
+Benutzer werden identifiziert durch einen Namen \textsf{username} und verfügen über Attribute. Außerdem ist für jeden Benutzer ein Verlauf \textsf{history} an gekauften Produkten bekannt, auf dessen Grundlage feature-basierte Produktempfehlungen ausgesprochen werden.
+\begin{lstlisting}[label=User,caption=Struktur vom \textsf{User}]
+data User = User { username   :: Text
+                 , history    :: [Product]
+                 , attributes :: Attributes
+                 }
+\end{lstlisting}
