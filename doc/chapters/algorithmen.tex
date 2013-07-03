@@ -21,11 +21,15 @@ wearable u ps = attrOk u . sizeOk u $ ps
 \\
 Der in Code \ref{wearable} beschriebene Algorithmus weicht von der tatsächlichen Implementierung ab, da im produktiven Einsatz aufgrund des Kontext monadisch gearbeitet werden muss. Das hier gezeigte Verfahren ist unabhängig davon korrekt und dient der Verdeutlichung der Idee für feature-basierte Produktempfehlungen\\
 \\
-Sind die von einem Benutzer tragbaren Produkte ausgewählt, so wird zwischen diesen und den vom Benutzer bereits gekauften Produkten paarweise die Ähnlichkeit berechnet, um Empfehlungen zu generieren. Somit ist es im folgenden hinreichend, zu be\-schrei\-ben, wie die Ähnlichkeit zwischen zwei Produkten bestimmt werden kann.\\
+Sind die von einem Benutzer tragbaren Produkte ausgewählt, so wird zwischen diesen und den vom Benutzer bereits gekauften Produkten paarweise die Ähnlichkeit berechnet, um Empfehlungen zu generieren. Im folgenden wird zunächst be\-schrie\-ben, wie die Ähnlichkeit zwischen zwei Produkten bestimmt werden kann.\\
 \\
-Um die Ähnlichkeit zwischen zwei Produkten zu bestimmen, findet zunächst eine Projektion auf ihre Boni \textsf{productAttributes} statt, welche als Vektoren im $\mathbb{R}^4$ interpretiert werden. Zwischen diesen 
+Um die Ähnlichkeit zwischen zwei Produkten zu bestimmen, findet zunächst eine Projektion auf ihre Boni \textsf{productAttributes} statt, welche als Vektoren im euklidischen Raum $\mathbb{R}^4$ interpretiert werden können. Eine Erweiterung auf weitere Attribute ist problemlos möglich und würde für $n$ Attribute in einer Projektion in den euklidischen Raum $\mathbb{R}^n$ resultieren. Als Ähnlichkeitsmaß dient die euklidische Norm im jeweiligen Raum, welche definiert ist als
+\begin{equation}
+  \left|\left| x \right|\right| = \sqrt{\sum_{i=1}^n x_i^2}.
+\end{equation}
+Der Algorithmus zur Berechnung der Ähnlichkeit von Produkten ist in Code \ref{dist} aufgezeigt.
 
-\begin{lstlisting}[label=wearable,caption={Algorithmus zur Bestimmung von Produkten, die ein Benutzer tragen kann}]
+\begin{lstlisting}[label=dist,caption={Algorithmus zur Berechnung der Ähnlichkeit von Produkten}]
 attribs :: [Attributes -> Double]
 attribs = map (fromIntegral .)
               [unStr . str, unInt . int, unDex . dex, unSta . sta]
@@ -36,11 +40,37 @@ p1 -? p2 = (attr p1) `dist` (attr p2)
     dist x y = sqrt . foldr (+) 0 . map (**2.0) $ zipWith (-) x y
     attr     = \p -> map ($ productAttributes p) attribs
 \end{lstlisting}
-Da die Ähnlichkeit zwischen Produkten symmetrisch ist, gilt 
+\textsf{attribs} führt die Projektion von Produkten in den $\mathbb{R}^4$ durch. \\
+\textsf{-?} bestimmt die Ähnlichkeit zwischen zwei Produkten.\\
+\\
+Da die Ähnlichkeit von Produkten definiert ist als die Norm der Differenz ihrer Eigenschaftsvektoren, projiziert in den $\mathbb{R}^n$ (hier $n = 4$), ist diese symmetrisch und es gilt:
 \begin{equation}
   \bigwedge_{p_1, p_2 \in P} \delta\left(p_1, p_2\right) = \delta\left(p_2, p_1\right)
 \end{equation}
-mit Produkten $p_1, p_2$ und der Menge aller Produkte $P$.
+mit Produkten $p_1, p_2$ und der Menge aller Produkte $P$. Dabei sei $\delta$ identisch zum in Code \ref{dist} beschriebenen Infix-Operator \enquote{\textsf{-?}}.\\
+\\
+Die durch \textsf{-?} gegebene Ähnlichkeit zwischen Produkten wird verwendet, um die Produktempfehlungen für einen Benutzer zu sortieren. Set \textsf{bought} die Menge der Produkte, die ein Benutzer bereits gekauft hat und \textsf{ps} die Menge der Produkte, die ebendieser Benutzer tragen kann. Die Berechnung der Produktempfehlungen, aufsteigend sortiert nach der Ähnlichkeit zu einem bereits gekauften Produkt, ist in Code \ref{fb-suggestions} aufgezeigt.
+
+\begin{lstlisting}[label=fb-suggestions,caption={Algorithmus zur Generierung feature-basierter Produktempfehlungen}]
+similarProducts :: [Product] -> [Product] -> [Product]
+similarProducts bought ps = 
+    let notBought = filter removeBought ps
+        pairs     = [(x -? y, y) | x <- bought, y <- notBought]
+    in nub . map snd . sort $ pairs
+  where
+    removeBought = \p -> (productId p) `notElem` (map productId ps)
+\end{lstlisting}
+
 
 \section{Association-based}
-\lipsum[1-4]
+Association-basierte Empfehlungen werden auf der Grundlage fest verknüpter Kategorien ausgesprochen, welche durch die in Code \ref{Association} beschriebene Datenstruktur realisiert werden. Somit wird jedem Produkt eine Menge assoziierter Produkte zugeordnet. Sei \textsf{p} ein Produkt, \textsf{ps} die Menge aller verfügbaren Produkte und \textsf{as} die Menger der definierten Assoziationen. Der in Code \ref{ab-suggestions} gezeignte Algorithmus dient der Berechnung assoziations-basierter Produktempfehlungen.
+
+\begin{lstlisting}[label=ab-suggestions,caption={Algorithmus zur Generierung association-basierter Produktempfehlungen}]
+associationBased :: Product -> [Product] -> [Association] -> [Product]
+associationBased p ps as =
+  let cats = foldr union empty . map assocedCategories . asc $ as
+  in filter (not . null . intersection cats . productCategories) ps
+  where
+    asc = filter (\a -> assocCategory a `member` productCategories p)
+\end{lstlisting}
+Der in Code \ref{ab-suggestions} gezeigte Algorithmus weicht erneut von der tatsächlichen Implementierung ab, da diese monadisch arbeiten muss. Das Verfahren ist unabhängig davon korrekt und illustriert das prinzipielle Vorgehen.
