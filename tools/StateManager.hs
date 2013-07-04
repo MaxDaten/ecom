@@ -173,9 +173,14 @@ runStateManager arg@Purge{..} state = update state (PutState initialEcomState)
 runStateManager arg@Export{..} state = do
     let all = (exportProducts || exportAssocs || exportUsers) `xor` True
 
-    exportWith AllProducts (outDir </> productDir)
-    exportWith AllAssocs (outDir </> asscoDir)
-    exportWith AllUsers (outDir </> userDir)
+    when (all || exportProducts) $
+        exportWith AllProducts (outDir </> productDir)
+
+    when (all || exportAssocs) $
+        exportWith AllAssocs (outDir </> asscoDir)
+
+    when (all || exportUsers) $
+        exportWith AllUsers (outDir </> userDir)
 
     where
         exportWith :: (QueryEvent queryEvent, MethodState queryEvent ~ EcomState, MethodResult queryEvent ~ [a]
