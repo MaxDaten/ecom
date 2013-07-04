@@ -11,13 +11,19 @@ import              System.Console.CmdArgs.Implicit
 import              Data.List                       (isSuffixOf, isPrefixOf)
 import              Data.Maybe                      (catMaybes)
 import qualified    Data.Text                       as T
+import qualified    Data.Text.Encoding              as T
 ----------------------------------------------------------------------------------------------------
 import              Data.Acid
 import              Data.Acid.Advanced
 import qualified    Data.Aeson                      as Aeson
 import              Data.Aeson                      (FromJSON, ToJSON)
-import qualified    Data.ByteString.Lazy            as BS
+import qualified    Data.ByteString.Lazy            as BL
+import qualified    Data.ByteString.Lazy.Internal   as BL
+import qualified    Data.ByteString                 as BS
+import qualified    Data.ByteString.Internal        as BS
+import              Data.UUID                       (UUID)
 import qualified    Data.UUID                       as UUID
+import qualified    Data.UUID.V5                    as UUID
 ----------------------------------------------------------------------------------------------------
 import              Ecom.Model
 ----------------------------------------------------------------------------------------------------
@@ -127,7 +133,7 @@ runStateManager Import{..} state = do
         importWith stUpdate dir chkQuery = do
             sampleFiles <- getDirectoryContents dir >>= return . (appendFolder dir) . filterSamples
 
-            samples <- mapM ((liftM Aeson.decode) . BS.readFile) sampleFiles
+            samples <- mapM ((liftM Aeson.decode) . BL.readFile) sampleFiles
 
             print "parsed samples:"
             mapM_ print samples
@@ -197,12 +203,15 @@ runStateManager arg@Export{..} state = do
             let jsons = zip states $ map Aeson.encode states
             mapM_ (writeEncoded outDir) jsons            
 
-        writeEncoded :: (ToJSON a, Fileable a) => FilePath -> (a, BS.ByteString) -> IO ()
-        writeEncoded outDir (st, jsonString) = BS.writeFile (outDir </> getFilename st <.> "json") jsonString
+        writeEncoded :: (ToJSON a, Fileable a) => FilePath -> (a, BL.ByteString) -> IO ()
+        writeEncoded outDir (st, jsonString) = BL.writeFile (outDir </> getFilename st <.> "json") jsonString
 
 xor :: Bool -> Bool -> Bool
 xor True p  = not p
 xor False p = p
+
+textToUUID :: T.Text -> UUID
+textToUUID = UUID.generateNamed UUID.namespaceOID . BS.unpack . T.encodeUtf8
 
 
 class Fileable a where
@@ -210,7 +219,7 @@ class Fileable a where
 
 
 instance Fileable Association where
-    getFilename = T.unpack . unProductCategory . assocCategory
+    getFilename = UUID.toString . textToUUID . unProductCategory . assocCategory
 
 
 instance Fileable Product where
@@ -218,4 +227,4 @@ instance Fileable Product where
 
 
 instance Fileable User where
-    getFilename = T.unpack . username
+    getFilename = UUID.toString . textToUUID . username
