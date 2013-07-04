@@ -120,7 +120,7 @@ postAdminEditUserR name = do
 
 getAdminCreateProductR :: Handler RepHtml
 getAdminCreateProductR = do
-    (widget, enctype) <- generateFormPost productForm
+    (widget, enctype) <- generateFormPost $ productForm Nothing
     defaultLayout [whamlet|
     ^{basicProductForm widget enctype}
     <a .btn href=@{AdminAllUsersR}>« _{MsgBack}|]
@@ -128,7 +128,7 @@ getAdminCreateProductR = do
 
 postAdminCreateProductR :: Handler RepHtml
 postAdminCreateProductR = do
-    ((result, _), _) <- runFormPost productForm
+    ((result, _), _) <- runFormPost $ productForm Nothing
     case result of
         FormSuccess product -> do
             acidUpdate (InsertProduct product)
@@ -144,6 +144,40 @@ getAdminAllProductsR = do
         setTitle "Admin Products"
         $(widgetFile "admin/products")
         $(widgetFile "table")
+
+
+getAdminDeleteProductR :: ProductId -> Handler RepHtml
+getAdminDeleteProductR pid = do
+    acidUpdate (DeleteProductById pid)
+    redirect AdminAllProductsR
+
+
+getAdminEditProductR :: ProductId -> Handler RepHtml
+getAdminEditProductR pid = do
+    mProduct <- acidQuery (ProductById pid)
+    case mProduct of
+        Nothing -> notFound
+        Just _  -> do
+            (widget, enctype) <- generateFormPost $ productForm mProduct
+            defaultLayout [whamlet|
+                <form method=post action=@{AdminEditProductR pid} enctype=#{enctype}>
+                    ^{widget}
+                    <button .btn-primary .btn>_{MsgSubmit}
+            |]
+
+postAdminEditProductR :: ProductId -> Handler RepHtml
+postAdminEditProductR pid = do
+    mProduct <- acidQuery (ProductById pid)
+    case mProduct of
+        Nothing -> notFound
+        Just _ -> do
+            ((result, _), _) <- runFormPost $ productForm mProduct
+            case result of
+                FormSuccess product -> do
+                    acidUpdate (InsertProduct product)
+                    setInfoMessageI MsgProductUpdated
+                _ -> setErrorMessageI MsgInvalidInput
+    redirect AdminAllProductsR
 
 
 ---------------------------------------------------------------------------------------------------

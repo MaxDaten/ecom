@@ -4,12 +4,13 @@ $newline never
 <table .table .table-striped .table-hover>
     <thead>
         <tr>
-            <th>id
-            <th>Title
-            <th>Category
-            <th>Sizes
-            <th>Colors
-            <th>Description
+            <th>_{MsgProductId}
+            <th>_{MsgProductTitle}
+            <th>_{MsgProductCategories}
+            <th>_{MsgProductSizes}
+            <th>_{MsgProductColors}
+            <th>_{MsgProductDescription}
+            <th>_{MsgActions}
     <tbody>
         $forall p <- allProducts
             <tr>
@@ -21,3 +22,10 @@ $newline never
                     $forall color <- getProductColors p
                         ^{colorPreview color 25 25}
                 <td>#{shortenDescription 20 $ getProductDescription p}
+                <td>
+                    <form method=get action=@{AdminEditProductR (productId p)}>
+                        <button .btn .btn-small type=submit>
+                            <i class="icon-edit">
+                    <form method=get action=@{AdminDeleteProductR (productId p)}>
+                        <button .btn .btn-small .btn-danger type=submit>
+                            <i class="icon-remove">

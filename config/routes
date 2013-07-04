@@ -20,13 +20,17 @@
 /admin/create/user                      AdminCreateUserR                GET
 /admin/create/product                   AdminCreateProductR             GET POST
 /admin/create/assoc                     AdminCreateAssocR               GET POST
+
 /admin/edit/user/#Text 					AdminEditUserR					GET POST
+/admin/edit/product/#ProductId 			AdminEditProductR 				GET POST
 
 /admin/delete/user/#Text                AdminDeleteUserR                GET
 /admin/delete/assoc/#Text               AdminDeleteAssocR               GET
-/admin/users/#Text                      AdminUserR                      GET
+/admin/delete/product/#ProductId 		AdminDeleteProductR 			GET
 /admin/delete/history/#Text             AdminClearHistoryR              POST
 /admin/delete/history/#Text/#Int        AdminDeleteHistoryEntry         POST
+
+/admin/users/#Text                      AdminUserR                      GET
 
 /users/#Text                            UserR                           GET
 

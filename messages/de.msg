@@ -21,6 +21,7 @@ BoughtProducts	 	 		: Gekaufte Produkte
 ProductBought p@Product     : Produkt gekauft #{show $ getProductTitle p}
 ProductNotFound				: Produkt nicht gefunden
 ProductAdded 				: Produkt hinzugefügt
+ProductUpdated 				: Produkt aktualisiert
 AssocCreated 				: Assoziation hinzugefügt
 Username			 		: Nutzername
 Actions				 		: Aktionen
@@ -44,7 +45,7 @@ UserHistoryEntryDeleted		: Kauf-Eintrag gelöscht
 UserUpdated					: Nutzer aktualisiert
 UserAttrib					: Nutzerattribute
 
-
+ProductId 					: Id
 ProductSize 				: Größe
 ProductSizes				: Größen
 ProductColor				: Farbe

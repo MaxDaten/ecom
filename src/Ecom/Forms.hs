@@ -7,10 +7,10 @@ import 				Ecom.Import
 import 				Ecom.Utils
 
 import             	Data.Set                 (Set)
-import qualified 	Data.Set                  as Set
+import qualified 	Data.Set                 as Set
 import             	Data.List.Split
 import              Control.Arrow            ((&&&))
-import 				Data.Text                (pack, unpack)
+import 				Data.Text                (pack, unpack, intercalate)
 import             	Data.UUID                (nil)
 import 				Data.Colour.SRGB         (sRGB24show, toSRGB, sRGB24read)
 
@@ -55,19 +55,19 @@ productAForm = Product
         slotOptions    :: [(EcomMessage, ProductSlot)]
         slotOptions     = map (slotMsg &&& id) [minBound..maxBound]
 
-productMForm :: Html -> MForm Handler (FormResult Product, Widget)
-productMForm extra = do  
-    (titleRes, titleView)    <- mreq textField (i18nFieldSettings MsgProductTitle) Nothing
-    (slotRes,  slotView)     <- mreq (selectFieldList slotOptions) (i18nFieldSettings MsgProductSlot) (Just (maxBound :: ProductSlot))
-    (catRes,   catView)      <- mreq textField (i18nFieldSettings MsgProductCategories) Nothing
-    (sizeRes,  sizeView)     <- mreq textField (i18nFieldSettings MsgProductSizes) Nothing
-    (colRes,   colView)      <- mreq textField (i18nFieldSettings MsgProductColors) Nothing
-    (reqRes,   reqViews')    <- aFormToForm $ attributesAForm
-    (boniRes,  boniViews')   <- aFormToForm $ attributesAForm
-    (descRes,  descView)     <- mreq textareaField (i18nFieldSettings MsgProductDescription) Nothing
+productMForm :: Maybe Product -> Html -> MForm Handler (FormResult Product, Widget)  
+productMForm mProduct extra = do
+    (titleRes, titleView)    <- mreq textField (i18nFieldSettings MsgProductTitle)                    $ maybe Nothing (Just . getProductTitle) mProduct
+    (slotRes,  slotView)     <- mreq (selectFieldList slotOptions) (i18nFieldSettings MsgProductSlot) $ maybe (Just (maxBound :: ProductSlot)) (Just . productSlot) mProduct
+    (catRes,   catView)      <- mreq textField (i18nFieldSettings MsgProductCategories)               $ maybe Nothing (Just . toCVS . getProductCategories) mProduct
+    (sizeRes,  sizeView)     <- mreq textField (i18nFieldSettings MsgProductSizes)                    $ maybe Nothing (Just . toCVS . map (pack . show) . getProductSizes) mProduct
+    (colRes,   colView)      <- mreq textField (i18nFieldSettings MsgProductColors)                   $ maybe Nothing (Just . toCVS . map (pack . sRGB24show) . getProductColors) mProduct
+    (reqRes,   reqViews')    <- aFormToForm $ attributesAFormWithDefault                              $ maybe mkAttributes productRequirements mProduct
+    (boniRes,  boniViews')   <- aFormToForm $ attributesAFormWithDefault                              $ maybe mkAttributes productAttributes mProduct
+    (descRes,  descView)     <- mreq textareaField (i18nFieldSettings MsgProductDescription)          $ maybe Nothing (Just . Textarea . getProductDescription) mProduct
     let reqViews    = reqViews' []
         boniViews   = boniViews' []
-        productRes  = Product (ProductId nil)
+        productRes  = Product (maybe (ProductId nil) productId mProduct)
                     <$> (ProductTitle <$> titleRes)
                     <*> slotRes
                     <*> (fromCVS ProductCategory <$> catRes)
@@ -135,13 +135,15 @@ productMForm extra = do
     where
         fromCVS :: (Ord a) => (Text -> a) -> Text -> Set a
         fromCVS ctor    = Set.fromList . map (ctor . pack) . splitOn "," . unpack
+        toCVS :: [Text] -> Text
+        toCVS = intercalate ","
         mkPSizes        = ProductSize . read . unpack
         mkPColors       = ProductColor . toSRGB . sRGB24read . unpack
         mkPDescription  = ProductDescription . unTextarea
         slotOptions    :: [(EcomMessage, ProductSlot)]
         slotOptions     = map (slotMsg &&& id) [minBound..maxBound]
 
-productForm :: Html -> MForm Handler (FormResult Product, Widget)
+productForm :: Maybe Product -> Html -> MForm Handler (FormResult Product, Widget)
 productForm = productMForm
 
 basicProductForm :: Widget -> Enctype -> WidgetT Ecom IO ()

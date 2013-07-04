@@ -275,6 +275,14 @@ insertProduct p = do
     where
         invalidId = UUID.null . unProductId . productId
 
+deleteProductById :: ProductId -> Update EcomState ()
+deleteProductById pid = do
+    ecom@EcomState{..} <- get
+    put $ ecom { catalog = IxSet.deleteIx pid catalog }
+
+
+deleteProduct :: Product -> Update EcomState ()
+deleteProduct p = deleteProductById (productId p)
 
 updateProduct :: Product -> Update EcomState ()
 updateProduct = insertProduct
@@ -442,8 +450,7 @@ getProductTitle Product{..} = t
     where (ProductTitle t) = productTitle
 
 getProductDescription :: Product -> Text
-getProductDescription Product{..} = d
-    where (ProductDescription d) = productDescription
+getProductDescription Product{..} = let (ProductDescription d) = productDescription in d
 
 getProductColors :: Product -> [Colour Double]
 getProductColors Product{..} = map unProductColor $ Set.toList productColors
@@ -468,6 +475,8 @@ unProductCategory (ProductCategory p) = p
 makeAcidic ''EcomState [ 'fetchState, 'putState
                        , 'insertProduct
                        , 'updateProduct
+                       , 'deleteProductById
+                       , 'deleteProduct
                        , 'allProducts
                        , 'productById
                        
