@@ -112,3 +112,5 @@ selectFieldHelper outside onOpt inside opts' = Field
 
 i18nFieldSettings :: (RenderMessage Ecom msg) => msg -> FieldSettings Ecom
 i18nFieldSettings msg = FieldSettings (SomeMessage msg) Nothing Nothing Nothing []
+
+

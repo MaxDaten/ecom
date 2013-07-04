@@ -23,6 +23,7 @@
 
 /admin/edit/user/#Text 					AdminEditUserR					GET POST
 /admin/edit/product/#ProductId 			AdminEditProductR 				GET POST
+/admin/edit/assoc/#Text					AdminEditAssocR 				GET POST
 
 /admin/delete/user/#Text                AdminDeleteUserR                GET
 /admin/delete/assoc/#Text               AdminDeleteAssocR               GET

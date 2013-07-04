@@ -339,10 +339,10 @@ allAssocs = do
     return $ IxSet.toList assocs
 
 
-assocByCategory :: ProductCategory -> Query EcomState [Association]
+assocByCategory :: ProductCategory -> Query EcomState (Maybe Association)
 assocByCategory pCategory = do
     EcomState{..} <- ask
-    return . IxSet.toList $ assocs @= pCategory
+    return . getOne $ assocs @= pCategory
 
 
 associatedProducts :: Product -> Query EcomState [Product]

@@ -43,6 +43,7 @@ InvalidUser					: Ungültiger Nutzer
 UserHistoryCleared			: Kauf-Verlauf gelöscht
 UserHistoryEntryDeleted		: Kauf-Eintrag gelöscht
 UserUpdated					: Nutzer aktualisiert
+AssocUpdated				: Assoziation aktualisiert
 UserAttrib					: Nutzerattribute
 
 ProductId 					: Id

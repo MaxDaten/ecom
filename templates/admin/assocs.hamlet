@@ -14,6 +14,9 @@ $newline never
                 <td>#{toHtml from}
                 <td>#{intersperse "," $ map toHtml tos}
                 <td>
+                    <form method=get action=@{AdminEditAssocR from}>
+                        <button .btn .btn-small type=submit>
+                            <i class="icon-edit">
                     <form method=get action=@{AdminDeleteAssocR from}>
                         <button .btn .btn-small .btn-danger type=submit>
                             <i class="icon-remove">

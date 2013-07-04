@@ -184,7 +184,7 @@ postAdminEditProductR pid = do
 
 getAdminCreateAssocR :: Handler RepHtml
 getAdminCreateAssocR = do
-    (widget, enctype) <- generateFormPost assocForm
+    (widget, enctype) <- generateFormPost $ assocForm Nothing
     defaultLayout [whamlet|
     ^{basicAssocForm widget enctype}
     <a .btn href=@{AdminAssocsR}>« _{MsgBack}
@@ -192,7 +192,7 @@ getAdminCreateAssocR = do
 
 postAdminCreateAssocR :: Handler RepHtml
 postAdminCreateAssocR = do
-    ((result, _), _) <- runFormPost assocForm
+    ((result, _), _) <- runFormPost $ assocForm Nothing
     case result of
         FormSuccess assoc -> do
             acidUpdate (InsertAssoc assoc)
@@ -208,6 +208,7 @@ getAdminAssocsR = do
     defaultLayout $ do
         setTitle "Admin Assocs"
         $(widgetFile "admin/assocs")
+        $(widgetFile "table")
     where
         toText :: Association -> (Text, [Text])
         toText = (unProductCategory . assocCategory) &&& ((map unProductCategory) . toList . assocedCategories)
@@ -216,3 +217,35 @@ getAdminDeleteAssocR :: Text -> Handler RepHtml
 getAdminDeleteAssocR name = do
     acidUpdate (DeleteAssocByName name)
     redirect AdminAssocsR
+
+
+getAdminEditAssocR :: Text -> Handler RepHtml
+getAdminEditAssocR aName = do
+    mAssoc <- acidQuery (AssocByCategory (ProductCategory aName))
+
+    case mAssoc of
+        Nothing -> notFound
+        Just _ -> do
+            (widget, enctype) <- generateFormPost $ assocForm mAssoc
+            defaultLayout [whamlet|
+            <form method=post action=@{AdminEditAssocR aName} enctype=#{enctype}>
+                ^{widget}
+                <button .btn-primary .btn>_{MsgSubmit}
+            <a .btn href=@{AdminAssocsR}>« _{MsgBack}
+            |]
+
+postAdminEditAssocR :: Text -> Handler RepHtml
+postAdminEditAssocR aName = do
+    mAssoc <- acidQuery (AssocByCategory (ProductCategory aName))
+
+    case mAssoc of
+        Nothing -> notFound
+        Just a -> do
+            ((result, _),_) <- runFormPost $ assocForm mAssoc
+            case result of
+                FormSuccess assoc -> do
+                    acidUpdate (InsertAssoc a{assocedCategories = assocedCategories assoc})
+                    setInfoMessageI MsgAssocUpdated
+                _ -> setErrorMessageI MsgInvalidInput
+    redirect AdminAssocsR
+

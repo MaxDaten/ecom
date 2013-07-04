@@ -5,10 +5,10 @@ module Ecom.Forms where
 
 import 				Ecom.Import
 import 				Ecom.Utils
-
+import              Data.Maybe               (fromMaybe)
+import              Data.List.Split          (splitOn)
 import             	Data.Set                 (Set)
 import qualified 	Data.Set                 as Set
-import             	Data.List.Split
 import              Control.Arrow            ((&&&))
 import 				Data.Text                (pack, unpack, intercalate)
 import             	Data.UUID                (nil)
@@ -133,10 +133,6 @@ productMForm mProduct extra = do
         |]
     return (productRes, widget)
     where
-        fromCVS :: (Ord a) => (Text -> a) -> Text -> Set a
-        fromCVS ctor    = Set.fromList . map (ctor . pack) . splitOn "," . unpack
-        toCVS :: [Text] -> Text
-        toCVS = intercalate ","
         mkPSizes        = ProductSize . read . unpack
         mkPColors       = ProductColor . toSRGB . sRGB24read . unpack
         mkPDescription  = ProductDescription . unTextarea
@@ -251,14 +247,23 @@ attributesAForm = attributesAFormWithDefault mkAttributes
 
 ---------------------------------------------------------------------------------------------------
 
-assocAForm :: AForm Handler Association
-assocAForm = Association
-    <$> (ProductCategory <$> areq textField (i18nFieldSettings MsgFromAssoc) Nothing)
-    <*> (fromCVS ProductCategory <$> areq textField (i18nFieldSettings MsgToAssocs) Nothing)
+assocAForm :: Maybe Association -> AForm Handler Association
+assocAForm Nothing = 
+    Association
+        <$> (ProductCategory         <$> areq textField (i18nFieldSettings MsgFromAssoc) Nothing)
+        <*> (fromCVS ProductCategory <$> areq textField (i18nFieldSettings MsgToAssocs)  Nothing)
+assocAForm (Just assoc) = 
+    let fromText = unProductCategory . assocCategory $ assoc
+        fromDef = Just fromText
+        toDef   = Just . toCVS . map (unProductCategory) . Set.toList . assocedCategories $ assoc
+        fromFS  = (i18nFieldSettings MsgFromAssoc){fsAttrs = [("disabled", "")]}
+    in Association
+            <$> (ProductCategory . fromMaybe fromText   <$> aopt textField fromFS (Just fromDef))
+            <*> (fromCVS ProductCategory                <$> areq textField (i18nFieldSettings MsgToAssocs)  toDef)
 
 
-assocForm :: Html -> MForm Handler (FormResult Association, Widget)
-assocForm = renderTable assocAForm
+assocForm :: Maybe Association -> Html -> MForm Handler (FormResult Association, Widget)
+assocForm assoc = renderTable $ assocAForm assoc
 
 
 basicAssocForm :: Widget -> Enctype -> WidgetT Ecom IO ()
@@ -273,3 +278,7 @@ basicAssocForm widget enctype = toWidget $
 
 fromCVS :: (Ord a) => (Text -> a) -> Text -> Set a
 fromCVS ctor    = Set.fromList . map (ctor . pack) . splitOn "," . unpack
+
+
+toCVS :: [Text] -> Text
+toCVS = intercalate ","
