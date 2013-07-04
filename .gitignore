@@ -10,3 +10,12 @@ state/
 *.sublime-*
 static/combined
 .DS_Store
+*.aux
+*.idx
+*.ilg
+*.ind
+*.log
+*.nlo
+*.nls
+*.toc
+*.lol
