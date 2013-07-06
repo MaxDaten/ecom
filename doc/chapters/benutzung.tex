@@ -6,19 +6,19 @@ Folgende Schritte sind für die Einrichtung einer Entwicklungsumgebung notwendig
 \begin{enumerate}
   \item Installieren der Haskell-Plattform \cite{HasP}
   \vspace*{-0.5em}
-  \item Optional \textsf{\$HOME/.cabal/bin} zu der \textsf{Path}-Umgebungsvariablen hinzufügen.
+  \item Optional \texttt{\$HOME/.cabal/bin} zu der \texttt{Path}-Umgebungsvariablen hinzufügen.
   \vspace*{-0.5em}
-  \item Yesod mittels \textsf{cabal install yesod-platform yesod-bin} installieren. Die Installation kann einige Minuten dauern. 
+  \item Yesod mittels \texttt{cabal install yesod-platform yesod-bin} installieren. Die Installation kann einige Minuten dauern. 
   \vspace*{-0.5em}
   \item Installieren von Git \cite{GitIn}
   \vspace*{-0.5em}
-  \item Klonen des Git-Repository mittels \textsf{git clone git@github.com:MaxDaten/ecom.git ecom}. Verzeichnis \textsf{ecom} mit den Quellen wird angelegt.
+  \item Klonen des Git-Repository mittels \texttt{git clone git@github.com:MaxDaten/ecom.git ecom}. Verzeichnis \texttt{ecom} mit den Quellen wird angelegt.
   \vspace*{-0.5em}
-  \item Im \textsf{ecom}-Verzeichnis den Befehl \textsf{cabal install --only-dependencies} ausführen.
-  \vspace*{-0.5em}
-  \item Mit \textsf{yesod devel} den Entwicklungsserver starten, beenden des Servers mit Enter. 
-  \vspace*{-0.5em}
-  \item Während der Server läuft, kann der Shop standardmäßig unter der URL \\ \textsf{http://localhost:3000} besucht werden. Das Binding des Servers an einen anderen Port und einen anderen Hostname kann in der Datei \textsf{config/settings.yml} konfiguriert werden.
+  \item Im \texttt{ecom}-Verzeichnis den Befehl \texttt{cabal install --only-dependencies} ausführen.
+  \vspace*{-1.5em} %% ???
+  \item Mit \texttt{yesod devel} den Entwicklungsserver starten; beenden des Servers mit \Enter
+  \vspace*{-1.5em}
+  \item Während der Server läuft, kann der Shop standardmäßig unter der URL \\ \texttt{http://localhost:3000} besucht werden. Das Binding des Servers an einen anderen Port und einen anderen Hostname kann in der Datei \texttt{config/settings.yml} konfiguriert werden.
 \end{enumerate}
 
 Die Projektstruktur kann \tblref{tbl:Projektstruktur} entnommen werden.
@@ -27,23 +27,23 @@ Die Projektstruktur kann \tblref{tbl:Projektstruktur} entnommen werden.
   \centering
   \begin{tabular}{|l|p{12cm}|}
     \hline
-    \textsf{src} & Quelldateien der Serverlogik \\
+    \texttt{src} & Quelldateien der Serverlogik \\
     \hline
-    \textsf{static} & Alle Dateien, die nicht vom Server generiert werden (Bilder, css/js Bibliotheken...) \\
+    \texttt{static} & Alle Dateien, die nicht vom Server generiert werden (Bilder, css/js Bibliotheken...) \\
     \hline
-    \textsf{tools} & Quelldateien für das StateManager Tool (\secpref{sec:StateManager}) \\
+    \texttt{tools} & Quelldateien für das StateManager Tool (\secpref{sec:StateManager}) \\
     \hline
-    \textsf{config} & Definition für Routen und sonstige Konfigurationen \\
+    \texttt{config} & Definition für Routen und sonstige Konfigurationen \\
     \hline
-    \textsf{doc} & Dokumentation \\
+    \texttt{doc} & Dokumentation \\
     \hline
-    \textsf{messages} & Lokalisierungsdateien \\
+    \texttt{messages} & Lokalisierungsdateien \\
     \hline
-    \textsf{samples} & Produktkatalog und -konfiguration als JSON Dateien für den StateManager \\
+    \texttt{samples} & Produktkatalog und -konfiguration als JSON Dateien für den StateManager \\
     \hline
-    \textsf{templates} & html, css, js template-Dateien für die Darstellung der Webseiten \\
+    \texttt{templates} & html, css, js template-Dateien für die Darstellung der Webseiten \\
     \hline
-    \textsf{state} & wird vom Server von acid-sate erstellt. beinhaltet die Persistenz-Dateien. \\
+    \texttt{state} & wird vom Server von acid-state (Persistenz-Layer) erstellt. \\
     \hline
   \end{tabular}
   \caption{Projektstruktur}
@@ -56,30 +56,32 @@ Die Projektstruktur kann \tblref{tbl:Projektstruktur} entnommen werden.
 \section{Die Navigationsleiste}
 Auf jeder Seite ganz oben befindet sich die Navigationsleiste, über die mehrere Funktionen schnell erreicht werden können \figref{fig:Navigationsleiste}. Diese Leiste ist unabhängig von der aktuellen Shopseite immer sichtbar und seine Funktionalitäten stehen damit jederzeit zur Ver\-fü\-gung. Sie beinhaltet von links nach rechts die folgenden Funktionen:
 \begin{itemize}
-  \item Home (1) \\
+  \item Home \figannotation{1}\\
         Startseite mit vollständigem Produktkatalog
   \vspace*{-0.5em}
-  \item Cat1 bis Cat4 (2) \\
-        Anzeige der Produkte einer Kategorie (ohne Funktion in aktueller Version)
+  \item Cat1 bis Cat4 \figannotation{2}\\
+        Anzeige der Produkte einer Kategorie (ohne Funktion in der aktuellen Version)
   \vspace*{-0.5em}
-  \item Suche (3) \\
-        Suchen nach spezifischen Produkten (ohne Funktion in aktueller Version)
+  \item Suche \figannotation{3}\\
+        Suchen nach spezifischen Produkten (ohne Funktion in der aktuellen Version)
   \vspace*{-0.5em}
-  \item Verwaltung (4) \\
-        Verwaltungsmenü (\secpref{sec:Verwaltung})
+  \item Verwaltung \figannotation{4}\\
+        Verwaltungsmenü \chpref{sec:Verwaltung}
 \end{itemize}
-Direkt unterhalb der Navigationsleiste und genau wie diese immer sichtbar, wird angezeigt, ob zurzeit ein Nutzer eingeloggt ist. Ist dies der Fall, so wird zusätzlich sein Name eingeblendet  (siehe lila Kreis). Außerdem  kann er mit der Schaltfläche Abmelden (brauner Kreis) auf der rechten Seite ausgeloggt werden.  Ist kein Nutzer angemeldet, so führt ein Klick auf die Schaltfläche Anmelden zur Nutzerverwaltung (siehe Abschnitt Nutzer). 
-Wieder etwas darunter werden Nachrichten zur zuletzt vorgenommenen Aktion angezeigt (rosa Kreis).
+Direkt unterhalb der Navigationsleiste und genau wie diese immer sichtbar, wird angezeigt, ob zurzeit ein Nutzer eingeloggt ist. Ist dies der Fall, so wird zusätzlich sein Name eingeblendet. Außerdem kann er mit der Schaltfläche Abmelden auf der rechten Seite ausgeloggt werden. Ist kein Nutzer angemeldet, so führt ein Klick auf die Schaltfläche \texttt{Anmelden} \figannotation{5} zur Nutzerverwaltung \chpref{chp:Nutzer}. Wieder etwas darunter werden Nachrichten zur zuletzt vorgenommenen Aktion angezeigt \figannotation{6}.
 
 \begin{figure}[h!]
   \begin{tikzpicture}
+  [every node/.style={fill=black, circle, inner sep = 3pt}]
   \pgftext{%
     \includegraphics[width=\textwidth]{img/Navi.png}%
   }%
-  \node[fill=black, opacity=.5, text opacity=1] at (-7.5,2) [circle] {\bf \tiny \color{white} 1};
-  \node[fill=black, opacity=.5, text opacity=1] at (-5,2) [circle] {\bf \tiny \color{white} 2};
-  \node[fill=black, opacity=.5, text opacity=1] at (4.5,2) [circle] {\bf \tiny \color{white} 3};
-  \node[fill=black, opacity=.5, text opacity=1] at (7.5,2) [circle] {\bf \tiny \color{white} 4};
+  \node at (-7.5,2) {\tiny \color{white} 1};
+  \node at (-5,2) {\tiny \color{white} 2};
+  \node at (4.5,2) {\tiny \color{white} 3};
+  \node at (7.5,2) {\tiny \color{white} 4};
+  \node at (7.5,1) {\tiny \color{white} 5};
+  \node at (0,0.2) {\tiny \color{white} 6};
   % \draw[fill] (0,0) circle [radius=0.1];
   % \draw[help lines] (-8,-4) grid (8,4);
   \end{tikzpicture}
@@ -90,15 +92,16 @@ Wieder etwas darunter werden Nachrichten zur zuletzt vorgenommenen Aktion angeze
 
 
 \section{Produktkatalog}
-Zu Beginn des Shopbesuchs oder durch einen Klick auf eine der Schaltflächen Home in der Navigationsleiste werden alle vorhandenen Produkte des Katalogs angezeigt \figref{fig:Produktkatalog}. Sollte gerade ein Nutzer angemeldet sein, so werden zusätzlich Empfehlungen prä\-sen\-tiert, die auf seinen gemachten Käufen basieren, sofern vorhanden. Über den Schieberegler (1) darüber kann die Reichweite der Empfehlungen erweitert oder eingeschränkt werden. \\
+Zu Beginn des Shopbesuchs oder durch einen Klick auf eine der Schaltflächen Home in der Navigationsleiste werden alle vorhandenen Produkte des Katalogs angezeigt \figref{fig:Produktkatalog}. Sollte gerade ein Nutzer angemeldet sein, so werden zusätzlich Empfehlungen prä\-sen\-tiert, die auf seinen getätigten Käufen basieren, sofern vorhanden. Über den Schieberegler \figannotation{1} kann die Reichweite der Empfehlungen erweitert oder eingeschränkt werden. \\
 Durch das Anklicken eines Artikels gelangt man auf dessen Produktbeschreibung, siehe auch \chpref{chp:Produktbeschreibung}.
 
 \begin{figure}[h!]
   \begin{tikzpicture}
+  [every node/.style={fill=black, circle, inner sep = 3pt}]
     \pgftext{%
       \includegraphics[width=\textwidth]{img/Produktkatalog.png}%
     }%
-    \node[fill=black, opacity=.5, text opacity=1] at (0,4.15) [circle] {\bf \tiny \color{white} 1};
+    \node at (0,4.15) {\bf \tiny \color{white} 1};
     % \draw[fill] (0,0) circle [radius=0.1];
     % \draw[help lines] (-8,-8) grid (8,8);
   \end{tikzpicture}
@@ -110,26 +113,28 @@ Durch das Anklicken eines Artikels gelangt man auf dessen Produktbeschreibung, s
 
 \section{Verwaltung}
 \label{sec:Verwaltung}
-Die Administration des Shops kann über das Verwaltungsmenü vorgenommen werden, das über die Navigationsleiste erreichbar ist \figref{fig:Verwaltung}. Es bietet von oben nach unten die folgenden Funktionen:
+Die Administration des Shops kann über das Verwaltungsmenü vorgenommen werden, das über die Navigationsleiste erreichbar ist \figref{fig:Verwaltung}. Es bietet die folgenden Funktionen:
 \begin{itemize}
-  \item Produkte verwalten (1) \\
+  \item Produkte verwalten \figannotation{1}\\
         ruft die Produkteverwaltung auf, siehe \chpref{chp:Produkte}
   \vspace*{-0.5em}
-  \item Nutzer verwalten (2) \\
+  \item Nutzer verwalten \figannotation{2}\\
         ruft die Nutzerverwaltung auf, siehe \chpref{chp:Nutzer}
-  \item Assoziationen verwalten (3) \\
+  \vspace*{-0.5em}
+  \item Assoziationen verwalten \figannotation{3}\\
         ruft die Assoziationsverwaltung auf, siehe \chpref{chp:Assoziationen}
   \vspace*{-0.5em}
 \end{itemize}
 
 \begin{figure}[h!]
   \begin{tikzpicture}
+  [every node/.style={fill=black, circle, inner sep = 3pt}]
     \pgftext{%
       \includegraphics[scale=1]{img/Verwaltung.png}%
     }%
-    \node[fill=black, opacity=.5, text opacity=1] at (-0.9,-0.1) [circle] {\bf \tiny \color{white} 1};
-    \node[fill=black, opacity=.5, text opacity=1] at (-0.9,-0.8) [circle] {\bf \tiny \color{white} 2};
-    \node[fill=black, opacity=.5, text opacity=1] at (-0.9,-1.5) [circle] {\bf \tiny \color{white} 3};
+    \node at (-0.9,-0.1) {\bf \tiny \color{white} 1};
+    \node at (-0.9,-0.8) {\bf \tiny \color{white} 2};
+    \node at (-0.9,-1.5) {\bf \tiny \color{white} 3};
     % \draw[fill] (0,0) circle [radius=0.1];
     % \draw[help lines] (-6,-6) grid (6,6);
   \end{tikzpicture}
@@ -141,16 +146,17 @@ Die Administration des Shops kann über das Verwaltungsmenü vorgenommen werden,
 
 \section{Produkte}
 \label{chp:Produkte}
-Die Verwaltung der zum Verkauf stehenden Produkte erfolgt über die Produkteverwaltung, die über das Verwaltungsmenü erreichbar ist. Eine Tabelle zeigt alle vorhandenen Produkte auf \figref{fig:Produktverwaltung}. Jede Tabellenzeile ist anklickbar, um direkt zur entsprechenden Produktbeschreibung zu gelangen, siehe dazu auch \chpref{chp:Produktbeschreibung}. Produkte können bearbeitet (2) oder gelöscht werden (3).
+Die Verwaltung der zum Verkauf stehenden Produkte erfolgt über die Produkteverwaltung, die über das Verwaltungsmenü erreichbar ist. Eine Tabelle zeigt alle vorhandenen Produkte auf \figref{fig:Produktverwaltung}. Jede Tabellenzeile ist anklickbar, um direkt zur entsprechenden Produktbeschreibung zu gelangen, siehe dazu auch \chpref{chp:Produktbeschreibung}. Produkte können bearbeitet \figannotation{2} oder gelöscht werden \figannotation{3}.
 
 \begin{figure}[h!]
   \begin{tikzpicture}
+  [every node/.style={fill=black, circle, inner sep = 3pt}]
     \pgftext{%
       \includegraphics[width=\textwidth]{img/Produkte.png}
     }
-    \node[fill=black, opacity=.5, text opacity=1] at (-4.7,0.9) [circle] {\bf \tiny \color{white} 1};
-    \node[fill=black, opacity=.5, text opacity=1] at (5.75,-0.05) [circle] {\bf \tiny \color{white} 2};
-    \node[fill=black, opacity=.5, text opacity=1] at (7.4,-0.05) [circle] {\bf \tiny \color{white} 3};
+    \node at (-4.7,0.9)   {\bf \tiny \color{white} 1};
+    \node at (5.75,-0.05) {\bf \tiny \color{white} 2};
+    \node at (7.4,-0.05)  {\bf \tiny \color{white} 3};
     % \draw[fill] (0,0) circle [radius=0.1];
     % \draw[help lines] (-6,-6) grid (6,6);
   \end{tikzpicture}
@@ -159,7 +165,7 @@ Die Verwaltung der zum Verkauf stehenden Produkte erfolgt über die Produkteverw
   \label{fig:Produktverwaltung}
 \end{figure}
 \text{}\vspace*{-1em}\\
-Über die Schaltfläche \textit{Neues Produkt hinzufügen} (1) gelangt man zur Produkteeingabemaske, über die neue Produkte in den Shop eingebracht werden können. Dafür müssen alle Felder entsprechend der gewünschten Produktspezifikationen ausgefüllt werden. Kategorien, Größen und Farben müssen in einer kommaseparierten Liste (CSV\nomenclature{CSV}{Comma-Separated Values}) eingegeben werden, Farben werden nur als Hex-Werte mit führendem Hash akzeptiert (\figref{fig:Produktformular})
+Über die Schaltfläche \textit{Neues Produkt hinzufügen} \figannotation{1} gelangt man zur Produkteeingabemaske, über die neue Produkte in den Shop eingebracht werden können. Dafür müssen alle Felder entsprechend der gewünschten Produktspezifikationen ausgefüllt werden. Kategorien, Größen und Farben müssen in einer kommaseparierten Liste (CSV\nomenclature{CSV}{Comma-Separated Values}) eingegeben werden, Farben werden nur als Hex-Werte mit führendem Hash akzeptiert \figref{fig:Produktformular}
 
 \begin{figure}[h!]
   \centering
@@ -168,28 +174,7 @@ Die Verwaltung der zum Verkauf stehenden Produkte erfolgt über die Produkteverw
   \label{fig:Produktformular}
 \end{figure}
 
-\section{Assoziationen}
-\label{chp:Assoziationen}
-Die Kategorien, denen Produkte angehören können, lassen sich mit der Hilfe von Assoziationen koppeln. Dadurch werden Artikel dieser Kategorien als zueinander zu\-ge\-hö\-rig definiert und so in der Produktbeschreibung \chpref{chp:Produktbeschreibung} dargestellt. Dies erleichtert es, zusammengehörige Produkte zu erkennen und zu kaufen. Diese Kategorieassoziationen lassen sich in der Assosiationsverwaltung definieren, die über das Verwaltungsmenü erreichbar ist. In dieser werden die vorhandenen Kopplungen in einer Tabelle dargestellt \figref{fig:Assoziationen}. Assoziationen lassen sich bearbeiten (\ref{fig:Assoziationen}.2) oder löschen (\ref{fig:Assoziationen}.3). \\
-
-\begin{figure}[h!]
-  \begin{tikzpicture}
-    \pgftext{%
-      \includegraphics[width=\textwidth]{img/Assoziationen.png}
-    }
-    \node[fill=black, opacity=.5, text opacity=1] at (-4.3,1.4) [circle] {\bf \tiny \color{white} 1};
-    \node[fill=black, opacity=.5, text opacity=1] at (5.2,0.4) [circle] {\bf \tiny \color{white} 2};
-    \node[fill=black, opacity=.5, text opacity=1] at (6.9,0.4) [circle] {\bf \tiny \color{white} 3};
-    % \draw[fill] (0,0) circle [radius=0.1];
-    % \draw[help lines] (-6,-6) grid (6,6);
-  \end{tikzpicture}
-  \centering
-  \caption{Assoziationen}
-  \label{fig:Assoziationen}
-\end{figure}
-\text{}\vspace*{-1em}\\
-Über die Schaltfläche \textit{Neue Kategorie-Assoziation}(\ref{fig:Assoziationen}.1) gelangt man zur Asso\-zia\-tionen\-ein\-ga\-be\-mas\-ke. Um darüber neue Assoziationen anzulegen, müssen die beiden Felder \textit{Von} und \textit{Zu} ausgefüllt werden. Im ersten Feld wird eine Kategorie eingetragen und im zweiten eine kommaseparierte Liste (CSV) aus beliebig vielen Kategorien, zu denen eine Kopplung von der Kategorie im ersten Feld aufgebaut werden soll. Kategorien sind nicht automatisch selbstreferenzierend. Soll eine Kategorie sich in einer Assoziation selbst referenzieren, so muss diese ebenfalls im zweiten Feld stehen.
-
+\newpage
 
 \section{Nutzer}
 \label{chp:Nutzer}
@@ -197,17 +182,18 @@ Die Administration der im Shopsystem registrierten Nutzer erfolgt über die Nutz
 
 Folgende Aktionen sind möglich:
 \begin{itemize}
-  \item Nutzerdetails aufrufen (\ref{fig:Nutzer}.2) \figref{fig:Nutzerdetails}
+  \item Nutzerdetails aufrufen \figannotation{2}\figref{fig:Nutzerdetails}
   \vspace*{-0.5em}
-  \item als entsprechender Nutzer einloggen (\ref{fig:Nutzer}.3)
+  \item als entsprechender Nutzer einloggen \figannotation{3}
   \vspace*{-0.5em}
-  \item vollständigen Kauf-Verlauf des Nutzers löschen (\ref{fig:Nutzer}.4)
+  \item vollständigen Kauf-Verlauf des Nutzers löschen \figannotation{4}
   \vspace*{-0.5em}
-  \item Nutzer löschen (\ref{fig:Nutzer}.5)
+  \item Nutzer löschen \figannotation{5}
 \end{itemize}
 
 \begin{figure}[h!]
   \begin{tikzpicture}
+  [every node/.style={fill=black, circle, inner sep = 3pt}]
     \pgftext{%
       \includegraphics[width=\textwidth]{img/Nutzer.png}
     }
@@ -224,16 +210,17 @@ Folgende Aktionen sind möglich:
   \label{fig:Nutzer}
 \end{figure}
 \text{}\vspace*{-1em}\\
-Die Nutzerdetails \figref{fig:Nutzerdetails} zeigen die Attribute des Nutzers und seine Kaufhistorie an. Über die Schaltfläche oberhalb der Attributwerte (1) können diese ge\-än\-dert werden. Die Bedeutungen der Spalten der Tabelle der gekauften Produkte entsprechen den gleichnamigen Spalten der Tabelle aus der Produkteverwaltung, siehe auch \chpref{chp:Produkte}. Durch einen Klick auf die \textit{Löschen}-Schaltfläche (2) in der Spalte \textit{Aktionen} wird das dazugehörige Produkt gelöscht. Die Produkttitel sind anklickbar und führen direkt zur dazugehörigen Produktbeschreibung, siehe \chpref{chp:Produktbeschreibung}.
+Die Nutzerdetails \figref{fig:Nutzerdetails} zeigen die Attribute des Nutzers und seine Kaufhistorie an. Über die Schaltfläche oberhalb der Attributwerte \figannotation{1} können diese ge\-än\-dert werden. Die Bedeutungen der Spalten der Tabelle der gekauften Produkte entsprechen den gleichnamigen Spalten der Tabelle aus der Produkteverwaltung, siehe auch \chpref{chp:Produkte}. Durch einen Klick auf die \textit{Löschen}-Schaltfläche \figannotation{2} in der Spalte \textit{Aktionen} wird das dazugehörige Produkt gelöscht. Die Produkttitel sind anklickbar und führen direkt zur dazugehörigen Produktbeschreibung, siehe \chpref{chp:Produktbeschreibung}.
 
-Über die Schaltfläche \textit{Neuen Nutzer}(1) hinzufügen gelangt man zur Nutzereingabemaske, über die neue Nutzer im System registriert werden können. Dafür müssen alle Felder ausgefüllt werden \figref{fig:Nutzerformular}.
+Über die Schaltfläche \textit{Neuen Nutzer} \figannotation{1} hinzufügen gelangt man zur Nutzereingabemaske, über die neue Nutzer im System registriert werden können. Dafür müssen alle Felder ausgefüllt werden \figref{fig:Nutzerformular}.
 \begin{figure}[h!]
   \begin{tikzpicture}
+  [every node/.style={fill=black, circle, inner sep = 3pt}]
     \pgftext{%
       \includegraphics[width=\textwidth]{img/Nutzerdetails.png}
     }
-    \node[fill=black, opacity=.5, text opacity=1] at (-6.8,1.7) [circle] {\bf \tiny \color{white} 1};
-    \node[fill=black, opacity=.5, text opacity=1] at (5.7,-2) [circle] {\bf \tiny \color{white} 2};
+    \node at (-6.8,1.7) {\bf \tiny \color{white} 1};
+    \node at (5.7,-2)   {\bf \tiny \color{white} 2};
     % \draw[fill] (0,0) circle [radius=0.1];
     % \draw[help lines] (-6,-6) grid (6,6);
   \end{tikzpicture}
@@ -249,49 +236,74 @@ Die Nutzerdetails \figref{fig:Nutzerdetails} zeigen die Attribute des Nutzers un
   \label{fig:Nutzerformular}
 \end{figure}
 
-\newpage
+\clearpage
 
-\section{Produktbeschreibung}
-\label{chp:Produktbeschreibung}
-Jedes Produkt besitzt eine eigene Seite \figref{fig:Produktbeschreibung}, durch die es präsentiert wird. Außerdem kann es über diese gekauft werden. Jede Produktbeschreibung besteht aus den folgenden Bestandteilen:
-\begin{itemize}
-  \item Titel (1)
-  \vspace*{-0.5em}
-  \item Bild des Produktes (2)
-  \vspace*{-0.5em}
-  \item Beschreibung des Produktes (3)
-  \vspace*{-0.5em}
-  \item durch das Tragen des Produktes gewährte Attributsboni  (4)
-  \vspace*{-0.5em}
-  \item Attributswerte, die ein Nutzer besitzen muss, um das Produkt tragen zu können (5)
-  \vspace*{-0.5em}
-  \item Ausrüstungsplatz, an dem das Produkt getragen wird (6)
-  \vspace*{-0.5em}
-  \item Drop-Down-Menü, um die gewünschte Größe auszuwählen (7)
-  \vspace*{-0.5em}
-  \item Radioboxen, um die gewünschte Farbe auszuwählen (8)
-  \vspace*{-0.5em}
-  \item Schaltfläche zum Kaufen des Produktes (9)
-  \vspace*{-0.5em}
-  \item mit dem aktuellen Produkt in Verbindung stehende andere Artikel (10)
-\end{itemize}
-Um ein Produkt zu erwerben, müssen erst Größe und Farbe ausgewählt werden, bevor die Kaufen-Schaltfläche bestätigt wird. Ansonsten erscheint eine Fehlermeldung. Durch Klicken auf die zugehörigen Produkte wird zu deren jeweiliger Produktbeschreibung gewechselt.
+
+\section{Assoziationen}
+\label{chp:Assoziationen}
+Die Kategorien, denen Produkte angehören können, lassen sich mit der Hilfe von Assoziationen koppeln. Dadurch werden Artikel dieser Kategorien als zueinander zu\-ge\-hö\-rig definiert und so in der Produktbeschreibung \chpref{chp:Produktbeschreibung} dargestellt. Dies erleichtert es, zusammengehörige Produkte zu erkennen und zu kaufen. Diese Kategorieassoziationen lassen sich in der Assosiationsverwaltung definieren, die über das Verwaltungsmenü erreichbar ist. In dieser werden die vorhandenen Kopplungen in einer Tabelle dargestellt \figref{fig:Assoziationen}. Assoziationen lassen sich bearbeiten \figannotation{2} oder löschen \figannotation{3}. \\
 
 \begin{figure}[h!]
   \begin{tikzpicture}
+  [every node/.style={fill=black, circle, inner sep = 3pt}]
+    \pgftext{%
+      \includegraphics[width=\textwidth]{img/Assoziationen.png}
+    }
+    \node at (-4.3,1.4) {\bf \tiny \color{white} 1};
+    \node at (5.2,0.4)  {\bf \tiny \color{white} 2};
+    \node at (6.9,0.4)  {\bf \tiny \color{white} 3};
+    % \draw[fill] (0,0) circle [radius=0.1];
+    % \draw[help lines] (-6,-6) grid (6,6);
+  \end{tikzpicture}
+  \centering
+  \caption{Assoziationen}
+  \label{fig:Assoziationen}
+\end{figure}
+\text{}\vspace*{-1em}\\
+Über die Schaltfläche \textit{Neue Kategorie-Assoziation} \figannotation{1} gelangt man zur Asso\-zia\-tionen\-ein\-ga\-be\-mas\-ke. Um neue Assoziationen anzulegen, müssen die beiden Felder \textit{Von} und \textit{Zu} ausgefüllt werden. Im ersten Feld wird eine Kategorie eingetragen und im zweiten eine kommaseparierte Liste (CSV) aus beliebig vielen Kategorien, zu denen eine Kopplung von der Kategorie im ersten Feld aufgebaut werden soll. Kategorien sind nicht automatisch selbstreferenzierend. Soll eine Kategorie sich in einer Assoziation selbst referenzieren, so muss diese ebenfalls im zweiten Feld eingetragen werden.
+
+\section{Produktbeschreibung}
+\label{chp:Produktbeschreibung}
+Jedes Produkt besitzt eine eigene Seite \figref{fig:Produktbeschreibung}, durch die es präsentiert wird und gekauft werden kann. Jede Produktbeschreibung besteht aus den folgenden Bestandteilen:
+\begin{itemize}
+  \item Titel \figannotation{1}
+  \vspace*{-0.5em}
+  \item Bild des Produktes \figannotation{2}
+  \vspace*{-0.5em}
+  \item Beschreibung des Produktes \figannotation{3}
+  \vspace*{-0.5em}
+  \item durch das Tragen des Produktes gewährte Attributsboni \figannotation{4}
+  \vspace*{-0.5em}
+  \item Attributswerte, die ein Nutzer besitzen muss, um das Produkt tragen zu können \figannotation{5}
+  \vspace*{-0.5em}
+  \item Ausrüstungsplatz, an dem das Produkt getragen wird \figannotation{6}
+  \vspace*{-0.5em}
+  \item Drop-Down-Menü, um die gewünschte Größe auszuwählen \figannotation{7}
+  \vspace*{-0.5em}
+  \item Radioboxen, um die gewünschte Farbe auszuwählen \figannotation{8}
+  \vspace*{-0.5em}
+  \item Schaltfläche zum Kaufen des Produktes \figannotation{9}
+  \vspace*{-0.5em}
+  \item mit dem aktuellen Produkt in Verbindung stehende andere Artikel \figannotation{10}
+\end{itemize}
+Um ein Produkt zu erwerben zu können, müssen Größe und Farbe ausgewählt worden sein, andernfalls bricht die Kaufaktion mit einem Fehler ab. Durch Klicken auf die zugehörigen Produkte wird zu deren jeweiliger Produktbeschreibung gewechselt.
+
+\begin{figure}[h!]
+  \begin{tikzpicture}
+  [every node/.style={fill=black, circle, inner sep = 3pt}]
     \pgftext{%
       \includegraphics[width=\textwidth]{img/Produktbeschreibung.png}
     }
-    \node[fill=black, opacity=.5, text opacity=1] at (-4,5) [circle] {\bf \tiny \color{white} 1};
-    \node[fill=black, opacity=.5, text opacity=1] at (-4.5,1.25) [circle] {\bf \tiny \color{white} 2};
-    \node[fill=black, opacity=.5, text opacity=1] at (-3,-2) [circle] {\bf \tiny \color{white} 3};
-    \node[fill=black, opacity=.5, text opacity=1] at (4,3.5) [circle] {\bf \tiny \color{white} 4};
-    \node[fill=black, opacity=.5, text opacity=1] at (4,1.5) [circle] {\bf \tiny \color{white} 5};
-    \node[fill=black, opacity=.5, text opacity=1] at (1,2.5) [circle] {\bf \tiny \color{white} 6};
-    \node[fill=black, opacity=.5, text opacity=1] at (4,0.2) [circle] {\bf \tiny \color{white} 7};
-    \node[fill=black, opacity=.5, text opacity=1] at (4,-0.8) [circle] {\bf \tiny \color{white} 8};
-    \node[fill=black, opacity=.5, text opacity=1] at (4,-1.8) [circle] {\bf \tiny \color{white} 9};
-    \node[fill=black, opacity=.5, text opacity=1] at (0,-4) [circle] {\bf \tiny \color{white} 10};
+    \node at (-4,5)       {\bf \tiny \color{white} 1};
+    \node at (-4.5,1.25)  {\bf \tiny \color{white} 2};
+    \node at (-3,-2)      {\bf \tiny \color{white} 3};
+    \node at (4,3.5)      {\bf \tiny \color{white} 4};
+    \node at (4,1.5)      {\bf \tiny \color{white} 5};
+    \node at (1,2.5)      {\bf \tiny \color{white} 6};
+    \node at (4,0.2)      {\bf \tiny \color{white} 7};
+    \node at (4,-0.8)     {\bf \tiny \color{white} 8};
+    \node at (4,-1.8)     {\bf \tiny \color{white} 9};
+    \node at (0,-4)       {\bf \tiny \color{white} 10};
     % \draw[fill] (0,0) circle [radius=0.1];
     % \draw[help lines] (-6,-6) grid (6,6);
   \end{tikzpicture}
@@ -303,5 +315,5 @@ Um ein Produkt zu erwerben, müssen erst Größe und Farbe ausgewählt werden, b
 
 \section{StateManager}
 \label{sec:StateManager}
-Zusammen mit der Shopsoftware wird das Programm StateMananger ausgeliefert. Mit seiner Hilfe können die Produkte und Assoziationen in der Shopdatenbank auch bei nicht laufendem Server selektiv betrachtet, als JSON importiert oder exportiert werden. Die exportierten Dateien finden sich im Ordner \textsf{exports} im \textsf{ecom}-Verzeichnis. \\
-Der StateManager lässt sich über die Kommandozeile aus dem ecom-Verzeichnis heraus bedienen. Der Befehl \textsf{runhaskell -isrc tools/StateManger.hs --help} liefert weitere Informationen zu seiner Benutzung. 
+Zusammen mit der Shopsoftware wird das Programm StateMananger ausgeliefert. Mit seiner Hilfe können die Produkte und Assoziationen in der Shopdatenbank auch bei nicht laufendem Server selektiv betrachtet, als JSON importiert oder exportiert werden. Die exportierten Dateien finden sich im Ordner \texttt{exports} im \texttt{ecom}-Verzeichnis. \\
+Der StateManager lässt sich über die Kommandozeile aus dem ecom-Verzeichnis heraus bedienen. Der Befehl \texttt{runhaskell -isrc tools/StateManger.hs --help} liefert weitere Informationen zu seiner Benutzung. 

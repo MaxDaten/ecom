@@ -42,6 +42,9 @@
 % eigene Grafiken
 \usepackage{tikz}
 
+% nice key fonts
+\usepackage{keystroke}
+
 % fancy transparent overlays
 \usepackage{transparent}
 
@@ -137,9 +140,12 @@
 \newcommand{\algref}[1]{(Algorithmus~\ref{#1},~S.~\pageref{#1})}
 \newcommand{\tblref}[1]{(\tablename~\ref{#1},~S.~\pageref{#1})}
 \newcommand{\chpref}[1]{(\chaptername~\ref{#1},~S.~\pageref{#1})}
-\newcommand{\secpref}[1]{(\ref{#1},~S.~\pageref{#1})}
+\newcommand{\secpref}[1]{(Abschnitt~\ref{#1},~S.~\pageref{#1})}
 \newcommand{\appref}[1]{(\appendixname~\ref{#1},~S.~\pageref{#1})}
 \newcommand{\coderef}[1]{(Code~\ref{#1},~S.~\pageref{#1})}
+
+% Kreise für Bild-Nummern-Verweise (annotations)
+\newcommand{\figannotation}[1]{\tikz{\node[fill=black, inner sep = 2pt][circle] {\tiny\color{white}{#1}};}}
 
 \usepackage{makeidx}
 
