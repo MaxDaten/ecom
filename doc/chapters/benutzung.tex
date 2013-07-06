@@ -54,7 +54,7 @@ Die Projektstruktur kann \tblref{tbl:Projektstruktur} entnommen werden.
 
 
 \section{Die Navigationsleiste}
-Auf jeder Seite ganz oben befindet sich die Navigationsleiste, über die mehrere Funktionen schnell erreicht werden können. Diese Leiste ist unabhängig von der aktuellen Shopseite immer sichtbar und seine Funktionalitäten stehen damit jederzeit zur Ver\-fü-gung. Sie beinhaltet von links nach rechts die folgenden Funktionen:
+Auf jeder Seite ganz oben befindet sich die Navigationsleiste, über die mehrere Funktionen schnell erreicht werden können \figref{fig:Navigationsleiste}. Diese Leiste ist unabhängig von der aktuellen Shopseite immer sichtbar und seine Funktionalitäten stehen damit jederzeit zur Ver\-fü\-gung. Sie beinhaltet von links nach rechts die folgenden Funktionen:
 \begin{itemize}
   \item Home (roter Kreis) \\
         ruft die Startseite mit dem vollständigen Produktkatalog auf
@@ -80,9 +80,9 @@ Wieder etwas darunter werden Nachrichten zur zuletzt vorgenommenen Aktion angeze
 
 
 \section{Produktkatalog}
-Zu Beginn des Shopbesuchs oder durch einen Klick auf eine der Schaltflächen Home oder Cat1 bis Cat2 in der Navigationsleiste gelangt man zum Produktkatalog, der alle vorhandenen Produkte darstellt. Ob und auf welche der Schaltflächen geklickt wurde, beeinflusst die Auswahl der angezeigten Produkte. \\
+Zu Beginn des Shopbesuchs oder durch einen Klick auf eine der Schaltflächen Home oder Cat1 bis Cat2 in der Navigationsleiste gelangt man zum Produktkatalog, der alle vorhandenen Produkte darstellt \figref{fig:Produktkatalog}. Ob und auf welche der Schaltflächen geklickt wurde, beeinflusst die Auswahl der angezeigten Produkte. \\
 Sollte gerade ein Nutzer angemeldet sein, so werden zusätzlich Empfehlungen prä\-sen\-tiert, die auf seinen gemachten Käufen basieren, sofern vorhanden. Über den Schieberegler darüber kann die Reichweite der Empfehlungen erweitert oder eingeschränkt werden. \\
-Durch das Anklicken eines Artikels gelangt man auf dessen Produktbeschreibung (siehe dort).
+Durch das Anklicken eines Artikels gelangt man auf dessen Produktbeschreibung, siehe auch \chpref{chp:Produktbeschreibung}.
 
 \begin{figure}[h!]
   \centering
@@ -93,16 +93,16 @@ Durch das Anklicken eines Artikels gelangt man auf dessen Produktbeschreibung (s
 
 
 \section{Verwaltung}
-Die Administration des Shops kann über das Verwaltungsmenü vorgenommen werden, das über die Navigationsleiste erreichbar ist. Es bietet von oben nach unten die folgenden Funktionen
+Die Administration des Shops kann über das Verwaltungsmenü vorgenommen werden, das über die Navigationsleiste erreichbar ist \figref{fig:Verwaltung}. Es bietet von oben nach unten die folgenden Funktionen:
 \begin{itemize}
   \item Produkte verwalten (roter Kreis) \\
-        ruft die Produkteverwaltung auf (siehe Abschnitt Produkte)
+        ruft die Produkteverwaltung auf, siehe \chpref{chp:Produkte}
   \vspace*{-0.5em}
   \item Assoziationen verwalten (grüner Kreis) \\
-        ruft die Assoziationsverwaltung auf (siehe Abschnitt Assoziationen)
+        ruft die Assoziationsverwaltung auf, siehe \chpref{chp:Assoziationen}
   \vspace*{-0.5em}
   \item Nutzer verwalten (blauer Kreis) \\
-        ruft die Nutzerverwaltung auf (siehe Abschnitt Nutzer)
+        ruft die Nutzerverwaltung auf, siehe \chpref{chp:Nutzer}
 \end{itemize}
 
 \begin{figure}[h!]
@@ -114,7 +114,8 @@ Die Administration des Shops kann über das Verwaltungsmenü vorgenommen werden,
 
 
 \section{Produkte}
-Die Verwaltung der zum Verkauf stehenden Produkte erfolgt über die Produkteverwaltung, die über das Verwaltungsmenü erreichbar ist.  Eine Tabelle listet alle vorhandenen Produkte auf. Die Tabellenzeilen haben von links nach rechts die folgenden Bedeutungen
+\label{chp:Produkte}
+Die Verwaltung der zum Verkauf stehenden Produkte erfolgt über die Produkteverwaltung, die über das Verwaltungsmenü erreichbar ist. Eine Tabelle zeigt alle vorhandenen Produkte auf \figref{fig:Produktverwaltung}. Die Spalten haben von links nach rechts die folgenden Bedeutungen:
 \begin{itemize}
   \item id \\
         eine eindeutige Identifikationsnummer (generiert nach UUID v4), über die jedes Produkt eindeutig identifiziert werden kann
@@ -134,7 +135,7 @@ Die Verwaltung der zum Verkauf stehenden Produkte erfolgt über die Produkteverw
   \item Description \\
         eine Beschreibung des Produktes
 \end{itemize}
-Jede Tabellenzeile ist anklickbar, um direkt zur entsprechenden Produktbeschreibung (siehe dort) zu gelangen.
+Jede Tabellenzeile ist anklickbar, um direkt zur entsprechenden Produktbeschreibung zu gelangen, siehe dazu auch \chpref{chp:Produktbeschreibung}.
 
 \begin{figure}[h!]
   \centering
@@ -143,7 +144,7 @@ Jede Tabellenzeile ist anklickbar, um direkt zur entsprechenden Produktbeschreib
   \label{fig:Produktverwaltung}
 \end{figure}
 \text{}\vspace*{-1em}\\
-Über die Schaltfläche Neues Produkt hinzufügen gelangt man zur Produkteeingabemaske, über die neue Produkte in den Shop eingebracht werden können. Dafür müssen alle Felder entsprechend der gewünschten Produktspezifikationen ausgefüllt werden. Von oben nach unten haben sie folgende Bedeutungen
+Über die Schaltfläche \textit{Neues Produkt hinzufügen} gelangt man zur Produkteeingabemaske, über die neue Produkte in den Shop eingebracht werden können. Dafür müssen alle Felder entsprechend der gewünschten Produktspezifikationen ausgefüllt werden. Von oben nach unten haben sie folgende Bedeutungen
 \begin{itemize}
   \item Titel \\
         Name des Produktes
@@ -152,13 +153,13 @@ Jede Tabellenzeile ist anklickbar, um direkt zur entsprechenden Produktbeschreib
         Drop-Down-Menü zur Auswahl  des Ausrüstungsplatzes, der von dem Produkt belegt wird
   \vspace*{-0.5em}
   \item Kategorien \\
-        kommaseparierte Liste der Kategorien, zu denen das Produkt gehören soll
+        kommaseparierte Liste (CSV\nomenclature{CSV}{Comma-Separated Values}) der Kategorien, denen das Produkt angehört
   \vspace*{-0.5em}
   \item Größen \\
-        kommaseparierte Liste der Größen, in denen das Produkt verfügbar sein soll
+        kommaseparierte Liste (CSV) der Größen, in denen das Produkt verfügbar sein soll
   \vspace*{-0.5em}
   \item Farben \\
-        kommaseparierte Liste der Farben, in denen das Produkt verfügbar sein soll; die Farben müssen in ihren Hexwerten mit führendem ‘\#’ angegeben werden (Bsp: ‘\#ff0000’ für Rot)
+        kommaseparierte Liste (CSV) der Farben, in denen das Produkt verfügbar sein soll; die Farben müssen in ihren Hexwerten mit führendem ‘\#’ angegeben werden (Bsp: ‘\#ff0000’ für Rot)
   \vspace*{-0.5em}
   \item Beschreibung \\
         eine Beschreibung des Produktes
@@ -168,7 +169,8 @@ Mit Betätigen der Schaltfläche Absenden wird das neue Produkt in den Shop übe
 
 
 \section{Assoziationen}
-Die Kategorien, denen Produkte angehören können, lassen sich mit der Hilfe von Assoziationen koppeln. Dadurch werden Artikel dieser Kategorien als zueinander zu\-ge\-hö\-rig definiert und so in den Produktbeschreibungen (siehe dort) dargestellt. Dies erleichtert es, zusammengehörige Produkte zu erkennen und zu kaufen. Diese Kategorieassoziationen lassen sich in der Assosiationsverwaltung definieren, die über das Verwaltungsmenü erreichbar ist. In dieser werden die vorhandenen Kopplungen in einer Tabelle dargestellt. Durch Klick auf die rote Schaltfläche am Ende einer Tabellenzeile lässt sich die jeweilige Assoziation löschen. \\
+\label{chp:Assoziationen}
+Die Kategorien, denen Produkte angehören können, lassen sich mit der Hilfe von Assoziationen koppeln. Dadurch werden Artikel dieser Kategorien als zueinander zu\-ge\-hö\-rig definiert und so in der Produktbeschreibung \chpref{chp:Produktbeschreibung} dargestellt. Dies erleichtert es, zusammengehörige Produkte zu erkennen und zu kaufen. Diese Kategorieassoziationen lassen sich in der Assosiationsverwaltung definieren, die über das Verwaltungsmenü erreichbar ist. In dieser werden die vorhandenen Kopplungen in einer Tabelle dargestellt \figref{fig:Assoziationen}. Durch Klick auf die rote Schaltfläche am Ende einer Tabellenzeile lässt sich die jeweilige Assoziation löschen. \\
 
 \begin{figure}[h!]
   \centering
@@ -177,22 +179,23 @@ Die Kategorien, denen Produkte angehören können, lassen sich mit der Hilfe von
   \label{fig:Assoziationen}
 \end{figure}
 \text{}\vspace*{-1em}\\
-Über die Schaltfläche Neue Kategorie-Assoziation gelangt man zur Asso\-zia\-tionen\-ein\-ga\-be\-mas\-ke. Um darüber neue Assoziationen anzulegen, müssen die beiden Felder Von und Zu ausgefüllt werden.  Im ersten Feld wird eine Kategorie eingetragen und im zweiten eine kommaseparierte Liste aus beliebig vielen Kategorien, zu denen eine Kopplung von der Kategorie im ersten Feld aufgebaut werden soll. Kategorien sind nicht automatisch selbstreferenzierend. Soll eine Kategorie sich selbst in einer Assoziation selbst referenzieren, so muss diese ebenfalls im zweiten Feld stehen. Mit Betätigen der Schaltfläche Absenden wird die neu definierte Kopplung übernommen, während ein Klick auf Zurück die Neueingabe abbricht. In beiden Fällen kehrt das Programm auf die Assoziationsverwaltung zurück.
+Über die Schaltfläche \textit{Neue Kategorie-Assoziation} gelangt man zur Asso\-zia\-tionen\-ein\-ga\-be\-mas\-ke. Um darüber neue Assoziationen anzulegen, müssen die beiden Felder \textit{Von} und \textit{Zu} ausgefüllt werden. Im ersten Feld wird eine Kategorie eingetragen und im zweiten eine kommaseparierte Liste (CSV) aus beliebig vielen Kategorien, zu denen eine Kopplung von der Kategorie im ersten Feld aufgebaut werden soll. Kategorien sind nicht automatisch selbstreferenzierend. Soll eine Kategorie sich selbst in einer Assoziation selbst referenzieren, so muss diese ebenfalls im zweiten Feld stehen. Mit Betätigen der Schaltfläche \textit{Absenden} wird die neu definierte Kopplung übernommen, während ein Klick auf \textit{Zurück} die Neueingabe abbricht. In beiden Fällen kehrt das Programm auf die Assoziationsverwaltung zurück.
 
 
 \section{Nutzer}
-Die Administration der im Shopsystem registrierten Nutzer erfolgt über die Nutzerverwaltung, die über das Verwaltungsmenü erreichbar ist. Eine Tabelle listet alle im System vorhandenen Nutzer auf. Die Tabellenzeilen haben von links nach rechts die folgenden Bedeutungen
+\label{chp:Nutzer}
+Die Administration der im Shopsystem registrierten Nutzer erfolgt über die Nutzerverwaltung, die über das Verwaltungsmenü erreichbar ist. Eine Tabelle listet alle im System vorhandenen Nutzer auf \figref{fig:Nutzer}. Die Tabellenzeilen haben von links nach rechts die folgenden Bedeutungen:
 \begin{itemize}
   \item Nutzername \\
-        der Name des Nutzers; ist anklickbar, um direkt zu den  Nutzerdetails (siehe unten) zu gelangen
+        der Name des Nutzers; ist anklickbar, um direkt zu seinen Details zu gelangen
   \vspace*{-0.5em}
   \item Gekaufte Produkte \\
-        die Anzahl der von diesem Nutzer gekauften Produkte; ist anklickbar, um direkt zu den Nutzerdetails (siehe unten) zu gelangen
+        die Anzahl der von diesem Nutzer gekauften Produkte; ist anklickbar, um direkt zu den Nutzerdetails zu gelangen
   \vspace*{-0.5em}
   \item Aktionen \\
-        drei Schaltflächen, mit denen der Nutzer konfiguriert werden kann (siehe unten)
+        drei Schaltflächen, mit denen der Nutzer konfiguriert werden kann
 \end{itemize}
-Die drei Schaltflächen haben von links nach rechts die folgenden Funktionen
+Die drei Schaltflächen haben von links nach rechts die folgenden Funktionen:
 \begin{itemize}
   \item als entsprechender Nutzer einloggen; ein eventuell bereits eingeloggter anderer Nutzer wird dadurch ausgeloggt (roter Kreis)
   \vspace*{-0.5em}
@@ -208,7 +211,7 @@ Die drei Schaltflächen haben von links nach rechts die folgenden Funktionen
   \label{fig:Nutzer}
 \end{figure}
 \text{}\vspace*{-1em}\\
-Die Nutzerdetails zeigen die Attribute des Nutzers und Kaufhistorie an. Über die Schaltfläche oberhalb der Attributwerte können diese geändert werden. Die Bedeutungen der Spalten der Tabelle der gekauften Produkte entsprechen den gleichnamigen Spalten der Tabelle aus der Produkteverwaltung (siehe Abschnitt Produkte). Durch einen Klick auf die Löschen-Schaltfläche in der Spalte Actions wird das dazugehörige Produkt gelöscht.  Die Produkttitel sind anklickbar und führen direkt zur dazugehörigen Produktbeschreibung (siehe dort).
+Die Nutzerdetails \figref{fig:Nutzerdetails} zeigen die Attribute des Nutzers und seine Kaufhistorie an. Über die Schaltfläche oberhalb der Attributwerte können diese ge\-än\-dert werden. Die Bedeutungen der Spalten der Tabelle der gekauften Produkte entsprechen den gleichnamigen Spalten der Tabelle aus der Produkteverwaltung, siehe auch \chpref{chp:Produkte}. Durch einen Klick auf die \textit{Löschen}-Schaltfläche in der Spalte \textit{Actions} wird das dazugehörige Produkt gelöscht. Die Produkttitel sind anklickbar und führen direkt zur dazugehörigen Produktbeschreibung, siehe \chpref{chp:Produktbeschreibung}.
 
 \begin{figure}[h!]
   \centering
@@ -217,7 +220,7 @@ Die Nutzerdetails zeigen die Attribute des Nutzers und Kaufhistorie an. Über di
   \label{fig:Nutzerdetails}
 \end{figure}
 \text{}\vspace*{-1em}\\
-Über die Schaltfläche Neuen Nutzer hinzufügen gelangt man zur Nutzereingabemaske, über die neue Nutzer im System registriert werden können. Dafür müssen alle Felder ausgefüllt werden. Sie haben folgende Bedeutungen
+Über die Schaltfläche \textit{Neuen Nutzer} hinzufügen gelangt man zur Nutzereingabemaske, über die neue Nutzer im System registriert werden können. Dafür müssen alle Felder ausgefüllt werden. Sie haben folgende Bedeutungen:
 \begin{itemize}
   \item Name \\
         Name des Nutzers
@@ -225,11 +228,12 @@ Die Nutzerdetails zeigen die Attribute des Nutzers und Kaufhistorie an. Über di
   \item Stärke, Intelligenz, Geschicklichkeit, Ausdauer \\
         die Höhe des jeweiligen Attributwertes des Nutzers
 \end{itemize}
-Mit Betätigen der Schaltfläche Absenden wird der neue Nutzer in das System übernommen, während ein Klick auf Zurück die Neueingabe abbricht. In beiden Fällen kehrt das Programm auf die Nutzerverwaltung zurück.
+Mit Betätigen der Schaltfläche \textit{Absenden} wird der neue Nutzer in das System über\-nommen, während ein Klick auf \textit{Zurück} die Neueingabe abbricht. In beiden Fällen kehrt das Programm auf die Nutzerverwaltung zurück.
 
 
-\section{Produktbeschreibungen}
-Jedes Produkt besitzt eine eigene Seite, durch die es präsentiert wird. Außerdem kann es über diese gekauft werden. Jede Produktbeschreibung besteht aus den folgenden Bestandteilen
+\section{Produktbeschreibung}
+\label{chp:Produktbeschreibung}
+Jedes Produkt besitzt eine eigene Seite \figref{fig:Produktbeschreibung}, durch die es präsentiert wird. Außerdem kann es über diese gekauft werden. Jede Produktbeschreibung besteht aus den folgenden Bestandteilen:
 \begin{itemize}
   \item Titel (roter Kreis)
   \vspace*{-0.5em}
@@ -249,7 +253,7 @@ Jedes Produkt besitzt eine eigene Seite, durch die es präsentiert wird. Außerd
   \vspace*{-0.5em}
   \item Schaltfläche zum Kaufen des Produktes (grauer Kreis)
   \vspace*{-0.5em}
-  \item mit dem aktuellen Produkt in Verbindung stehende andere Artikel (dunkelblauer Kreis)
+  \item mit dem aktuellen Produkt in Verbindung stehende andere Artikel (dunkel\-blau\-er Kreis)
 \end{itemize}
 Um ein Produkt zu erwerben, müssen erst Größe und Farbe ausgewählt werden, bevor die Kaufen-Schaltfläche bestätigt wird. Ansonsten erscheint eine Fehlermeldung. Durch Klicken auf die zugehörigen Produkte wird zu deren jeweiliger Produktbeschreibung gewechselt.
 

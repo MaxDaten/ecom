@@ -2,11 +2,11 @@
 Produktempfehlungen können einem Benutzer auf Grundlage verschiedener Informationen gemacht werden. feature-basierte Emfpehlungen werden anhand der Ähnlichkeit von Produkten gemacht, association-basierte Empfehlungen anhand von als zusammengehörig definierten Produktkategorien.
 
 \section{Feature-based}
-Feature-basierte Produktempfehlungen werden auf der Grundlage dessen aus\-ge\-spro\-chen, was ein Benutzer bisher gekauft hat, was sich also in seiner \textsf{history} (Code \ref{User}, Z.2) befindet. Dabei wird berücksichtigt, dass einem Benutzer nur die Produkte empfohlen werden, die er auch tragen kann. \\
+Feature-basierte Produktempfehlungen werden auf der Grundlage dessen aus\-ge\-spro\-chen, was ein Benutzer bisher gekauft hat, was sich also in seiner \textsf{history} \coderef{code:User} befindet. Dabei wird berücksichtigt, dass einem Benutzer nur die Produkte empfohlen werden, die er auch tragen kann. \\
 \\
-Ein Benutzer kann ein Produkt tragen, wenn es in einer Größe verfügbar ist, in der er bereits ein anderes Produkt gekauft hat und wenn er die Anforderungen des Produktes erfüllt. Die ist der Fall, wenn die Anforderungen des Produktes bezüglich Stärke, Intelligenz, Geschicklichkeit und Ausdauer alle kleiner sind als die Attribute des Benutzers bezogen auf das jeweilige Merkmal. Sei \textsf{u} ein Benutzer und \textsf{ps} der Katalog an verfügbaren Produkten, dann können die Produkte, die von \textsf{u} getragen werden können, wie in Code \ref{wearable} gezeigt, bestimmt werden.
+Ein Benutzer kann ein Produkt tragen, wenn es in einer Größe verfügbar ist, in der er bereits ein anderes Produkt gekauft hat und wenn er die Anforderungen des Produktes erfüllt. Die ist der Fall, wenn die Anforderungen des Produktes bezüglich Stärke, Intelligenz, Geschicklichkeit und Ausdauer alle kleiner sind als die Attribute des Benutzers bezogen auf das jeweilige Merkmal. Sei \textsf{u} ein Benutzer und \textsf{ps} der Katalog an verfügbaren Produkten, dann können die Produkte, die von \textsf{u} getragen werden können, wie in \coderef{code:wearable} gezeigt, bestimmt werden.
 
-\begin{lstlisting}[label=wearable,caption={Algorithmus zur Bestimmung von Produkten, die ein Benutzer tragen kann}]
+\begin{lstlisting}[label=code:wearable,caption={Algorithmus zur Bestimmung von Produkten, die ein Benutzer tragen kann}]
 wearable :: User -> [Product] -> [Product]
 wearable u ps = attrOk u . sizeOk u $ ps
   where
@@ -19,7 +19,7 @@ wearable u ps = attrOk u . sizeOk u $ ps
 \textsf{sizeOk} wählt aus einer Menge von Produkten diejenigen aus, die in einer Größe verfügbar sind, die zu einem gegebenen Benutzer passen.\\
 \textsf{attrOk} schränkt die verfügbaren Produkte auf diejenigen ein, die der Benutzer aufgrund seiner und der Produktattribute tragen kann.
 \\
-Der in Code \ref{wearable} beschriebene Algorithmus weicht von der tatsächlichen Implementierung ab, da im produktiven Einsatz aufgrund des Kontext monadisch gearbeitet werden muss. Das hier gezeigte Verfahren ist unabhängig davon korrekt und dient der Verdeutlichung der Idee für feature-basierte Produktempfehlungen\\
+Der in \coderef{code:wearable} beschriebene Algorithmus weicht von der tatsächlichen Implementierung ab, da im produktiven Einsatz aufgrund des Kontext monadisch gearbeitet werden muss. Das hier gezeigte Verfahren ist unabhängig davon korrekt und dient der Verdeutlichung der Idee für feature-basierte Produktempfehlungen\\
 \\
 Sind die von einem Benutzer tragbaren Produkte ausgewählt, so wird zwischen diesen und den vom Benutzer bereits gekauften Produkten paarweise die Ähnlichkeit berechnet, um Empfehlungen zu generieren. Im folgenden wird zunächst be\-schrie\-ben, wie die Ähnlichkeit zwischen zwei Produkten bestimmt werden kann.\\
 \\
@@ -27,9 +27,9 @@ Um die Ähnlichkeit zwischen zwei Produkten zu bestimmen, findet zunächst eine 
 \begin{equation}
   \left|\left| x \right|\right| = \sqrt{\sum_{i=1}^n x_i^2}.
 \end{equation}
-Der Algorithmus zur Berechnung der Ähnlichkeit von Produkten ist in Code \ref{dist} aufgezeigt.
+Der Algorithmus zur Berechnung der Ähnlichkeit von Produkten ist in \coderef{code:dist} aufgezeigt.
 
-\begin{lstlisting}[label=dist,caption={Algorithmus zur Berechnung der Ähnlichkeit von Produkten}]
+\begin{lstlisting}[label=code:dist,caption={Algorithmus zur Berechnung der Ähnlichkeit von Produkten}]
 attribs :: [Attributes -> Double]
 attribs = map (fromIntegral .)
               [unStr . str, unInt . int, unDex . dex, unSta . sta]
@@ -49,9 +49,9 @@ Da die Ähnlichkeit von Produkten definiert ist als die Norm der Differenz ihrer
 \end{equation}
 mit Produkten $p_1, p_2$ und der Menge aller Produkte $P$. Dabei sei $\delta$ identisch zum in Code \ref{dist} beschriebenen Infix-Operator \enquote{\textsf{-?}}.\\
 \\
-Die durch \textsf{-?} gegebene Ähnlichkeit zwischen Produkten wird verwendet, um die Produktempfehlungen für einen Benutzer zu sortieren. Set \textsf{bought} die Menge der Produkte, die ein Benutzer bereits gekauft hat und \textsf{ps} die Menge der Produkte, die ebendieser Benutzer tragen kann. Die Berechnung der Produktempfehlungen, aufsteigend sortiert nach der Ähnlichkeit zu einem bereits gekauften Produkt, ist in Code \ref{fb-suggestions} aufgezeigt.
+Die durch \textsf{-?} gegebene Ähnlichkeit zwischen Produkten wird verwendet, um die Produktempfehlungen für einen Benutzer zu sortieren. Set \textsf{bought} die Menge der Produkte, die ein Benutzer bereits gekauft hat und \textsf{ps} die Menge der Produkte, die ebendieser Benutzer tragen kann. Die Berechnung der Produktempfehlungen, aufsteigend sortiert nach der Ähnlichkeit zu einem bereits gekauften Produkt, ist in \coderef{code:fb-suggestions} aufgezeigt.
 
-\begin{lstlisting}[label=fb-suggestions,caption={Algorithmus zur Generierung feature-basierter Produktempfehlungen}]
+\begin{lstlisting}[label=code:fb-suggestions,caption={Algorithmus zur Generierung feature-basierter Produktempfehlungen}]
 similarProducts :: [Product] -> [Product] -> [Product]
 similarProducts bought ps = 
     let notBought = filter removeBought ps
@@ -63,9 +63,9 @@ similarProducts bought ps =
 
 
 \section{Association-based}
-Association-basierte Empfehlungen werden auf der Grundlage fest verknüpter Kategorien ausgesprochen, welche durch die in Code \ref{Association} beschriebene Datenstruktur realisiert werden. Somit wird jedem Produkt eine Menge assoziierter Produkte zugeordnet. Sei \textsf{p} ein Produkt, \textsf{ps} die Menge aller verfügbaren Produkte und \textsf{as} die Menger der definierten Assoziationen. Der in Code \ref{ab-suggestions} gezeignte Algorithmus dient der Berechnung assoziations-basierter Produktempfehlungen.
+Association-basierte Empfehlungen werden auf der Grundlage fest verknüpter Kategorien ausgesprochen, welche durch die in \coderef{code:Association} beschriebene Datenstruktur realisiert werden. Somit wird jedem Produkt eine Menge assoziierter Produkte zugeordnet. Sei \textsf{p} ein Produkt, \textsf{ps} die Menge aller verfügbaren Produkte und \textsf{as} die Menger der definierten Assoziationen. Der in \coderef{code:ab-suggestions} gezeigte Algorithmus dient der Berechnung assoziations-basierter Produktempfehlungen.
 
-\begin{lstlisting}[label=ab-suggestions,caption={Algorithmus zur Generierung association-basierter Produktempfehlungen}]
+\begin{lstlisting}[label=code:ab-suggestions,caption={Algorithmus zur Generierung association-basierter Produktempfehlungen}]
 associationBased :: Product -> [Product] -> [Association] -> [Product]
 associationBased p ps as =
   let cats = foldr union empty . map assocedCategories . asc $ as
@@ -73,4 +73,4 @@ associationBased p ps as =
   where
     asc = filter (\a -> assocCategory a `member` productCategories p)
 \end{lstlisting}
-Der in Code \ref{ab-suggestions} gezeigte Algorithmus weicht erneut von der tatsächlichen Implementierung ab, da diese monadisch arbeiten muss. Das Verfahren ist unabhängig davon korrekt und illustriert das prinzipielle Vorgehen.
+Der in \coderef{code:ab-suggestions} beschriebene Algorithmus weicht erneut von der tatsächlichen Implementierung ab, da diese monadisch arbeiten muss. Das Verfahren ist unabhängig davon korrekt und illustriert das prinzipielle Vorgehen.
