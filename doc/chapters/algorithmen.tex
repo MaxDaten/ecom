@@ -47,9 +47,9 @@ Da die Ähnlichkeit von Produkten definiert ist als die Norm der Differenz ihrer
 \begin{equation}
   \bigwedge_{p_1, p_2 \in P} \delta\left(p_1, p_2\right) = \delta\left(p_2, p_1\right)
 \end{equation}
-mit Produkten $p_1, p_2$ und der Menge aller Produkte $P$. Dabei sei $\delta$ identisch zum in Code \ref{dist} beschriebenen Infix-Operator \enquote{\textsf{-?}}.\\
+mit Produkten $p_1, p_2$ und der Menge aller Produkte $P$. Dabei sei $\delta$ identisch zum in Code \ref{code:dist} beschriebenen Infix-Operator \enquote{\textsf{-?}}.\\
 \\
-Die durch \textsf{-?} gegebene Ähnlichkeit zwischen Produkten wird verwendet, um die Produktempfehlungen für einen Benutzer zu sortieren. Set \textsf{bought} die Menge der Produkte, die ein Benutzer bereits gekauft hat und \textsf{ps} die Menge der Produkte, die ebendieser Benutzer tragen kann. Die Berechnung der Produktempfehlungen, aufsteigend sortiert nach der Ähnlichkeit zu einem bereits gekauften Produkt, ist in \coderef{code:fb-suggestions} aufgezeigt.
+Die durch \textsf{-?} gegebene Ähnlichkeit zwischen Produkten wird verwendet, um die Produktempfehlungen für einen Benutzer zu sortieren. Sei \textsf{Set bought} die Menge der Produkte, die ein Benutzer bereits gekauft hat und \textsf{ps} die Menge der Produkte, die ebendieser Benutzer tragen kann. Die Berechnung der Produktempfehlungen, aufsteigend sortiert nach der Ähnlichkeit zu einem bereits gekauften Produkt, ist in \coderef{code:fb-suggestions} aufgezeigt.
 
 \begin{lstlisting}[label=code:fb-suggestions,caption={Algorithmus zur Generierung feature-basierter Produktempfehlungen}]
 similarProducts :: [Product] -> [Product] -> [Product]
